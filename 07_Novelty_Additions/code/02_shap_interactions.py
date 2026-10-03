@@ -1,136 +1,150 @@
 """
-Addition 2: test the toxic-essential metal antagonism hypothesis (selenium
-protecting against cadmium/lead toxicity) using SHAP interaction values
-from the fitted CatBoost model, computed on the full held-out test
-partition (n=2,229) for consistency with Figures 3-5 of the manuscript.
+Addition 2: metal-metal interactions, including the toxic-essential
+antagonism hypothesis (selenium offsetting cadmium or lead).
+
+2026-10 audit (A5). The earlier version reported Spearman p-values computed
+from correlations between SHAP interaction values and metal levels, on all
+test rows. Two problems: (1) SHAP values are deterministic outputs of one
+fitted model, so those p-values ignore model uncertainty and are not valid
+population inference; (2) selenium and manganese were not measured in
+2007-2010, so for about 40% of rows their values were a single imputed
+median, which manufactured strong-looking correlations. This version:
+  * keeps the SHAP interaction summary as a DESCRIPTION of the fitted model,
+    computed only on test rows where both metals were actually measured, and
+    with no p-values;
+  * tests each metal-metal interaction formally with an explicit logistic
+    regression on the whole analytic cohort (observed values only, metals on
+    the log scale, full adjustment set), likelihood-ratio test for the
+    product term, Benjamini-Hochberg false-discovery-rate control across the
+    10 pairs.
+The heatmap and the table use the same scale (the full pairwise interaction,
+i.e. both symmetric halves of the SHAP interaction matrix).
+
+Run (after the main pipeline): python 07_Novelty_Additions/code/02_shap_interactions.py
 """
+import sys
+from itertools import combinations
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
+
 import numpy as np
 import pandas as pd
-import joblib
-import shap
+import patsy
+import statsmodels.api as sm
+from scipy import stats
+from scipy.stats import spearmanr
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 import pubstyle as ps
 
 ps.apply_style()
-
-METALS = {
-    "LBXBPB": "Blood lead",
-    "LBXBCD": "Blood cadmium",
-    "LBXTHG": "Blood mercury",
-    "LBXBSE": "Blood selenium",
-    "LBXBMN": "Blood manganese",
-}
+TABLES, FIGURES = ac.out_dirs("07_Novelty_Additions")
+METALS = ac.METAL_NAMES
 
 
-def _fmt_p(p: float) -> str:
-    if p < 0.001:
-        return f"{p:.1e}"
-    return f"{p:.3f}"
+def interaction_lrt(df, m1, m2):
+    """Likelihood-ratio test of log(m1) x log(m2) in an adjusted logistic model."""
+    sub = df[[m1, m2, "mets_status"] + ac.ADJUST_COLUMNS].dropna().copy()
+    sub = sub[(sub[m1] > 0) & (sub[m2] > 0)]
+    sub["a"], sub["b"] = np.log(sub[m1]), np.log(sub[m2])
+    f0 = f"mets_status ~ a + b + {ac.ADJUST_FORMULA}"
+    y, X0 = patsy.dmatrices(f0, sub, return_type="dataframe")
+    _, X1 = patsy.dmatrices(f0 + " + a:b", sub, return_type="dataframe")
+    m0 = sm.GLM(y, X0, family=sm.families.Binomial()).fit()
+    mfull = sm.GLM(y, X1, family=sm.families.Binomial()).fit()
+    lr = 2 * (mfull.llf - m0.llf)
+    return len(sub), float(mfull.params["a:b"]), float(stats.chi2.sf(lr, 1))
 
 
 def main():
-    state = joblib.load("shared_state.joblib")
-    cb_model = state["cb_model"]
-    Xt_test_df = state["Xt_test_df"]
-    test_df = state["test_df"].reset_index(drop=True)
+    st = ac.primary_state()
+    Xt = st["Xt_test_df"]
+    raw = st["test_df"]
+    iv = st["explainer"].shap_interaction_values(Xt)
+    iv = np.asarray(iv[1] if isinstance(iv, list) else iv)
+    names = list(Xt.columns)
+    idx = {m: names.index(m) for m in METALS}
+    cohort = ac.analysis_frame()
 
-    explainer = shap.TreeExplainer(cb_model)
-    interaction_values = explainer.shap_interaction_values(Xt_test_df)
-    print("Interaction tensor shape:", interaction_values.shape)
+    rows = []
+    metal_cols = list(METALS)
+    sub = np.zeros((5, 5))
+    for i, j in combinations(range(5), 2):
+        m1, m2 = metal_cols[i], metal_cols[j]
+        observed = raw[m1].notna().values & raw[m2].notna().values
+        pair = iv[observed, idx[m1], idx[m2]] * 2  # full pairwise interaction
+        sub[i, j] = sub[j, i] = np.mean(np.abs(pair))
+        n_lrt, beta, p = interaction_lrt(cohort, m1, m2)
+        rows.append({"Metal 1": METALS[m1], "Metal 2": METALS[m2],
+                     "Test rows with both measured": int(observed.sum()),
+                     "Mean |SHAP interaction| (descriptive)": round(float(sub[i, j]), 5),
+                     "Regression n": n_lrt, "Interaction beta (log x log)": round(beta, 4),
+                     "LRT p": p})
+    table = pd.DataFrame(rows)
+    table["FDR-adjusted p"] = ac.bh_fdr(table["LRT p"])
+    table["LRT p"] = table["LRT p"].map(ac.fmt_p)
+    table["FDR-adjusted p"] = table["FDR-adjusted p"].map(ac.fmt_p)
+    table = table.sort_values("Mean |SHAP interaction| (descriptive)", ascending=False)
+    table.to_csv(TABLES / "table_metal_interaction_ranking.csv", index=False)
+    print(table.to_string(index=False))
 
-    feat_names = list(Xt_test_df.columns)
-    idx = {name: feat_names.index(name) for name in METALS}
-
-    # Mean |interaction| across all test rows, off-diagonal only, for every metal pair
-    mean_abs_interaction = np.mean(np.abs(interaction_values), axis=0)  # (46, 46)
-    metal_cols = list(METALS.keys())
-    metal_idx = [idx[m] for m in metal_cols]
-    submatrix = mean_abs_interaction[np.ix_(metal_idx, metal_idx)]
-    pair_rows = []
-    for i, m1 in enumerate(metal_cols):
-        for j, m2 in enumerate(metal_cols):
-            if j <= i:
-                continue
-            pair_rows.append({
-                "Metal 1": METALS[m1], "Metal 2": METALS[m2],
-                "Mean |SHAP interaction|": round(submatrix[i, j] * 2, 5),  # SHAP splits interaction across the pair symmetrically; report the combined (Lundberg convention: value at [i,j] and [j,i] are equal, each already half the joint contribution)
-            })
-    pair_table = pd.DataFrame(pair_rows).sort_values("Mean |SHAP interaction|", ascending=False)
-    pair_table.to_csv("table_metal_interaction_ranking.csv", index=False)
-    print(pair_table.to_string(index=False))
-
-    # Heatmap of the 5x5 metal-metal interaction matrix (cividis: perceptually
-    # uniform and colourblind-safe, consistent with the sequential-map choice
-    # used elsewhere in this figure set)
     fig, ax = plt.subplots(figsize=(ps.W_SINGLE * 1.5, ps.W_SINGLE * 1.4))
     labels = [METALS[m] for m in metal_cols]
-    disp = submatrix.copy()
+    disp = sub.copy()
     np.fill_diagonal(disp, np.nan)
     im = ax.imshow(disp, cmap="cividis")
-    ax.set_xticks(range(len(labels))); ax.set_xticklabels(labels, rotation=40, ha="right")
-    ax.set_yticks(range(len(labels))); ax.set_yticklabels(labels)
-    for i in range(len(labels)):
-        for j in range(len(labels)):
+    ax.set_xticks(range(5)); ax.set_xticklabels(labels, rotation=40, ha="right")
+    ax.set_yticks(range(5)); ax.set_yticklabels(labels)
+    for i in range(5):
+        for j in range(5):
             if i != j:
-                # Contrast text color from the ACTUAL rendered RGBA (perceived
-                # luminance), not a guessed value threshold -- cividis is not
-                # linear in lightness against the raw data value once vmin/vmax
-                # auto-scale, so a value-based heuristic mis-colors several cells.
                 rgba = im.cmap(im.norm(disp[i, j]))
-                luminance = 0.299 * rgba[0] + 0.587 * rgba[1] + 0.114 * rgba[2]
-                txt_color = "white" if luminance < 0.55 else "black"
-                ax.text(j, i, f"{submatrix[i,j]:.4f}", ha="center", va="center",
-                         fontsize=7.5, color=txt_color)
+                lum = 0.299 * rgba[0] + 0.587 * rgba[1] + 0.114 * rgba[2]
+                ax.text(j, i, f"{disp[i, j]:.4f}", ha="center", va="center", fontsize=7.5,
+                        color="white" if lum < 0.55 else "black")
     cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
-    cbar.set_label("Mean |SHAP interaction|", fontsize=8.5)
+    cbar.set_label("Mean |SHAP interaction| (rows with both metals measured)", fontsize=7.8)
     cbar.ax.tick_params(labelsize=7.5)
     ax.spines[:].set_visible(False)
     ax.tick_params(length=0)
     fig.tight_layout()
-    ps.save(fig, "fig_metal_interaction_heatmap")
-    print("Saved fig_metal_interaction_heatmap.png/.pdf")
+    ps.save(fig, FIGURES / "fig_metal_interaction_heatmap")
 
-    # Dependence-style plots: selenium's SHAP contribution colored by cadmium, and by lead
-    se_shap_main = interaction_values[:, idx["LBXBSE"], idx["LBXBSE"]]  # Se's own main effect
-    se_val = Xt_test_df["LBXBSE"].values
-    cd_val = Xt_test_df["LBXBCD"].values
-    pb_val = Xt_test_df["LBXBPB"].values
-
-    from scipy.stats import spearmanr
-
+    # selenium x cadmium and selenium x lead, observed selenium only
+    se_obs = raw["LBXBSE"].notna().values
     fig2, axes = plt.subplots(1, 2, figsize=(ps.W_DOUBLE * 0.95, ps.W_DOUBLE * 0.42))
-    panel_letters = ["A", "B"]
-    summary_rows = []
-    for ax, other_val, other_name, letter in zip(axes, [cd_val, pb_val], ["cadmium", "lead"], panel_letters):
-        # interaction component specifically: Se x other metal
-        other_key = "LBXBCD" if other_name == "cadmium" else "LBXBPB"
-        se_other_interaction = interaction_values[:, idx["LBXBSE"], idx[other_key]] * 2
-        rho, p = spearmanr(other_val, se_other_interaction)
-        sc = ax.scatter(se_val, se_other_interaction, c=other_val, cmap=ps.shap_cmap(),
-                          s=10, alpha=0.75, linewidths=0, rasterized=True)
+    summary = []
+    for ax, other, label, letter in zip(axes, ["LBXBCD", "LBXBPB"], ["cadmium", "lead"], "AB"):
+        inter = iv[se_obs, idx["LBXBSE"], idx[other]] * 2
+        se_raw = raw.loc[se_obs, "LBXBSE"].values
+        other_raw = raw.loc[se_obs, other].values
+        rho = spearmanr(other_raw, inter)[0]
+        sc = ax.scatter(se_raw, inter, c=np.log(other_raw), cmap=ps.shap_cmap(), s=10, alpha=0.75,
+                        linewidths=0, rasterized=True)
         ax.axhline(0, color="#999999", lw=0.8, zorder=1)
-        ax.set_xlabel("Selenium (standardized, imputed)")
-        ax.set_ylabel(f"SHAP interaction: selenium × {other_name}", labelpad=4)
-        ax.text(0.04, 0.96, f"ρ = {rho:.3f}, P = {_fmt_p(p)}", transform=ax.transAxes,
-                 fontsize=7.5, va="top", ha="left", color="#333333")
+        ax.set_xlabel("Blood selenium (µg/L)")
+        ax.set_ylabel(f"SHAP interaction: selenium × {label}", labelpad=4)
+        ax.text(0.04, 0.96, f"descriptive ρ = {rho:.3f}\n(n = {se_obs.sum():,} with selenium measured)",
+                transform=ax.transAxes, fontsize=7.2, va="top", ha="left", color="#333333")
         cbar = fig2.colorbar(sc, ax=ax, fraction=0.046, pad=0.03)
-        cbar.set_label(f"{other_name.capitalize()} (standardized)", fontsize=8)
+        cbar.set_label(f"log {label}", fontsize=8)
         cbar.ax.tick_params(labelsize=7)
         ps.panel_label(ax, letter, dx=-0.24, dy=1.12)
-        summary_rows.append({
-            "Pair": f"Selenium × {other_name}",
-            "Mean |SHAP interaction|": round(float(np.mean(np.abs(se_other_interaction))), 5),
-            "Spearman rho": round(rho, 4),
-            "P value": _fmt_p(p),
-        })
+        reg = table[(table["Metal 1"].isin([METALS["LBXBSE"], METALS[other]]))
+                    & (table["Metal 2"].isin([METALS["LBXBSE"], METALS[other]]))].iloc[0]
+        summary.append({"Pair": f"Selenium × {label}", "Test rows with selenium measured": int(se_obs.sum()),
+                        "Mean |SHAP interaction| (descriptive)": round(float(np.mean(np.abs(inter))), 5),
+                        "Spearman rho, SHAP interaction vs. metal (descriptive)": round(float(rho), 4),
+                        "Regression interaction beta": reg["Interaction beta (log x log)"],
+                        "Regression LRT p": reg["LRT p"], "FDR-adjusted p": reg["FDR-adjusted p"]})
     fig2.subplots_adjust(left=0.09, right=0.97, top=0.96, bottom=0.15, wspace=0.65)
-    ps.save(fig2, "fig_selenium_interaction_dependence")
-    print("Saved fig_selenium_interaction_dependence.png/.pdf")
-
-    pd.DataFrame(summary_rows).to_csv("table_selenium_antagonism_test.csv", index=False)
-    print(pd.DataFrame(summary_rows).to_string(index=False))
+    ps.save(fig2, FIGURES / "fig_selenium_interaction_dependence")
+    pd.DataFrame(summary).to_csv(TABLES / "table_selenium_antagonism_test.csv", index=False)
+    print(pd.DataFrame(summary).to_string(index=False))
 
 
 if __name__ == "__main__":
