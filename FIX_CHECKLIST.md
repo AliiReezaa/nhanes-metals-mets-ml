@@ -82,5 +82,6 @@ Decisions confirmed with the study owner on 2026-10-03:
 | R1 | Full re-run from the raw NHANES files with all fixes; regenerate tables, figures, manuscript and supplement | [x] 8c07187 (full run from the raw files, 28 steps, all passed) |
 | R2 | Verification scripts (18, 20, 27, 28) all pass | [x] 8c07187 (18: 0 unexplained numbers; 20, 24, 25, 27 pass; 28: 13 checks, 0 flagged) |
 | R3 | Independent review of the final package | [x] ed66807 (independent reviewer: 1 high, 6 medium, 10 low findings; all addressed) |
-| R4 | Update the beginner's manual to the final version | [ ] |
-| R5 | Copy the final package back to the study folder | [ ] |
+| R4 | Update the beginner's manual to the final version (all 30 chapters and appendices; figures and tables re-rendered from the final run) | [x] |
+| R5 | Copy the final package back to the study folder (old SUBMISSION moved to backups/, fresh copy extracted, full git history saved as a bundle) | [x] |
+| R6 | Push the history to GitHub (AliiReezaa/nhanes-metals-mets-ml) | [ ] waiting for the empty repo to be created; this session cannot create repositories |
