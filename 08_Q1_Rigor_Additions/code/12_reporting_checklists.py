@@ -20,8 +20,17 @@ into one Introduction/Discussion -- lives outside this folder). Items that
 belong to those missing sections are marked "Not addressed at this draft
 stage" rather than scored as failures, since they are out of scope for what
 exists here, not overlooked.
+
+Run: python 08_Q1_Rigor_Additions/code/12_reporting_checklists.py
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
 import pandas as pd
+
+TABLES, _ = ac.out_dirs("08_Q1_Rigor_Additions")
 
 rows = [
     # (item, section, requirement, status, evidence, note)
@@ -63,7 +72,7 @@ rows = [
     ("12b", "Methods: Analysis", "Predictor handling (scaling/transformation)", "Satisfied", "Methods Sec. 7", "--"),
     ("12c", "Methods: Analysis", "Model type, rationale, tuning, internal validation", "Satisfied", "Methods Sec. 7", "11 models, randomized search, 10-fold stratified CV, all justified"),
     ("12d", "Methods: Analysis", "Heterogeneity across clusters", "Not addressed at this draft stage", "--",
-     "NHANES cycles are a natural clustering structure not analyzed as such in the original pipeline -- 07_Q1_Rigor_Additions/code/06_temporal_validation.py now partially fills this gap"),
+     "NHANES cycles are a natural clustering structure not analyzed as such in the original pipeline -- 08_Q1_Rigor_Additions/code/06_temporal_validation.py now partially fills this gap"),
     ("12e", "Methods: Analysis", "Performance measures and plots, rationale", "Satisfied", "Methods Sec. 8", "AUROC, AUPRC, Brier, calibration slope/O:E, DCA -- all justified with citations"),
     ("12f", "Methods: Analysis", "Model updating/recalibration", "Not applicable", "--", "Development-only study; no updating was performed or claimed"),
     ("12g", "Methods: Analysis", "How predictions are calculated for evaluation (formula/code/API)", "Partial",
@@ -92,7 +101,7 @@ rows = [
     ("20b", "Results: Participants", "Characteristics overall and by data source", "Satisfied", "Results Sec. 1, Table 1",
      "Survey-weighted, with design-based standard errors"),
     ("20c", "Results: Participants", "Comparison of development vs. evaluation predictor distributions", "Partial",
-     "07_Q1_Rigor_Additions/table_temporal_validation.csv now reports this across the temporal train/test split", "Not present for the original random split, since there is no separate external evaluation dataset"),
+     "08_Q1_Rigor_Additions/tables/table_temporal_validation.csv now reports this across the temporal train/test split", "Not present for the original random split, since there is no separate external evaluation dataset"),
     ("21", "Results: Model development", "N participants/events at each analysis stage", "Satisfied",
      "Results Sec. 1 (8,915/2,229), Methods Sec. 6 (4,130 events)", "--"),
     ("22", "Results: Model specification", "Full model detail for reuse/third-party evaluation", "Partial",
@@ -116,7 +125,7 @@ rows = [
 ]
 
 df = pd.DataFrame(rows, columns=["Item", "Section", "TRIPOD+AI requirement (summarized)", "Status", "Evidence / location", "Note"])
-df.to_csv("table_tripod_ai_checklist.csv", index=False)
+df.to_csv(TABLES / "table_tripod_ai_checklist.csv", index=False)
 
 status_counts = df["Status"].value_counts()
 print(f"TRIPOD+AI checklist -- status tally across {len(df)} (sub-)items:")
@@ -151,13 +160,13 @@ probast_rows = [
      "cross-validation and a held-out test partition are all low-risk practices. The residual concern, "
      "explicitly self-flagged in Methods Sec. 10, is that this is internal validation on a SINGLE random "
      "split under ONE fixed seed, with no external or temporal validation -- split-to-split variability is "
-     "not captured by within-partition bootstrapping. 07_Q1_Rigor_Additions/code/06_temporal_validation.py "
+     "not captured by within-partition bootstrapping. 08_Q1_Rigor_Additions/code/06_temporal_validation.py "
      "now provides a genuine forward-in-time check (AUROC 0.857 to 0.840 from random-split to temporal-"
      "holdout, well-calibrated in both), which moves this domain from what would otherwise be a clean "
      "'some concerns' toward the low end of it -- but a single temporal split is still not the same as "
      "true external validation on an independent cohort."),
 ]
 probast_df = pd.DataFrame(probast_rows, columns=["PROBAST-AI domain", "Risk of bias", "Rationale"])
-probast_df.to_csv("table_probast_ai_risk_of_bias.csv", index=False)
+probast_df.to_csv(TABLES / "table_probast_ai_risk_of_bias.csv", index=False)
 print("\nPROBAST-AI domain-level summary:")
 print(probast_df[["PROBAST-AI domain", "Risk of bias"]].to_string(index=False))

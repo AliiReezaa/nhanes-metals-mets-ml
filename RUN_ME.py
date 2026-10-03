@@ -75,9 +75,9 @@ CORE_STEPS = [
     ("Docs    write Results .docx",                 "17_write_results_docx.py",     {},                              False, {"full", "packaged", "quick"}),
     ("Docs    write Supplement .docx",              "21_write_supplement.py",       {},                              False, {"full", "packaged", "quick"}),
 ]
-NOVELTY = ["00_setup_and_fit.py", "01_dose_response.py", "02_shap_interactions.py",
-           "03_component_level.py", "04_effect_modification.py", "05_mixture_score.py"]
-RIGOR = ["00_setup_and_fit.py", "06_temporal_validation.py", "07_pr_curve.py", "08_shap_waterfall.py",
+NOVELTY = ["01_dose_response.py", "02_shap_interactions.py",
+           "03_component_level.py", "04_effect_modification.py"]
+RIGOR = ["06_temporal_validation.py", "07_pr_curve.py", "08_shap_waterfall.py",
          "09_shap_stability.py", "10_correlation_heatmap.py", "11_wqs_mixture.py", "12_reporting_checklists.py"]
 
 
@@ -178,31 +178,18 @@ def run_script(path: Path, args, cwd: Path, env) -> bool:
         return p.wait() == 0
 
 
-def run_additions(folder: str, scripts, env) -> None:
-    """The 07/08 scripts read 'SUBMISSION/05_Data_Processed/...' relative to the
-    folder they run in and write their figures and tables there, so each runs in
-    a scratch folder under outputs/ that mirrors that layout."""
-    work = OUT / folder
-    sub = work / "SUBMISSION"
-    (sub / "05_Data_Processed").mkdir(parents=True, exist_ok=True)
-    for f in ["model_ready.csv", "train_seqn.csv", "test_seqn.csv"]:
-        shutil.copy2(ROOT / "data_processed" / f, sub / "05_Data_Processed" / f)
-    shutil.copytree(CODE, sub / "06_Code", dirs_exist_ok=True)
-    src = ROOT / folder / "code"
-    for f in src.glob("*.py"):
-        shutil.copy2(f, work / f.name)
+def run_additions(folder: str, scripts, env, quick_args=None) -> None:
+    """The 07/08 scripts find the project from their own location and write to
+    outputs/<folder>/ (2026-10 audit, C22), so they run in place."""
     for s in scripts:
-        if not (work / s).exists():
+        path = ROOT / folder / "code" / s
+        if not path.exists():
             log(f"  [skip] {folder}/code/{s} not found")
-            if s == "00_setup_and_fit.py":
-                return
             continue
         t0 = time.time()
-        ok = run_script(work / s, [], work, env)
+        args = (quick_args or {}).get(s, [])
+        ok = run_script(path, args, ROOT, env)
         log(f"  {'done ' if ok else 'FAILED'} {folder}/{s}  ({time.time() - t0:.0f} s)")
-        if not ok and s == "00_setup_and_fit.py":
-            log("  setup failed, skipping the rest of this folder")
-            return
 
 
 def main() -> None:

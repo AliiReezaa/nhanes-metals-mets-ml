@@ -6,31 +6,35 @@ the whole test set. A waterfall plot for one true positive and one true
 negative makes the interpretability story concrete: for THIS person, here is
 exactly which features pushed the prediction up or down from the model's
 average, and by how much.
+
+Run (after the main pipeline): python 08_Q1_Rigor_Additions/code/08_shap_waterfall.py
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
 import numpy as np
 import pandas as pd
-import joblib
 import shap
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pubstyle as ps
-import sys
-
-sys.path.insert(0, "SUBMISSION/06_Code")
 import feature_labels as fl
 
 ps.apply_style()
+TABLES, FIGURES = ac.out_dirs("08_Q1_Rigor_Additions")
 
 
 def main():
-    state = joblib.load("shared_state.joblib")
-    cb_model = state["cb_model"]
+    state = ac.primary_state()
+    cb_model = state["estimator"]
     Xt_test_df = state["Xt_test_df"]
     y_test = state["y_test"].reset_index(drop=True)
     X_test_raw = state["X_test_raw"].reset_index(drop=True)
 
-    explainer = shap.TreeExplainer(cb_model)
+    explainer = state["explainer"]
     proba = cb_model.predict_proba(Xt_test_df)[:, 1]
 
     # Most-confident correctly classified true positive and true negative
@@ -46,8 +50,10 @@ def main():
     summary_rows = []
     for idx, label, fname in [(tp_idx, "true positive", "fig_shap_waterfall_true_positive"),
                                 (tn_idx, "true negative", "fig_shap_waterfall_true_negative")]:
-        sv_row = explainer.shap_values(Xt_test_df.iloc[[idx]])[0]
+        sv_row = state["shap_values"][idx]
         base_value = explainer.expected_value
+        if np.ndim(base_value) > 0:
+            base_value = np.ravel(base_value)[-1]
         row_data = Xt_test_df.iloc[idx].values
 
         expl = shap.Explanation(
@@ -64,7 +70,7 @@ def main():
             ax.tick_params(labelsize=7.5)
             ax.xaxis.label.set_fontsize(8.5)
         fig.tight_layout()
-        ps.save(fig, fname)
+        ps.save(fig, FIGURES / fname)
         plt.close(fig)
         print(f"Saved {fname}.png/.pdf")
 
@@ -77,7 +83,7 @@ def main():
             "Top feature |SHAP| value (log-odds)": round(float(np.max(np.abs(sv_row))), 4),
         })
 
-    pd.DataFrame(summary_rows).to_csv("table_shap_waterfall_examples.csv", index=False)
+    pd.DataFrame(summary_rows).to_csv(TABLES / "table_shap_waterfall_examples.csv", index=False)
     print(pd.DataFrame(summary_rows).to_string(index=False))
 
 

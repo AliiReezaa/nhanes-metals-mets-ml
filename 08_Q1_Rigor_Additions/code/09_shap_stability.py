@@ -1,8 +1,8 @@
 """
 Q1 rigor addition 5: bootstrap stability of feature importance. Every SHAP
 importance ranking reported so far (Figure 3/4, permutation_importance.csv,
-shap_importance.csv) is a single point estimate on the n=2,229 held-out test
-set, with no uncertainty attached -- so there is no way to tell whether the
+shap_importance.csv) is a single point estimate on the held-out test set,
+with no uncertainty attached -- so there is no way to tell whether the
 5th-ranked feature is meaningfully different from the 8th-ranked one, or
 whether that's noise from this particular test partition. This resamples the
 test set with replacement (does not refit the model -- the already-computed
@@ -12,20 +12,24 @@ computed on a fixed model), recomputes mean |SHAP| per feature each time,
 and reports both a 95% CI per feature and how often each feature lands in
 the top 10 across resamples (a ranking-stability measure that a single point
 estimate cannot show).
+
+Run (after the main pipeline): python 08_Q1_Rigor_Additions/code/09_shap_stability.py
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
 import numpy as np
 import pandas as pd
-import joblib
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import pubstyle as ps
-import sys
-
-sys.path.insert(0, "SUBMISSION/06_Code")
 import feature_labels as fl
 
 ps.apply_style()
+TABLES, FIGURES = ac.out_dirs("08_Q1_Rigor_Additions")
 
 RNG = np.random.default_rng(42)
 N_BOOT = 2000
@@ -34,7 +38,7 @@ TOP_N_STABILITY = 10
 
 
 def main():
-    state = joblib.load("shared_state.joblib")
+    state = ac.primary_state()
     shap_values = state["shap_values"]  # (n_test, n_features)
     feat_names = list(state["Xt_test_df"].columns)
     n, p = shap_values.shape
@@ -66,7 +70,7 @@ def main():
         "95% CI high": ci_high[order].round(5),
         "Top-10 inclusion rate across bootstraps (%)": top10_pct[order].round(1),
     })
-    table.to_csv("table_shap_importance_stability.csv", index=False)
+    table.to_csv(TABLES / "table_shap_importance_stability.csv", index=False)
     print(table.head(TOP_N_DISPLAY).to_string(index=False))
 
     # Plot: top-N features, mean |SHAP| with 95% bootstrap CI
@@ -87,7 +91,7 @@ def main():
                  va="center", fontsize=6.8, color="#555555")
     ax.set_xlim(0, ci_high[top_idx].max() * 1.28)
     fig.tight_layout()
-    ps.save(fig, "fig_shap_importance_stability")
+    ps.save(fig, FIGURES / "fig_shap_importance_stability")
     print("Saved fig_shap_importance_stability.png/.pdf")
 
 
