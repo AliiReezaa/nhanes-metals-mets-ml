@@ -19,16 +19,15 @@ every other script reads and writes -- there is no hand-typed number left
 anywhere in this file. It also regenerates study_workflow_AI_to_MR.html/.png
 unchanged in content (it never encoded a since-fixed number) purely for
 reproducibility, so every diagram in diagrams/ now has a script behind it.
-figure2_mr_study_design.png documents the (unchanged, unaffected-by-this-
-rebuild) planned Mendelian Randomization study design and is intentionally
-left untouched -- no MR code exists in this project yet for it to drift out
-of sync with.
+2026-10 audit (P2): figure2_mr_study_design.png (proposal Figure 2) is now
+drawn here too; the hand-made version still named a removed claim.
 
 Output: diagrams/figure1_data_cleaning_pipeline.png
         diagrams/ai_pipeline_steps_detailed.html
         diagrams/ai_pipeline_steps_detailed.png
         diagrams/study_workflow_AI_to_MR.html
         diagrams/study_workflow_AI_to_MR.png
+        diagrams/figure2_mr_study_design.png
 
 Run (after the full pipeline, 01 through 13, has been run at least once --
 every number below is read from their outputs, not computed here):
@@ -422,6 +421,84 @@ def build_study_workflow_diagram(n: dict):
     render_html_to_png(html_path, png_path)
 
 
+# ============================================================
+# Figure 2 of the proposal: MR study design (2026-10 audit, P2/P5/P6)
+# ============================================================
+MR_EXPOSURE_TIERS = {
+    "Primary": "lead, selenium, body mass index",
+    "Secondary": "cadmium",
+    "Exploratory": "manganese, mercury\n(suggestive loci), alcohol,\nphysical activity",
+}
+
+
+def build_figure2_mr():
+    """Proposal Figure 2, drawn from code. The earlier image was hand-made and
+    still named a '13-SNP lead instrument' after that unverifiable claim had
+    been removed from the text, and it showed the old exposure tiers."""
+    W, H = 12.0, 10.2
+    fig, ax = plt.subplots(figsize=(W, H))
+    ax.set_xlim(0, W); ax.set_ylim(0, H); ax.axis("off")
+
+    def box(x, y, w, h, title, body, edge, face):
+        ax.add_patch(mpatches.FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.02,rounding_size=0.08",
+                                             linewidth=2.2, edgecolor=edge, facecolor=face))
+        ax.text(x + w / 2, y + h - 0.42, title, ha="center", va="top", fontsize=15,
+                fontweight="bold", color=edge)
+        ax.text(x + w / 2, y + h - 1.05, body, ha="center", va="top", fontsize=10.8,
+                linespacing=1.55, color="#222222")
+
+    ax.text(W / 2, H - 0.25, "Figure 2. Mendelian randomization study design", ha="center", va="top",
+            fontsize=18, fontweight="bold", color="#1F3864")
+    ax.text(W / 2, H - 0.85, "Genetic variants as instrumental variables for blood-metal and metabolic "
+            "exposures, outcomes = metabolic syndrome components", ha="center", va="top", fontsize=11.5,
+            style="italic", color="#444444")
+
+    zx, zy, zw, zh = 0.5, 5.6, 4.6, 2.9
+    ux, uy, uw, uh = 6.9, 5.6, 4.6, 2.9
+    xx, xy, xw, xh = 0.5, 1.3, 4.6, 3.1
+    yx, yy, yw, yh = 6.9, 1.3, 4.6, 3.1
+    box(zx, zy, zw, zh, "Z: genetic instruments",
+        "SNPs per exposure (Table 1):\nmulti-element and toxic-metal GWAS\n(Pb, Cd, Mn), selenium GWAS (Se),\n"
+        "GIANT (BMI), GSCAN (alcohol),\naccelerometer GWAS (activity)", "#1F3864", "#E8EEF8")
+    box(ux, uy, uw, uh, "U: confounders",
+        "Age, sex, ancestry and population\nstratification, socioeconomic\nposition, smoking, diet",
+        "#5B3A7E", "#F1EAF7")
+    tiers = "\n".join(f"{k}: {v}" for k, v in MR_EXPOSURE_TIERS.items())
+    box(xx, xy, xw, xh, "X: exposures", tiers, "#1B6B4A", "#E6F3EC")
+    box(yx, yy, yw, yh, "Y: outcomes",
+        "Metabolic syndrome components,\nanalysed separately: waist\ncircumference, blood pressure,\n"
+        "HDL-C, triglycerides, fasting glucose\n(GIANT / ICBP / GLGC / MAGIC)", "#9A6A1E", "#FBF2E2")
+
+    arrow = dict(arrowstyle="-|>", lw=3.2, color="#1F3864", mutation_scale=26)
+    ax.annotate("", xy=(zx + zw / 2, xy + xh + 0.08), xytext=(zx + zw / 2, zy - 0.08), arrowprops=arrow)
+    ax.text(zx + zw / 2 - 0.15, (zy + xy + xh) / 2, "1  Relevance\n(F > 10)", ha="right", va="center",
+            fontsize=12, fontweight="bold", color="#1F3864")
+    ax.annotate("", xy=(yx - 0.1, xy + xh / 2), xytext=(xx + xw + 0.1, xy + xh / 2),
+                arrowprops=dict(arrowstyle="-|>", lw=3.2, color="#1B6B4A", mutation_scale=26))
+    ax.text((xx + xw + yx) / 2, xy + xh / 2 + 0.3, "causal\neffect (β)", ha="center", va="bottom",
+            fontsize=12, fontweight="bold", color="#1B6B4A")
+    conf = dict(arrowstyle="-|>", lw=2, color="#555555", ls=(0, (4, 3)), mutation_scale=18)
+    ax.annotate("", xy=(xx + xw - 0.3, xy + xh + 0.05), xytext=(ux + 0.2, uy - 0.05), arrowprops=conf)
+    ax.annotate("", xy=(yx + yw / 2, yy + yh + 0.05), xytext=(ux + uw / 2, uy - 0.05), arrowprops=conf)
+    red = "#A33A2E"
+    ax.plot([zx + zw + 0.1, ux - 0.1], [zy + zh / 2, zy + zh / 2], color=red, lw=2.6, ls=(0, (5, 4)))
+    ax.text((zx + zw + ux) / 2, zy + zh / 2 + 0.25, "2  Independence\n(no Z–U path)", ha="center",
+            va="bottom", fontsize=11.5, fontweight="bold", style="italic", color=red)
+    ax.plot([zx + zw - 0.4, yx + 0.6], [zy - 0.1, yy + yh + 0.1], color=red, lw=2.6, ls=(0, (5, 4)))
+    ax.text(7.95, 5.05, "3  Exclusion\nrestriction", ha="center", va="center",
+            fontsize=11, fontweight="bold", style="italic", color=red)
+    ax.plot([0.7, 1.5], [0.55, 0.55], color="#1F3864", lw=3)
+    ax.text(1.65, 0.55, "path used by MR", va="center", fontsize=10.5, color="#333333")
+    ax.plot([4.3, 5.1], [0.55, 0.55], color=red, lw=2.6, ls=(0, (5, 4)))
+    ax.text(5.25, 0.55, "path that must be absent", va="center", fontsize=10.5, color="#333333")
+    ax.plot([8.4, 9.2], [0.55, 0.55], color="#555555", lw=2, ls=(0, (4, 3)))
+    ax.text(9.35, 0.55, "confounding (bypassed)", va="center", fontsize=10.5, color="#333333")
+    out = DIAGRAMS_DIR / "figure2_mr_study_design.png"
+    fig.savefig(out, dpi=200, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    print(f"  saved: {out}")
+
+
 def main():
     print("Loading pipeline numbers from outputs/metrics/*.csv...")
     n = load_pipeline_numbers()
@@ -436,10 +513,11 @@ def main():
     print("\n[2/3] AI pipeline steps (13-step timeline)...")
     build_ai_pipeline_diagram(n)
 
-    print("\n[3/3] Study workflow (AI phase -> MR phase)...")
+    print("\n[3/4] Study workflow (AI phase -> MR phase)...")
     build_study_workflow_diagram(n)
 
-    print(f"\nDone. figure2_mr_study_design.png is intentionally left untouched (see module docstring).")
+    print("\n[4/4] Figure 2: MR study design...")
+    build_figure2_mr()
 
 
 if __name__ == "__main__":
