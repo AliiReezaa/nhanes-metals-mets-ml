@@ -13,8 +13,11 @@ from either section without collision:
   Table S5  predictor importance, SHAP and permutation (Results 3)
   Table S6  subgroup discrimination and calibration (Results 5)
   Table S7  sensitivity analyses (Results 5)
+  Table S8  incremental value of the metals and simple baselines (Results 5)
+  Table S9  repeated cross-validation, all models (Results 2)
+  Table S10 temporal validation (Results 5)
   Figure S1 analysis pipeline (Methods 6)
-  Figure S2 AUROC forest and paired-bootstrap differences (Results 2)
+  Figure S2 AUROC forest and paired differences (Results 2)
   Figure S3 calibration curves (Results 2)
   Figure S4 decision-curve analysis (Results 2)
   Figure S5 subgroup discrimination (Results 5)
@@ -46,6 +49,9 @@ s_diq = pd.read_csv(MET / "sensitivity_diq010.csv")
 s_met = pd.read_csv(MET / "sensitivity_metals_scope.csv")
 s_smo = pd.read_csv(MET / "sensitivity_smote_vs_classweight.csv")
 s_out = pd.read_csv(MET / "sensitivity_outcome_definition.csv")
+inc = pd.read_csv(MET / "incremental_value.csv")
+rcv = pd.read_csv(MET / "repeated_cv.csv")
+temporal = pd.DataFrame(N.get("temporal_validation", []))
 
 n_pred = N["n_predictors"]
 TOP = N["top_model"]
@@ -92,13 +98,14 @@ PREDICTORS = [
     ]),
     ("Lifestyle", [
         ("SMQ020", "Smoked at least 100 cigarettes in life", "Binary (yes = 1)", "1"),
-        ("SMQ040", "Current cigarette smoking frequency",
-         "Ordinal, recoded 0 = not at all, 1 = some days, 2 = every day", "1"),
-        ("ALQ101 / ALQ111", "Alcohol gatekeeper item, harmonized across cycles: \"had at least 12 "
-                            "alcoholic drinks in any one year\" (2007–2016) and \"ever had a drink "
-                            "of any kind of alcohol\" (2017–2018)", "Binary (ever = 1)", "1"),
-        ("ALQ130", "Average number of alcoholic drinks per day on drinking days, past 12 months",
-         "Continuous, drinks/day", "1"),
+        ("SMQ040", "Current cigarette smoking frequency (never-smokers, who skip the item, coded "
+                   "not at all)", "Ordinal, recoded 0 = not at all, 1 = some days, 2 = every day", "1"),
+        ("ALQ120Q / ALQ121", "Any alcohol in the past 12 months, from the past-year drinking frequency "
+                             "(ALQ120Q in 2007–2016, ALQ121 in 2017–2018); those who never had 12 drinks "
+                             "in their life or never had a drink skip it and are coded no",
+         "Binary (yes = 1)", "1"),
+        ("ALQ130", "Average number of alcoholic drinks on drinking days, past 12 months (0 for "
+                   "past-year non-drinkers)", "Continuous, drinks/day", "1"),
         ("DBQ700", "Self-rated overall diet quality", "Ordinal 1–5 (excellent → poor)", "1"),
         ("PAQ605", "Vigorous-intensity activity as part of work", "Binary (yes = 1)", "1"),
         ("PAQ650", "Vigorous-intensity recreational activity", "Binary (yes = 1)", "1"),
@@ -117,8 +124,9 @@ METS_CRITERIA = [
      "BPQ100D (currently taking prescribed medicine for cholesterol)"],
     ["Reduced HDL cholesterol", "HDL-C < 40 mg/dL (men) or < 50 mg/dL (women)", "LBDHDD",
      "BPQ100D (currently taking prescribed medicine for cholesterol)"],
-    ["Elevated blood pressure", "Systolic ≥ 130 mmHg or diastolic ≥ 85 mmHg",
-     "BPXSY1, BPXDI1", "BPQ050A (currently taking prescribed medicine for hypertension)"],
+    ["Elevated blood pressure", "Mean systolic ≥ 130 mmHg or mean diastolic ≥ 85 mmHg",
+     "BPXSY1–4, BPXDI1–4 (mean of valid readings)",
+     "BPQ050A (currently taking prescribed medicine for hypertension)"],
     ["Elevated fasting glucose", "Fasting plasma glucose ≥ 100 mg/dL", "LBXGLU",
      "DIQ050 (currently taking insulin); DIQ070 (taking pills to lower blood sugar)"],
 ]
@@ -178,8 +186,8 @@ def main():
     ds.caption(doc, "Table S2.",
                "Metabolic syndrome component definitions. A component is scored positive when "
                "either the measured criterion or the drug-treatment criterion is met, following the "
-               f"harmonized joint interim statement {cite('alberti')} and the earlier AHA/NHLBI "
-               f"thresholds {cite('grundy')}. Participants meeting at least three of five "
+               f"harmonized joint interim statement {cite('alberti')}, which retains the AHA/NHLBI "
+               f"thresholds and treatment clauses {cite('grundy')}. Participants meeting at least three of five "
                "components were classified as cases.", above=True)
     ds.add_table(doc, ["Component", "Measured criterion", "NHANES variable",
                        "Drug-treatment criterion"],
@@ -187,10 +195,14 @@ def main():
                  align_right_from=99, font_size=ds.Pt(8))
     ds.table_note(doc,
                   "HDL-C, high-density lipoprotein cholesterol. NHANES carries only one "
-                  "cholesterol-medication item in the cycles used here and does not distinguish "
-                  "HDL-specific from triglyceride-specific treatment, so BPQ100D is applied to both "
-                  "lipid components. Component measurements and medication items were used solely "
-                  "to construct the outcome and were excluded from the predictor set.")
+                  "cholesterol-medication item and does not name the drug, whereas the guideline's "
+                  "lipid treatment clause refers to drugs such as fibrates and nicotinic acid; "
+                  "BPQ100D is applied to both lipid components as a stated modelling choice, and a "
+                  "sensitivity analysis without it is given in Table S7. Blood pressure is the mean "
+                  "of all valid readings (a diastolic reading of 0 mmHg is treated as invalid); a "
+                  "first-reading-only version is also tested in Table S7. Component measurements and "
+                  "medication items were used solely to construct the outcome and were excluded from "
+                  "the predictor set.")
 
     # ================= Table S3 =================
     rows3 = []
@@ -203,9 +215,9 @@ def main():
         rows3.append([t["model"], GRIDS.get(t["model"], "—"), sel, f"{t['cv_auc']:.4f}"])
     ds.caption(doc, "Table S3.",
                "Hyperparameter search space, selected configuration and cross-validated "
-               "discrimination for each algorithm. Configurations were chosen by randomized search "
-               "(capped at 12 configurations; smaller grids searched exhaustively) with 10-fold "
-               "stratified cross-validation on the training partition, optimizing AUROC. *These "
+               "discrimination for each algorithm. Every grid holds at most 12 configurations and was "
+               "searched exhaustively, with 10-fold stratified cross-validation on the training "
+               "partition, optimizing AUROC. *These "
                "values are tuning-selection statistics and are optimistically biased; "
                "test-partition performance is reported in the main text.*", above=True)
     ds.add_table(doc, ["Algorithm", "Search space", "Selected configuration", "CV AUROC"],
@@ -241,7 +253,8 @@ def main():
                   "Acc., accuracy; Sens., sensitivity; Spec., specificity; PPV, positive predictive "
                   "value; NPV, negative predictive value; κ, Cohen's kappa. Subscript 0.5 denotes "
                   "the conventional cut-point. Thresholds were selected without reference to the "
-                  "test partition.")
+                  "test partition. Bootstrap 95% confidence intervals for every value are given in "
+                  "04_Results_Tables/model_comparison.csv.")
     ds.page_break(doc)
 
     # ================= Table S5 =================
@@ -249,6 +262,8 @@ def main():
         perm[["feature_code", "perm_importance_mean", "perm_importance_std", "rank"]],
         on="feature_code", suffixes=("_shap", "_perm"))
     rows5, n_resolved = [], 0
+    n_neg = int((perm["perm_importance_mean"] < 0).sum())
+    n_zero = int((perm["perm_importance_mean"] == 0).sum())
     for _, r in merged.nsmallest(15, "rank_shap").iterrows():
         pv, sd = r["perm_importance_mean"], r["perm_importance_std"]
         resolved = abs(pv) > sd
@@ -275,13 +290,9 @@ def main():
                   "reflecting permutation variability only and not sampling variability of the test "
                   f"partition. Only {n_resolved} of these fifteen clear it, so ranks below the "
                   "leading few should not be read as a resolved ordering. A negative value means "
-                  "permuting the predictor left discrimination unchanged or marginally improved it. "
-                  "Two of the 33 columns (the missing-category indicators for race/ethnicity and "
-                  "marital status) are constant or near-constant and receive exactly zero importance "
-                  "under both methods; under SHAP they fall to the bottom (joint rank 32), but under "
-                  "permutation importance an exact zero ranks above the seven predictors with "
-                  "negative importance, placing them at joint rank 25 of 33 and pushing genuinely "
-                  "uninformative predictors such as mercury below them.")
+                  "permuting the predictor left discrimination unchanged or marginally improved it; "
+                  f"{n_neg} of the {N['n_predictors_ranked']} predictors had a negative mean and "
+                  f"{n_zero} exactly zero, so the lower permutation ranks are not interpretable.")
     ds.page_break(doc)
 
     # ================= Table S6 =================
@@ -328,25 +339,90 @@ def main():
                       f"{r['cv_auc_all_5_metals']:.4f}", f"{r['cv_auc_lead_only']:.4f}",
                       f"{r['delta']:+.4f}"])
     for _, r in s_out.iterrows():
-        rows7.append(["Measured-value-only outcome definition", r["model"],
-                      f"{r['cv_auc_harmonized_label']:.4f}", f"{r['cv_auc_labonly_label']:.4f}",
-                      f"{r['delta'] * -1:+.4f}"])
+        base = r["cv_auc_harmonized_label"]
+        for label, col in [("Measured-value-only outcome definition", "cv_auc_labonly_label"),
+                           ("No lipid-medication clause in the outcome", "cv_auc_nolipidmed_label"),
+                           ("Outcome with first blood-pressure reading only", "cv_auc_bpfirst_label")]:
+            rows7.append([label, r["model"], f"{base:.4f}", f"{r[col]:.4f}", f"{r[col] - base:+.4f}"])
     ds.caption(doc, "Table S7.",
-               "Prespecified sensitivity analyses. Each entry is the mean AUROC from 10-fold "
-               "stratified cross-validation on the training partition, using the three leading "
-               "algorithms at their default hyperparameter configurations so that the comparison "
-               "between arms is not confounded by re-tuning. *Absolute values are consequently "
-               "lower than the tuned values in Table S3 and are not comparable to them; the "
-               "difference between arms is the quantity of interest.*", above=True)
+               "Sensitivity analyses. Each entry is the mean AUROC from 10-fold stratified "
+               "cross-validation on the training partition, using the three leading algorithms at "
+               "their tuned hyperparameters (Table S3), holding everything except the stated change "
+               "fixed. The outcome-definition arms change the label, and therefore its prevalence, "
+               "as well as the difficulty of the task.", above=True)
     ds.add_table(doc, ["Analysis", "Model", "Primary", "Alternative", "Δ AUROC"],
                  rows7, col_widths_in=[2.30, 1.25, 0.80, 1.05, 0.80],
                  align_right_from=2, font_size=ds.Pt(8.5))
     ds.table_note(doc,
                   "Δ AUROC is the alternative specification minus the primary, so a positive value "
-                  "indicates the alternative discriminated better. For the outcome-definition arm "
-                  "the primary specification is the harmonized definition used throughout, and the "
-                  "negative values indicate that the measured-value-only definition is harder to "
-                  "predict.")
+                  "indicates the alternative discriminated better. For the outcome-definition arms "
+                  "the primary specification is the harmonized definition used throughout. Gradient "
+                  "boosting has no class-weight option and used balanced sample weights instead.")
+    ds.page_break(doc)
+
+    # ================= Table S8 =================
+    names = {"full": "Full model (all predictors)", "no_metals": "Without the five metals",
+             "lead_only": "Lead as the only metal", "no_bmi": "Without body mass index",
+             "age_bmi_lr": "Age and body mass index only (logistic regression)"}
+    rows8 = []
+    for _, r in inc.iterrows():
+        rows8.append([names[r["model"]], str(int(r["n_predictors"])), f"{r['cv_auc']:.4f}",
+                      f"{r['test_auc']:.3f} ({ci(r['test_auc_ci_low'], r['test_auc_ci_high'])})",
+                      "reference" if r["model"] == "full" else
+                      f"{num(r['delta_vs_full'], 4)} ({num(r['delta_ci_low'], 4)} to {num(r['delta_ci_high'], 4)})",
+                      "—" if r["model"] == "full" else
+                      ("< 0.001" if r["delong_p"] < 0.001 else f"{r['delong_p']:.3f}")])
+    ds.caption(doc, "Table S8.",
+               f"Incremental value of the blood metals and simple baselines. The leading algorithm "
+               f"({inc.iloc[0]['algorithm']}) was refitted with its tuned hyperparameters on reduced "
+               f"predictor sets; every model was scored on the same {f['test_n']:,} test participants "
+               f"and compared with the full model by DeLong's test, with a paired-bootstrap 95% CI "
+               f"for the difference.", above=True)
+    ds.add_table(doc, ["Model", "Columns", "CV AUROC", "Test AUROC (95% CI)",
+                       "Δ vs full (95% CI)", "p"],
+                 rows8, col_widths_in=[2.05, 0.62, 0.70, 1.35, 1.45, 0.55],
+                 align_right_from=1, font_size=ds.Pt(8))
+    ds.table_note(doc,
+                  "CV AUROC, mean of 10-fold cross-validation on the training partition. Removing "
+                  "body mass index also removes its missing-value indicator. Waist circumference "
+                  "defines one outcome component and correlates strongly with body mass index, so "
+                  "part of the no-BMI loss is definitional.")
+
+    # ================= Table S9 =================
+    rows9 = []
+    for _, r in rcv.iterrows():
+        rows9.append([r["model"], f"{r['mean_auc']:.4f}", f"{r['sd_auc_folds']:.4f}",
+                      f"{r['p2_5_auc']:.4f}–{r['p97_5_auc']:.4f}",
+                      f"{r['min_repeat_mean']:.4f}–{r['max_repeat_mean']:.4f}"])
+    ds.caption(doc, "Table S9.",
+               f"Repeated stratified cross-validation on the training partition "
+               f"({int(rcv.iloc[0]['folds'])} folds × {int(rcv.iloc[0]['repeats'])} repeats, "
+               f"{int(rcv.iloc[0]['n_fits'])} fits per model, tuned hyperparameters), showing how much "
+               f"discrimination varies between data partitions.", above=True)
+    ds.add_table(doc, ["Model", "Mean AUROC", "SD across folds", "2.5th–97.5th percentile",
+                       "Range of repeat means"],
+                 rows9, col_widths_in=[1.45, 0.95, 1.05, 1.55, 1.40],
+                 align_right_from=1, font_size=ds.Pt(8))
+
+    # ================= Table S10 =================
+    if len(temporal):
+        rows10 = []
+        for _, r in temporal.iterrows():
+            rows10.append([r["Validation design"], f"{int(r['Train n']):,}", f"{int(r['Test n']):,}",
+                           f"{r['Test AUROC']:.3f} ({ci(r['AUROC 95% CI low'], r['AUROC 95% CI high'])})",
+                           f"{r['Calibration slope']:.2f}",
+                           num(r["Calibration intercept (in-the-large)"], 3),
+                           f"{r['O:E ratio']:.3f}"])
+        ds.caption(doc, "Table S10.",
+                   f"Temporal validation of the {temporal.iloc[0]['Model']} model: development on the "
+                   f"2007–2014 cycles with hyperparameters re-tuned by 10-fold cross-validation on those "
+                   f"cycles only, testing on 2015–2018, compared with the primary random split.",
+                   above=True)
+        ds.add_table(doc, ["Design", "Train n", "Test n", "AUROC (95% CI)", "Cal. slope",
+                           "Cal. intercept", "O:E"],
+                     rows10, col_widths_in=[2.05, 0.62, 0.55, 1.25, 0.65, 0.70, 0.50],
+                     align_right_from=1, font_size=ds.Pt(8))
+        ds.table_note(doc, "Cal. intercept, calibration-in-the-large (slope fixed at 1; 0 = perfect).")
     ds.page_break(doc)
 
     # ================= Figures =================
@@ -360,11 +436,12 @@ def main():
     ds.figure(doc, FIGP / "fig3_auc_forest.png", width_in=6.3)
     ds.caption(doc, "Figure S2.",
                f"Model discrimination and pairwise comparison against {TOP}. **(A)** AUROC with "
-               f"bootstrap 95% confidence intervals. **(B)** Difference in AUROC from {TOP} from a "
-               f"paired bootstrap in which the same resampled participants were scored under both "
-               f"models; intervals crossing zero indicate models that cannot be distinguished from "
-               f"{TOP}. Using unpaired intervals from panel A for these comparisons would overstate "
-               f"the uncertainty, because all models are scored on the same participants.")
+               f"bootstrap 95% confidence intervals. **(B)** Difference in AUROC from {TOP}, with a "
+               f"paired-bootstrap 95% confidence interval (the same resampled participants scored "
+               f"under both models) and the DeLong p-value; intervals crossing zero indicate models "
+               f"that cannot be distinguished from {TOP}. Using unpaired intervals from panel A for "
+               f"these comparisons would overstate the uncertainty, because all models are scored on "
+               f"the same participants.")
     ds.page_break(doc)
 
     ds.figure(doc, FIGP / "fig4_calibration.png", width_in=6.3)
@@ -377,8 +454,9 @@ def main():
     ds.figure(doc, FIGP / "fig5_decision_curve.png", width_in=4.5)
     ds.caption(doc, "Figure S4.",
                "Decision-curve analysis on the held-out test partition. Net benefit is plotted "
-               "against the risk threshold at which intervention would be considered warranted, for "
-               "the four leading models and for the treat-all and treat-none reference strategies.")
+               "against the risk threshold (2% to 80%) at which intervention would be considered "
+               "warranted, for the four leading models and for the treat-all and treat-none reference "
+               "strategies.")
     ds.page_break(doc)
 
     ds.figure(doc, FIGP / "fig9_subgroup_auc.png", width_in=5.2)

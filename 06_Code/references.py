@@ -48,11 +48,14 @@ REFS = [
     ("bernett", "Bernett J, Blumenthal DB, Grimm DG, Haselbeck F, Joeres R, Kalinina OV, et al. "
                 "Guiding questions to avoid data leakage in biological machine learning "
                 "applications. Nat Methods. 2024;21(8):1444–53. doi:10.1038/s41592-024-02362-y."),
-    ("lo_metals", "Lo K, Yang JL, Chen CL, Liu L, Huang YQ, Feng YQ, et al. Associations between "
-                  "blood and urinary manganese with metabolic syndrome and its components: "
-                  "cross-sectional analysis of National Health and Nutrition Examination Survey "
-                  "2011–2016. Sci Total Environ. 2021;780:146527. "
-                  "doi:10.1016/j.scitotenv.2021.146527."),
+    # 2026-10 audit (P12): Lo et al. 2021 (blood and urinary manganese only) was
+    # cited for the five-metal panel; Bulka et al. analysed the multi-metal
+    # panel against metabolic syndrome in NHANES. Record taken from the PubMed
+    # metadata captured for the proposal bank (PMID 30388496).
+    ("bulka", "Bulka CM, Persky VW, Daviglus ML, Durazo-Arvizu RA, Argos M. Multiple metal "
+              "exposures and metabolic syndrome: a cross-sectional analysis of the National "
+              "Health and Nutrition Examination Survey 2011–2014. Environ Res. "
+              "2019;168:397–405. doi:10.1016/j.envres.2018.10.022. PMID: 30388496."),
     ("heinze", "Heinze G, Wallisch C, Dunkler D. Variable selection – a review and "
                "recommendations for the practicing statistician. Biom J. 2018;60(3):431–49. "
                "doi:10.1002/bimj.201700067."),

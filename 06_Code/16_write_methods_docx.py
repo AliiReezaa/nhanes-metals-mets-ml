@@ -74,14 +74,20 @@ def main():
     ds.para(doc,
             f"Figure 1 gives the data-cleaning sequence with the number excluded at each step and "
             f"the number remaining. From {f['pooled']:,} pooled participants we excluded "
-            f"{f['excluded_age']:,} aged under 20 years, {f['excluded_mets']:,} adults missing any "
-            f"measurement required to define the outcome (mainly because triglycerides and fasting "
-            f"glucose are restricted to the fasting subsample), and {f['excluded_metals']:,} with no "
-            f"blood metal assayed, leaving {f['final_cohort']:,} adults. Selenium and manganese were "
-            f"not assayed in 2007–2008 or 2009–2010; those participants were retained because they "
+            f"{f['excluded_age']:,} aged under 20 years, {f['excluded_pregnant']:,} pregnant "
+            f"participants (pregnancy alters waist circumference, blood pressure, lipids and "
+            f"glucose), {f['excluded_mets']:,} adults missing any measurement required to define the "
+            f"outcome (mainly because triglycerides and fasting glucose are restricted to the morning "
+            f"fasting subsample), {f['excluded_fasting']:,} who did not meet the fasting criterion of "
+            f"8 to 24 hours (identified by a zero fasting-subsample weight, which NCHS assigns to "
+            f"every such participant in every cycle), and {f['excluded_metals']:,} with no blood "
+            f"metal assayed, leaving {f['final_cohort']:,} adults. Selenium and manganese were not "
+            f"assayed in 2007–2008 or 2009–2010; those participants were retained because they "
             f"contribute complete lead, cadmium and mercury data, making the resulting absence "
-            f"structural rather than random (Section 4). Refusal and don't-know codes were recoded "
-            f"to missing before analysis.")
+            f"structural rather than random (Section 5). Refusal and don't-know codes were recoded "
+            f"to missing using each item's own code width (for example 7 and 9 for one-digit items "
+            f"but 777 and 999 for the number of drinks), so that genuine answers of 7 or 9 drinks "
+            f"were kept.")
 
     ds.figure(doc, FIGP / "fig1_participant_flow.png", width_in=5.4)
     ds.caption(doc, "Figure 1.",
@@ -96,19 +102,26 @@ def main():
     ds.para(doc,
             f"Metabolic syndrome was defined by the harmonized criteria of the joint interim "
             f"statement of the International Diabetes Federation, NHLBI, American Heart Association "
-            f"and collaborating bodies {cite('alberti')}, which extend the earlier AHA/NHLBI "
-            f"thresholds {cite('grundy')} by scoring a component positive when the participant is "
-            f"pharmacologically treated for it even if the measured value is below the cut-point. "
+            f"and collaborating bodies {cite('alberti')}, which retain the AHA/NHLBI thresholds and "
+            f"drug-treatment clauses {cite('grundy')}: a component was scored positive when the "
+            f"measured value met the cut-point or the participant reported drug treatment for it. "
             f"Cases met at least three of five components; definitions, thresholds and source "
-            f"variables are in Table S2. NHANES asks about lipid-lowering treatment only once, "
-            f"without separating HDL- from triglyceride-specific therapy, so that item is applied to "
-            f"both lipid components, consistent with the *or* logic of the definition. The treatment "
-            f"clause moved {int(outdef.loc[1, 'n_reclassified_negative_to_positive']):,} participants "
-            f"from non-case to case and none in reverse, raising prevalence from "
+            f"variables are in Table S2. Blood pressure was the mean of all valid readings (up to "
+            f"four; a diastolic reading of 0 mmHg was treated as invalid). NHANES asks about "
+            f"cholesterol-lowering treatment only once, without naming the drug, whereas the "
+            f"guideline's treatment clause for triglycerides and HDL cholesterol refers to "
+            f"lipid-specific drugs such as fibrates and nicotinic acid; we applied the item to both "
+            f"lipid components as a stated modelling choice and tested it in a sensitivity analysis "
+            f"(Section 9). The treatment clauses together moved "
+            f"{int(outdef.loc[1, 'n_reclassified_negative_to_positive']):,} participants from "
+            f"non-case to case and none in reverse, raising prevalence from "
             f"{outdef.loc[0, 'prevalence_pct']:.2f}% to {outdef.loc[1, 'prevalence_pct']:.2f}%. The "
-            f"five component measurements and four medication items build the label only and were "
-            f"excluded from the predictor set, since a model given any of them could recover the "
-            f"outcome arithmetically rather than learn a risk relationship {cite('bernett')}.")
+            f"component measurements and medication items build the label only and were excluded "
+            f"from the predictor set, since a model given any of them could recover the outcome "
+            f"arithmetically rather than learn a risk relationship {cite('bernett')}. Body mass index "
+            f"is a predictor while waist circumference defines one component; the two are strongly "
+            f"correlated, so part of body mass index's predictive weight is close to definitional, and "
+            f"a model without it was fitted for comparison (Section 9).")
 
     # ==================================================================
     ds.heading(doc, "4. Predictor variables", 1)
@@ -118,7 +131,7 @@ def main():
             f"literature, across four domains. The **blood-metal panel** is lead, cadmium, total "
             f"mercury, selenium and manganese — the analytes measured together in the NHANES "
             f"whole-blood assay and the panel used in prior NHANES analyses of metals and metabolic "
-            f"syndrome {cite('lo_metals')}. **Demographic and socioeconomic** predictors (age, sex, "
+            f"syndrome {cite('bulka')}. **Demographic and socioeconomic** predictors (age, sex, "
             f"race/ethnicity, education, marital status, household size, income-to-poverty ratio, "
             f"examination period) are established correlates of both the outcome and metal exposure "
             f"and are retained as adjustment variables. The **anthropometric** domain is body mass "
@@ -147,36 +160,45 @@ def main():
             f"{r['pct_missing_var_1_train']:.1f}% missing — so it adds imputation burden while "
             f"splitting importance with a near-identical retained variable. Physician-diagnosed "
             f"diabetes was held out as partly downstream of the glucose component and reintroduced "
-            f"only in sensitivity analysis. Two items needed harmonization: the alcohol gatekeeper "
-            f"question changed between cycles, with ALQ101 (\"had at least 12 alcoholic drinks in "
-            f"any one year\") in 2007–2016 and ALQ111 (\"ever had a drink of any kind of alcohol\") "
-            f"only in 2017–2018, so the two were combined into one ever-drank indicator, since using "
-            f"either alone imposes roughly 83% structural missingness from questionnaire redesign; "
-            f"and PAD645 (minutes walking or bicycling for transportation) is asked only of those "
-            f"answering yes to PAQ635 (\"walk or use a bicycle for transportation\"), so a blank "
-            f"after a *no* denotes zero minutes and was recoded accordingly.")
+            f"only in sensitivity analysis. Three items needed harmonization or skip-pattern "
+            f"handling. The alcohol questionnaire was redesigned in 2017–2018, and its gatekeeper "
+            f"questions differ between periods (\"at least 12 drinks in any one year\" before, "
+            f"\"ever had a drink\" after), so alcohol use was represented by a construct asked the "
+            f"same way in every cycle: any alcohol in the past 12 months (from the past-year drinking "
+            f"frequency), with average drinks per drinking day set to zero for past-year "
+            f"non-drinkers, who are never asked that question. Current smoking intensity is asked "
+            f"only of people who have smoked at least 100 cigarettes, so never-smokers were coded as "
+            f"not smoking now. PAD645 (minutes walking or bicycling for transportation) is asked "
+            f"only of those answering yes to PAQ635, so a blank after a *no* denotes zero minutes and "
+            f"was recoded accordingly.")
 
     # ==================================================================
     ds.heading(doc, "5. Missing data", 1)
 
     top = miss.set_index("variable")["pct_missing"]
+    preds_base = set(N["missing_flags"]) | {"ALQ_PAST12", "SMQ040", "DMDEDUC2", "DMDMARTL", "SMQ020",
+                                           "PAQ605", "PAQ650", "PAQ665", "DBQ700"}
+    others = top[[v for v in top.index if v in preds_base and v not in
+                  ("LBXBSE", "LBXBMN", "INDFMPIR", "ALQ130", "ALQ_PAST12")]]
     ds.para(doc,
-            f"Missingness was concentrated in four predictors: current smoking intensity "
-            f"({top['SMQ040']:.1f}%, a skip pattern rather than non-response), selenium and manganese "
-            f"({top['LBXBSE']:.1f}% each, almost entirely the two cycles lacking the assay), average "
-            f"daily drinks ({top['ALQ130']:.1f}%) and income-to-poverty ratio "
-            f"({top['INDFMPIR']:.1f}%); all others were under 10%. Values were imputed inside the "
+            f"After the skip patterns were resolved, missingness was concentrated in selenium and "
+            f"manganese ({top['LBXBSE']:.1f}% each, entirely the two cycles lacking the assay), the "
+            f"income-to-poverty ratio ({top['INDFMPIR']:.1f}%) and the two alcohol items "
+            f"({top['ALQ_PAST12']:.1f}% and {top['ALQ130']:.1f}%); every other predictor was under "
+            f"{max(1, int(others.max()) + 1)}%. Values were imputed inside the "
             f"pipeline using the median for continuous and the modal category for categorical "
             f"variables, fitted on training folds only. Multiple imputation is standard for "
             f"etiological analysis {cite('sterne')} but sits awkwardly with a model that must also "
             f"score a future incomplete record, and simulation work spanning development and "
             f"deployment finds single imputation with missing indicators comparable for that purpose "
-            f"{cite('sisk')}. Each continuous predictor therefore carries a binary observed/imputed "
-            f"indicator, emitted at fixed width in every fold so the transformed matrix holds a "
-            f"constant {n_cols} columns. Indicators let the model use informative missingness, which "
-            f"is structural here, but can bias predictions when missingness depends on the outcome "
-            f"{cite('sisk')}; they are reported separately from the substantive predictors rather "
-            f"than interpreted as risk factors.")
+            f"{cite('sisk')}. Each continuous predictor with missing values therefore carries a "
+            f"binary indicator (1 = missing and imputed); selenium and manganese share one indicator "
+            f"because they are missing for exactly the same participants, which makes it a marker of "
+            f"the 2007–2010 cycles rather than of individual non-response. The indicators are fixed "
+            f"in advance, so the transformed matrix holds a constant {n_cols} columns in every fold. "
+            f"Indicators let the model use informative missingness but can bias predictions when "
+            f"missingness depends on the outcome {cite('sisk')}; they are reported separately from "
+            f"the substantive predictors rather than interpreted as risk factors.")
 
     # ==================================================================
     ds.heading(doc, "6. Partitioning and prevention of information leakage", 1)
@@ -241,9 +263,10 @@ def main():
             f"Eleven classifiers spanning linear, instance-based, kernel, neural and tree-ensemble "
             f"families were trained: logistic regression, decision tree, random forest, gradient "
             f"boosting, LightGBM, XGBoost, CatBoost, support vector machine, Gaussian naïve Bayes, "
-            f"multilayer perceptron and k-nearest neighbors. Hyperparameters were tuned by randomized "
-            f"search over the grids in Table S3 with 10-fold stratified cross-validation on the "
-            f"training partition, optimizing AUROC; selected configurations are reported there. "
+            f"multilayer perceptron and k-nearest neighbors. Hyperparameters were tuned over the "
+            f"grids in Table S3 with 10-fold stratified cross-validation on the training partition, "
+            f"optimizing AUROC; every grid had at most 12 configurations and was searched "
+            f"exhaustively, and the selected configurations are reported there. "
             f"Thresholds were selected by maximizing the Youden index {cite('youden')} on "
             f"out-of-fold training predictions, since choosing a threshold on the data used to report "
             f"sensitivity and specificity inflates both; results are given at the tuned threshold "
@@ -255,16 +278,19 @@ def main():
     ds.para(doc,
             f"Discrimination was summarized by AUROC and the area under the precision–recall curve, "
             f"with accuracy, sensitivity, specificity, predictive values, F1 and Cohen's kappa at "
-            f"both thresholds and 1,000-resample bootstrap intervals. Because all models are scored "
-            f"on the same participants their AUROC estimates are correlated, so comparing "
-            f"independent intervals would overstate the uncertainty of a difference "
-            f"{cite('delong')}; models were compared by paired bootstrap, applying the same "
-            f"resampled indices to both models in every draw. Calibration was assessed with "
-            f"quantile-binned curves, the Brier score, the calibration slope and the "
-            f"observed-to-expected ratio, because a model can rank well while misstating absolute "
+            f"both thresholds; every test-set metric carries a 1,000-resample percentile bootstrap "
+            f"interval. Because all models are scored on the same participants their AUROC estimates "
+            f"are correlated, so comparing independent intervals would overstate the uncertainty of a "
+            f"difference; each model was compared with the leading model by DeLong's test for "
+            f"correlated AUROCs {cite('delong')}, with the interval of the difference from a paired "
+            f"bootstrap applying the same resampled indices to both models in every draw. "
+            f"Calibration was assessed with quantile-binned curves, the Brier score, the calibration "
+            f"slope, the calibration-in-the-large intercept and the observed-to-expected ratio, "
+            f"because a model can rank well while misstating absolute "
             f"risk — the failure that matters if a predicted probability reaches a clinician "
             f"{cite('vancalster')}. Clinical utility was assessed by decision-curve analysis against "
-            f"treat-all and treat-none strategies {cite('vickers')}.")
+            f"treat-all and treat-none strategies over threshold probabilities from 2% to 80% "
+            f"{cite('vickers')}.")
 
     ds.para(doc,
             f"Predictor contributions were quantified two ways. SHapley Additive exPlanations were "
@@ -272,7 +298,8 @@ def main():
             f"additive contribution to each prediction on the log-odds scale, with global importance "
             f"the mean absolute value. Permutation importance was the mean decrease in AUROC over ten "
             f"permutations of each column, with the standard deviation retained so rank differences "
-            f"can be read against the noise producing them {cite('altmann')}. The two measure "
+            f"can be read against the noise producing them, in the permutation framework of "
+            f"{cite('altmann')}. The two measure "
             f"different things — how far a predictor moves individual predictions, versus how much "
             f"ranking performance depends on it — so a predictor substitutable by correlated "
             f"predictors scores high on the first and low on the second, and both are reported. SHAP "
@@ -285,14 +312,21 @@ def main():
     ds.heading(doc, "9. Sensitivity and subgroup analyses", 1)
 
     ds.para(doc,
-            f"Four prespecified sensitivity analyses addressed the design choices most likely to "
-            f"affect conclusions: adding physician-diagnosed diabetes; replacing SMOTENC with class "
-            f"weighting; restricting the panel to blood lead alone, to quantify what the other four "
-            f"metals contribute; and substituting a measured-value-only outcome definition. Each "
-            f"used 10-fold cross-validation on the training partition with the three leading "
-            f"algorithms at default hyperparameters, so the difference between arms is not "
-            f"confounded by a second search; absolute values are consequently lower than the tuned "
-            f"values in Table S3 and not comparable to them. Discrimination and calibration were "
+            f"Sensitivity analyses addressed the design choices most likely to affect conclusions: "
+            f"adding physician-diagnosed diabetes; replacing SMOTENC with class weighting (balanced "
+            f"sample weights for gradient boosting, which has no class-weight option); restricting "
+            f"the panel to blood lead alone; and three alternative outcome definitions "
+            f"(measured values only; no cholesterol-medication clause for the lipid components; "
+            f"blood pressure from the first reading only). Each used 10-fold cross-validation on the "
+            f"training partition with the three leading algorithms at their tuned hyperparameters, "
+            f"holding everything else fixed. The incremental value of the metals was assessed by "
+            f"refitting the leading model without the five metals, with lead as the only metal and "
+            f"without body mass index, and by a logistic regression on age and body mass index "
+            f"alone; each was scored on the same test participants and compared with the full model "
+            f"by DeLong's test. Because a single random partition leaves split-to-split variability "
+            f"uncaptured, all eleven models were also evaluated by repeated stratified 10-fold "
+            f"cross-validation (five repeats) on the training partition. Discrimination and "
+            f"calibration were "
             f"also recomputed within strata of sex, age tertile and race/ethnicity, with bootstrap "
             f"intervals and the calibration model refitted in every resample. Subgroup analyses are "
             f"descriptive; each stratum is nested within the overall sample, so subgroup intervals "
@@ -302,21 +336,25 @@ def main():
     ds.heading(doc, "10. Scope, software and availability", 1)
 
     ds.para(doc,
-            f"This is a development study with internal validation only: performance is estimated on "
-            f"a held-out partition of the same cohort, controlling optimism from model fitting but "
-            f"not from the cohort itself. No external or temporal validation was performed, though "
-            f"the six-cycle design would permit holding out the most recent cycle, and a single "
-            f"random partition under one seed leaves split-to-split variability that "
-            f"within-partition bootstrapping does not capture {cite('tripod')}. The models are a "
+            f"This is a development study with internal validation: performance is estimated on a "
+            f"held-out partition of the same cohort, supplemented by repeated cross-validation and a "
+            f"temporal validation in which the leading algorithm was re-tuned and refitted on the "
+            f"2007–2014 cycles and tested on the 2015–2018 cycles. No external cohort was available "
+            f"{cite('tripod')}. The models are a "
             f"research instrument for prioritizing exposures for the Mendelian randomization phase, "
             f"not a clinical screening tool, and have not been evaluated prospectively. Analyses used "
-            f"Python 3.11 with scikit-learn, imbalanced-learn, LightGBM, XGBoost, CatBoost and SHAP, "
+            f"Python 3.11–3.13 with scikit-learn, imbalanced-learn, LightGBM, XGBoost, CatBoost and SHAP, "
             f"one seed fixed throughout. Descriptive statistics used the NHANES complex-survey design "
-            f"with Taylor-series linearization, domain estimation and cycle-appropriate weights "
-            f"divided by the number of contributing cycles {cite('nhanes_design', 'nhanes_weights')}; "
+            f"with Taylor-series linearization and domain estimation, the fasting-subsample weight "
+            f"divided by the number of pooled cycles (the analytic cohort is the fasting subsample), "
+            f"weighted geometric means for the metals, and design-based t and adjusted Wald F tests "
+            f"{cite('nhanes_design', 'nhanes_weights')}; in 2013–2016 the metals were measured in a "
+            f"separate half-sample for which no combined weight exists, so metal estimates for those "
+            f"cycles are approximate; "
             f"models were fitted unweighted, the target being individual-level discrimination rather "
             f"than a population parameter. Data are public at {NHANES_URL}; code, derived metrics and "
-            f"model artifacts will be deposited publicly on publication. NHANES protocols were "
+            f"model artifacts are kept under version control and will be deposited publicly on "
+            f"publication. NHANES protocols were "
             f"approved by the NCHS Research Ethics Review Board with written informed consent; this "
             f"secondary analysis required no additional approval.")
 

@@ -927,6 +927,14 @@ def main():
               "sensitivity_smote_vs_classweight", "sensitivity_outcome_definition"]:
         NUMBERS[f] = pd.read_csv(cfg.OUT_METRICS / f"{f}.csv").to_dict(orient="records")
     NUMBERS["collinearity"] = pd.read_csv(cfg.OUT_METRICS / "collinearity_flags.csv").to_dict(orient="records")
+    # 2026-10 audit additions (A1-A4, A7): incremental value, repeated CV, temporal validation
+    for key, path in [("incremental_value", cfg.OUT_METRICS / "incremental_value.csv"),
+                      ("repeated_cv", cfg.OUT_METRICS / "repeated_cv.csv"),
+                      ("temporal_validation",
+                       cfg.OUT_DIR / "08_Q1_Rigor_Additions" / "tables" / "table_temporal_validation.csv")]:
+        if path.exists():
+            NUMBERS[key] = pd.read_csv(path).to_dict(orient="records")
+    NUMBERS["missing_flags"] = pd.read_csv(cfg.OUT_METRICS / "missing_flag_columns.csv")["flagged_predictor"].tolist()
     NUMBERS["missingness"] = pd.read_csv(cfg.OUT_METRICS / "missingness_report.csv").to_dict(orient="records")
     NUMBERS["n_predictors"] = int(len(pd.read_csv(cfg.OUT_METRICS / "predictors_used.csv")))
     NUMBERS["n_transformed_features"] = int(len(pu.transformed_feature_names(cont_cols, cat_cols)))
