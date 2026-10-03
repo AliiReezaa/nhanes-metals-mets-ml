@@ -3,8 +3,8 @@ Audit every entry in the proposal reference bank against PubMed's own record.
 
 The PubMed responses captured during sourcing are persisted by the harness as JSON files.
 This script harvests all of them into one PMID-keyed table, writes that table to
-outputs/metrics/proposal_reference_verification.json as the permanent audit record, and
-then checks each entry of scripts/22_proposal_references.REFS against it.
+04_Results_Tables/proposal_reference_verification.json as the permanent audit record, and
+then checks each entry of 06_Code/22_proposal_references.REFS against it.
 
 Four things are compared and any mismatch is printed rather than silently tolerated:
   * the title, normalised for case, punctuation and trailing period
@@ -30,14 +30,14 @@ import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "outputs" / "metrics" / "proposal_reference_verification.json"
-CAPTURE_DIRS = [
-    Path("/root/.claude/projects/-home-claude/"
-         "411419d0-063a-5967-9689-20e6132dbbfa/tool-results"),
-]
+# 2026-10 audit (C24): the audit record lives in 04_Results_Tables/ in this package; the
+# earlier version pointed at outputs/ and at a temporary folder of one past session.
+OUT = ROOT / "04_Results_Tables" / "proposal_reference_verification.json"
+# Optional extra folders of freshly captured PubMed JSON responses (none by default).
+CAPTURE_DIRS: list[Path] = []
 
 spec = importlib.util.spec_from_file_location(
-    "propref", ROOT / "scripts" / "22_proposal_references.py")
+    "propref", ROOT / "06_Code" / "22_proposal_references.py")
 propref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(propref)
 REFS = propref.REFS
@@ -118,7 +118,7 @@ def main() -> int:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(
         {"_note": "PubMed records captured during reference sourcing; the audit record "
-                  "for scripts/24_audit_proposal_references.py.",
+                  "for 06_Code/24_audit_proposal_references.py.",
          "_retrieved": "2026-09-18",
          "records": table}, indent=1, ensure_ascii=False))
     print(f"captured PubMed records: {len(table)}  ->  {OUT.relative_to(ROOT)}")

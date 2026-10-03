@@ -1,10 +1,18 @@
 """
-Assemble the advisor submission package.
+Refresh the publication folders of this package from a finished pipeline run.
 
-Everything in the package is copied from the working tree rather than regenerated, so the
-package can never contain a figure or a number that the verification scripts have not
-already checked. The script is idempotent: it clears and rebuilds the destination each
-time, so there is no way to ship a stale file that an earlier run left behind.
+2026-10 audit (C9, C11, C24): the package IS the repository, so this script now works in
+place. It copies the outputs of the latest run (outputs/, data_processed/, manuscript/)
+into the published folders (01_Manuscript, 03_Figures, 04_Results_Tables,
+05_Data_Processed, 07_Novelty_Additions, 08_Q1_Rigor_Additions), renders each Word
+document to PDF with LibreOffice when it is installed, writes README.md, and regenerates
+00_MANIFEST.csv over every published file. The earlier version built a separate
+SUBMISSION/ folder from a scripts/ + docx_final/ working layout that is not part of this
+package, so it could not run here. The published folders are emptied before copying, so
+no stale file from an earlier run survives.
+
+Run (after RUN_ME.py, or after the steps listed in README.md):
+    python 06_Code/26_build_submission.py
 
 Two conventions are worth knowing before reading the code.
 
@@ -30,11 +38,18 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-PKG = ROOT / "SUBMISSION"
+PKG = ROOT  # the package is the repository itself
 TODAY = date.today().isoformat()
 
 FIG_SRC = ROOT / "outputs" / "figures_pub"
 MET = ROOT / "outputs" / "metrics"
+
+# Folders that are regenerated on every run and never published.
+NOT_PUBLISHED = {".git", ".venv", "venv", "outputs", "data_processed", "NHANES_data",
+                 "manuscript", "__pycache__", ".pytest_cache"}
+NOT_PUBLISHED_FILES = {".DS_Store", "00_MANIFEST.csv"}
+
+ADDITION_FOLDERS = ["07_Novelty_Additions", "08_Q1_Rigor_Additions"]
 
 
 # ----------------------------------------------------------------------
@@ -42,7 +57,7 @@ MET = ROOT / "outputs" / "metrics"
 # ----------------------------------------------------------------------
 FIGURE_MAP: list[tuple[str, str, str]] = [
     ("fig1_participant_flow",        "Figure_1_Participant_Flow",
-     "Participant flow through the four exclusion steps, with cycle contributions (Methods)"),
+     "Participant flow through the five exclusion steps, with cycle contributions (Methods)"),
     ("fig2_roc_curves",              "Figure_2_ROC_Curves",
      "Receiver-operating-characteristic curves for all models on the held-out test set"),
     ("fig6_shap_beeswarm",           "Figure_3_SHAP_Summary",
@@ -54,7 +69,7 @@ FIGURE_MAP: list[tuple[str, str, str]] = [
     ("figM1_analysis_pipeline",      "Figure_S1_Analysis_Pipeline",
      "Schematic of the leakage-safe modelling pipeline"),
     ("fig3_auc_forest",              "Figure_S2_AUROC_Forest",
-     "AUROC forest plot with paired-bootstrap differences against the leading model"),
+     "AUROC forest plot with paired differences (DeLong) against the leading model"),
     ("fig4_calibration",             "Figure_S3_Calibration",
      "Calibration curves with slope, intercept and observed-to-expected ratio"),
     ("fig5_decision_curve",          "Figure_S4_Decision_Curve",
@@ -77,10 +92,9 @@ DOCS: list[tuple[Path, str, str]] = [
     (ROOT / "manuscript" / "Manuscript_Supplement_AI.docx",
      "01_Manuscript/03_Supplementary_Material.docx",
      "Supplementary material: Tables S1-S7 and Figures S1-S5"),
-    (ROOT / "docx_final" / "Metabolic_Syndrome_Proposal_Revised_FINAL4.docx",
-     "02_Proposal/Research_Proposal.docx",
-     "Research proposal, revised: 99 PubMed-verified references in first-mention order"),
 ]
+# The proposal is edited in place in 02_Proposal/ (its PDF is re-rendered below).
+PROPOSAL = ROOT / "02_Proposal" / "Research_Proposal.docx"
 
 DATA: list[tuple[Path, str, str]] = [
     (ROOT / "data_processed" / "model_ready.csv",
@@ -100,7 +114,7 @@ DATA: list[tuple[Path, str, str]] = [
 DESCRIPTIONS: dict[str, str] = {
     # metrics
     "model_comparison.csv": "Discrimination, calibration and classification metrics for all 11 models",
-    "model_comparison_significance.csv": "Paired-bootstrap differences in AUROC against the leading model",
+    "model_comparison_significance.csv": "AUROC differences against the leading model: paired-bootstrap 95% CI and DeLong p-value",
     "calibration_metrics.csv": "Calibration slope, intercept, observed-to-expected ratio and Brier score",
     "decision_curve_data.csv": "Net benefit across threshold probabilities for the decision-curve analysis",
     "subgroup_auc.csv": "Discrimination and calibration within age, sex and race/ethnicity subgroups",
@@ -108,16 +122,19 @@ DESCRIPTIONS: dict[str, str] = {
     "permutation_importance.csv": "Permutation importance per predictor, leading model",
     "permutation_importance_by_model.csv": "Permutation importance per predictor for each of the four leading models",
     "table1_by_mets_status.csv": "Table 1: cohort characteristics by metabolic-syndrome status",
-    "exclusion_flow.csv": "Counts excluded and remaining at each of the four exclusion steps",
+    "exclusion_flow.csv": "Counts excluded and remaining at each of the five exclusion steps",
     "strobe_flow.csv": "STROBE participant-flow counts, including per-cycle contributions",
     "missingness_report.csv": "Missingness per predictor in the analytic cohort",
     "missingness_report_age_filtered_precohort.csv": "Missingness before the metals-availability exclusion",
     "collinearity_flags.csv": "Predictor pairs flagged by the training-partition-only collinearity screen",
-    "predictors_used.csv": "The 33 predictors carried into the models, with type and source module",
+    "predictors_used.csv": "The predictor columns carried into the models",
+    "missing_flag_columns.csv": "Continuous predictors that receive a missing-value flag in the models",
+    "incremental_value.csv": "Test-set comparison of the full model with no-metals, lead-only, no-BMI and age+BMI-only models",
+    "repeated_cv.csv": "Repeated stratified 10-fold cross-validation (5 repeats) for all models: mean and spread of AUROC",
     "outcome_definition_comparison.csv": "Harmonized versus measured-value-only MetS outcome definitions",
     "sensitivity_diq010.csv": "Sensitivity arm: adding physician-diagnosed diabetes as a predictor",
     "sensitivity_smote_vs_classweight.csv": "Sensitivity arm: SMOTENC versus class weighting",
-    "sensitivity_outcome_definition.csv": "Sensitivity arm: alternative outcome definition",
+    "sensitivity_outcome_definition.csv": "Sensitivity arm: alternative outcome definitions (lab-only, no lipid-medication clause, first BP reading)",
     "sensitivity_metals_scope.csv": "Sensitivity arm: restricting the metal panel to blood lead alone",
     "tuning_summary.csv": "Cross-validated tuning result per model, with the selected hyperparameters",
     "best_params.json": "Selected hyperparameters per model",
@@ -125,10 +142,21 @@ DESCRIPTIONS: dict[str, str] = {
     "publication_numbers.json": "Every number quoted in the manuscripts, written at the moment each figure was drawn",
     "reference_verification.json": "PubMed audit record for the 21 Methods references",
     "proposal_reference_verification.json": "PubMed audit record for the proposal reference bank",
-    "test_predictions.csv": "Cached predicted probabilities on the test set; every figure derives from this one file",
+    "test_predictions.csv": "Predicted probabilities on the test set; every figure derives from this one file",
     # code
     "config.py": "Paths, variable definitions, clinical labels, MetS thresholds, random seed",
     "pipeline_utils.py": "Shared pipeline helpers: split loading, preprocessing, SMOTENC, feature names",
+    "stats_utils.py": "Shared statistics helpers: DeLong test, bootstrap intervals, p-value formatting",
+    "additions_common.py": "Shared setup for the 07/08 exploratory analyses (paths, fitted model, covariates)",
+    "readme_template.md": "Text of README.md, filled in by 26_build_submission.py",
+    "RUN_ME.py": "One-click launcher: installs packages in a private environment and runs the whole pipeline",
+    "RUN_ME_Windows.bat": "Double-click launcher for Windows (calls RUN_ME.py)",
+    "RUN_ME_macOS.command": "Double-click launcher for macOS (calls RUN_ME.py)",
+    "RUN_ME_Linux.sh": "Launcher for Linux (calls RUN_ME.py)",
+    "FIX_CHECKLIST.md": "Checklist of every issue found in the October 2026 audit and how each was fixed",
+    ".gitignore": "Files and folders git does not track (regenerated outputs, OS clutter)",
+    "Research_Proposal.docx": "Research proposal for the two-phase study (ML phase done, MR phase planned)",
+    "Humanized Proposal.docx": "Partial plain-language rewrite of the proposal's first sections (draft)",
     "pubstyle.py": "Figure style: Okabe-Ito palette, sizes, fonts, dual PNG/PDF export",
     "docx_style.py": "Manuscript docx style: headings, three-line tables, captions, page-break handling",
     "feature_labels.py": "Short figure labels and the caption glossaries that define them",
@@ -140,22 +168,30 @@ DESCRIPTIONS: dict[str, str] = {
 
 PATTERNS: list[tuple[str, str]] = [
     ("Figure_", "Publication figure (600 dpi PNG and vector PDF)"),
+    ("07_Novelty_Additions/code/", "Exploratory analysis script (07): see 07_Novelty_Additions/README.md"),
+    ("08_Q1_Rigor_Additions/code/", "Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md"),
+    ("07_Novelty_Additions/tables/", "Exploratory result table (07): see 07_Novelty_Additions/README.md"),
+    ("08_Q1_Rigor_Additions/tables/", "Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md"),
+    ("07_Novelty_Additions/figures/", "Exploratory figure (07): see 07_Novelty_Additions/README.md"),
+    ("08_Q1_Rigor_Additions/figures/", "Exploratory figure (08): see 08_Q1_Rigor_Additions/README.md"),
+    ("README.md", "Guide to the files in this folder"),
     (".pdf", "PDF rendering of the corresponding document"),
 ]
 
 CODE_ORDER_NOTE = {
+    "00": "download the raw NHANES files from the CDC",
     "01": "merge raw NHANES modules into one pooled table",
     "02": "clean and derive the harmonized MetS outcome",
     "03": "feature engineering",
     "04": "train/test split",
     "06": "cross-validated hyperparameter tuning",
     "07": "model training",
-    "08": "test-set evaluation with paired bootstrap",
+    "08": "test-set evaluation with DeLong comparisons and bootstrap intervals",
     "09": "SHAP explanation",
     "10": "sensitivity analyses",
     "11": "survey-weighted reporting",
-    "12": "exploratory visualisation",
-    "13": "publication extras",
+    "12": "exploratory visualisation and interactive dashboard",
+    "13": "incremental value of the metals, simple baselines and repeated cross-validation",
     "14": "diagram generation",
     "15": "publication figure set and the numbers JSON",
     "16": "build the Methods document",
@@ -167,8 +203,9 @@ CODE_ORDER_NOTE = {
     "23": "renumber the proposal's citations and append its reference list",
     "24": "audit the proposal reference bank against PubMed",
     "25": "verify the proposal's citations",
-    "26": "assemble this submission package",
-    "27": "verify the assembled package",
+    "26": "refresh the published folders, README and manifest from a finished run",
+    "27": "verify the published package",
+    "28": "compare a fresh run with the published results",
 }
 
 
@@ -182,14 +219,19 @@ def md5(path: Path) -> str:
 
 def describe(rel: str) -> str:
     name = Path(rel).name
+    if rel.startswith("06_Code/") or "/" not in rel:
+        if name in DESCRIPTIONS:
+            return DESCRIPTIONS[name]
+        stem = name.split("_")[0]
+        if stem.isdigit() and stem in CODE_ORDER_NOTE and name.endswith(".py"):
+            return f"Pipeline step {stem}: {CODE_ORDER_NOTE[stem]}"
+    for token, text in PATTERNS:
+        if token in rel and token != ".pdf":
+            return text
     if name in DESCRIPTIONS:
         return DESCRIPTIONS[name]
-    stem = name.split("_")[0]
-    if stem.isdigit() and stem in CODE_ORDER_NOTE and name.endswith(".py"):
-        return f"Pipeline step {stem}: {CODE_ORDER_NOTE[stem]}"
-    for token, text in PATTERNS:
-        if token in name:
-            return text
+    if name.endswith(".pdf"):
+        return "PDF rendering of the corresponding document"
     return ""
 
 
@@ -212,6 +254,25 @@ def to_pdf(src: Path, out_dir: Path) -> Path | None:
     return produced if produced.exists() else None
 
 
+def published_files():
+    for f in sorted(PKG.rglob("*")):
+        if not f.is_file():
+            continue
+        rel = f.relative_to(PKG)
+        if rel.parts[0] in NOT_PUBLISHED or any(p in NOT_PUBLISHED for p in rel.parts):
+            continue
+        if f.name in NOT_PUBLISHED_FILES or f.name.startswith("~$"):
+            continue
+        yield f, str(rel).replace("\\", "/")
+
+
+def refresh_folder(folder: Path) -> None:
+    """Empty a published output folder before copying the new run into it."""
+    if folder.exists():
+        shutil.rmtree(folder)
+    folder.mkdir(parents=True)
+
+
 def main() -> int:
     missing = [p for p, _, _ in DOCS + DATA if not p.exists()]
     for stem, _, _ in FIGURE_MAP:
@@ -220,24 +281,25 @@ def main() -> int:
             if not f.exists():
                 missing.append(f)
     if missing:
-        print("FAIL: these inputs are missing; build them before packaging:")
+        print("FAIL: these inputs are missing; run the pipeline before packaging:")
         for m in missing:
             print("   " + str(m.relative_to(ROOT)))
         return 1
 
-    if PKG.exists():
-        shutil.rmtree(PKG)
-    PKG.mkdir(parents=True)
-
-    # --- documents, and a PDF of each so the advisor can read without Word
+    # --- documents, and a PDF of each so a reader does not need Word
+    refresh_folder(PKG / "01_Manuscript")
     for src, rel, desc in DOCS:
         copy(src, rel)
         DESCRIPTIONS[Path(rel).name] = desc
-        pdf = to_pdf(src, PKG / Path(rel).parent)
-        if pdf is not None:
-            pdf.rename(PKG / Path(rel).with_suffix(".pdf"))
+        pdf = to_pdf(PKG / rel, PKG / Path(rel).parent)
+        if pdf is None:
+            print(f"NOTE: LibreOffice not found; {rel} has no PDF rendering")
+    if PROPOSAL.exists():
+        to_pdf(PROPOSAL, PROPOSAL.parent)
 
     # --- figures, renamed to the numbering the manuscripts use
+    refresh_folder(PKG / "03_Figures" / "Main")
+    refresh_folder(PKG / "03_Figures" / "Supplementary")
     for stem, target, desc in FIGURE_MAP:
         sub = "03_Figures/Main" if "Figure_S" not in target else "03_Figures/Supplementary"
         for ext in ("png", "pdf"):
@@ -246,56 +308,57 @@ def main() -> int:
             DESCRIPTIONS[f"{target}.{ext}"] = (
                 f"{desc} ({'600 dpi raster' if ext == 'png' else 'vector, for typesetting'})")
 
-    # --- results tables and audit records
+    # --- results tables and audit records (the two citation audit records are
+    #     produced by the citation scripts, not by a pipeline run, so they are kept)
+    keep = {"reference_verification.json", "proposal_reference_verification.json"}
+    res = PKG / "04_Results_Tables"
+    saved = {k: (res / k).read_bytes() for k in keep if (res / k).exists()}
+    refresh_folder(res)
+    for k, b in saved.items():
+        (res / k).write_bytes(b)
     for f in sorted(MET.glob("*")):
         if f.suffix in (".csv", ".json"):
             copy(f, f"04_Results_Tables/{f.name}")
 
     # --- data
+    refresh_folder(PKG / "05_Data_Processed")
     for src, rel, desc in DATA:
         copy(src, rel)
         DESCRIPTIONS[Path(rel).name] = desc
 
-    # --- code
-    for f in sorted((ROOT / "scripts").glob("*.py")):
-        copy(f, f"06_Code/{f.name}")
-    req = PKG / "06_Code" / "requirements.txt"
-    req.parent.mkdir(parents=True, exist_ok=True)
-    try:
-        freeze = subprocess.run([str(ROOT / "venv" / "bin" / "pip"), "freeze"],
-                                capture_output=True, text=True, timeout=120).stdout
-    except Exception:
-        freeze = ""
-    keep = ("pandas", "numpy", "scikit-learn", "imbalanced-learn", "lightgbm", "xgboost",
-            "catboost", "shap", "matplotlib", "scipy", "statsmodels", "joblib")
-    lines = [ln for ln in freeze.splitlines()
-             if ln.split("==")[0].lower() in keep]
-    req.write_text("# Analysis environment (Python 3.11). python-docx is required for the\n"
-                   "# document-building steps (16, 17, 21, 23) and is installed separately.\n"
-                   + "\n".join(sorted(lines)) + "\npython-docx\n")
+    # --- exploratory additions: tables and figures from outputs/<folder>/
+    for folder in ADDITION_FOLDERS:
+        src = ROOT / "outputs" / folder
+        for kind in ("tables", "figures"):
+            if (src / kind).exists():
+                refresh_folder(PKG / folder / kind)
+                for f in sorted((src / kind).glob("*")):
+                    if f.suffix in (".csv", ".png", ".pdf"):
+                        copy(f, f"{folder}/{kind}/{f.name}")
+
+    # --- proposal diagrams (14_generate_diagrams.py)
+    for f in sorted((ROOT / "diagrams").glob("*.png")):
+        DESCRIPTIONS[f.name] = "Proposal diagram generated by 14_generate_diagrams.py"
 
     write_readme()
     write_manifest()
 
-    total = sum(f.stat().st_size for f in PKG.rglob("*") if f.is_file())
-    n = sum(1 for f in PKG.rglob("*") if f.is_file())
-    print(f"package: {PKG.relative_to(ROOT)}")
-    print(f"files  : {n}")
+    files = list(published_files())
+    total = sum(f.stat().st_size for f, _ in files)
+    print(f"package: {PKG}")
+    print(f"files  : {len(files) + 1} (including the manifest)")
     print(f"size   : {total / 1e6:.1f} MB")
     return 0
 
 
 def verification_counts() -> str:
-    """Run the numeric audit and report what it actually found.
-
-    Hard-coding a token count into the README is exactly the kind of number that goes
-    stale the first time a sentence is edited, so it is measured at packaging time.
-    """
+    """Run the numeric audit and report what it actually found, measured at
+    packaging time rather than hard-coded."""
     try:
-        out = subprocess.run([sys.executable, str(ROOT / "scripts" / "18_verify_manuscript_numbers.py")],
+        out = subprocess.run([sys.executable, str(ROOT / "06_Code" / "18_verify_manuscript_numbers.py")],
                              capture_output=True, text=True, timeout=300).stdout
     except Exception:
-        return "the numeric audit"
+        return "see the script's output"
     counted = sum(int(ln.split(":")[1]) for ln in out.splitlines()
                   if ln.startswith("numeric tokens checked:"))
     bad = next((ln.split(":")[1].strip() for ln in out.splitlines()
@@ -305,123 +368,16 @@ def verification_counts() -> str:
 
 def write_readme() -> None:
     counts = verification_counts()
-    (PKG / "README.md").write_text(f"""# Blood Metals and Metabolic Syndrome — AI/ML Component
-
-Submission package prepared {TODAY}.
-
-This package covers the machine-learning arm of the study: predicting metabolic syndrome
-(MetS) in pooled NHANES 2007–2018 data from demographic, lifestyle, anthropometric and
-blood-metal predictors, and identifying which predictors carry the signal. The Mendelian
-randomization arm is described as planned work in the proposal and has not yet been run;
-no MR results appear anywhere in this package.
-
-## How the folders are organised
-
-| Folder | Contents |
-|---|---|
-| `01_Manuscript/` | Methods, Results and Supplementary Material, as .docx and .pdf |
-| `02_Proposal/` | The revised research proposal, as .docx and .pdf |
-| `03_Figures/Main/` | Figures 1–5, numbered as the manuscripts cite them |
-| `03_Figures/Supplementary/` | Figures S1–S5 |
-| `04_Results_Tables/` | Every metrics table the manuscripts draw on, plus the citation audit records |
-| `05_Data_Processed/` | The analytic dataset and the exact train/test split |
-| `06_Code/` | The full pipeline, numbered in execution order |
-| `00_MANIFEST.csv` | Every file above, with size, MD5 checksum and a one-line description |
-
-Every figure is supplied twice: a 600 dpi PNG for reading, and a vector PDF for
-typesetting. The two are drawn from the same code path, so they cannot disagree.
-
-## What has been checked, and how
-
-Four verification scripts run over this material. All four pass as packaged.
-
-- `06_Code/18_verify_manuscript_numbers.py` takes every numeric token in the three
-  manuscript documents and tries to trace it back to a value that actually exists in the
-  pipeline's output. It builds the allowed pool from the metrics tables, the numbers JSON
-  and a declared set of structural constants, and prints anything it cannot account for
-  rather than passing it silently. Current result: {counts}. This proves no number was
-  invented, mistyped, or left behind by an earlier draft; it does not prove that a real
-  number is attached to the right claim, which is what reading is for.
-- `06_Code/20_verify_citations.py` checks the Methods references: that every marker
-  resolves, that every reference is cited, that first-mention order is ascending, that
-  PMIDs and DOIs are unique, and that each entry matches the PubMed record captured in
-  `04_Results_Tables/reference_verification.json`.
-- `06_Code/24_audit_proposal_references.py` does the same field-by-field comparison for
-  the proposal's 111-entry reference bank — title, first author, journal, year, volume,
-  issue, pages and DOI against PubMed's own record.
-- `06_Code/25_verify_proposal_citations.py` checks the finished proposal document rather
-  than the script that produced it: numbering runs 1–99 with no gaps, no reference goes
-  uncited, first mentions ascend, and every listed entry renders exactly as the bank says
-  it should.
-- `06_Code/27_verify_submission.py` checks this package as you received it, which is the
-  one thing the others cannot: that every file on disk is in the manifest and every
-  checksum still matches, that every figure and table the text cites exists here and
-  nothing sits here uncited, that no document carries a leftover draft marker, and that
-  no page in any PDF is blank.
-
-## Reproducing the analysis
-
-```bash
-python -m venv venv && ./venv/bin/pip install -r 06_Code/requirements.txt
-
-# modelling pipeline, in order
-for s in 01 02 03 04 06 07 08 09 10 11 12 13; do ./venv/bin/python 06_Code/$s_*.py; done
-
-# figures and the numbers JSON
-./venv/bin/python 06_Code/15_publication_figures.py
-
-# documents (these need python-docx)
-python3 06_Code/16_write_methods_docx.py
-python3 06_Code/17_write_results_docx.py
-python3 06_Code/21_write_supplement.py
-python3 06_Code/23_rewrite_proposal_citations.py
-
-# verification
-python3 06_Code/18_verify_manuscript_numbers.py
-python3 06_Code/20_verify_citations.py
-python3 06_Code/24_audit_proposal_references.py
-python3 06_Code/25_verify_proposal_citations.py
-```
-
-Step 01 reads the raw NHANES `.xpt` files, which are not included here — they are public
-and are downloaded from the CDC (the URL is given in the Methods, Data subsection). Every
-step from 02 onward runs from `05_Data_Processed/`, which is included.
-
-The random seed is fixed in `06_Code/config.py`. The train/test split is additionally
-pinned by SEQN in `05_Data_Processed/train_seqn.csv` and `test_seqn.csv`, so the partition
-is reproducible even if the splitting code changes.
-
-## Two things worth flagging
-
-**Six claims in the proposal were rewritten rather than cited.** Each asserted something
-for which no real article could be found — a peri-menopausal blood-lead study, marital
-status and household size as MetS risk factors, an HIV/BMI threshold claim, wine being
-less harmful than beer or spirits, and a 13-SNP blood-lead instrument. The rewritten
-sentences say what the literature that does exist actually shows. The full list, with the
-reasoning, is in the docstring of `06_Code/23_rewrite_proposal_citations.py` under
-`REMOVED_CLAIMS`.
-
-**Every reference was checked against PubMed before use, and seven did not survive.** Four
-resolved to entirely different papers, and three could not be found at all. One of the
-seven was already in the previous draft of the proposal, cited by name in the prose.
-""", encoding="utf-8")
+    (PKG / "README.md").write_text(README_TEMPLATE.format(today=TODAY, counts=counts), encoding="utf-8")
 
 
 def write_manifest() -> None:
     rows, undescribed = [], []
-    for f in sorted(PKG.rglob("*")):
-        if not f.is_file() or f.name == "00_MANIFEST.csv":
-            continue
-        rel = str(f.relative_to(PKG))
+    for f, rel in published_files():
         desc = describe(rel)
         if not desc:
             undescribed.append(rel)
-        rows.append({
-            "path": rel,
-            "size_bytes": f.stat().st_size,
-            "md5": md5(f),
-            "description": desc,
-        })
+        rows.append({"path": rel, "size_bytes": f.stat().st_size, "md5": md5(f), "description": desc})
     with (PKG / "00_MANIFEST.csv").open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["path", "size_bytes", "md5", "description"])
         w.writeheader()
@@ -430,6 +386,9 @@ def write_manifest() -> None:
         print(f"NOTE: {len(undescribed)} file(s) have no description in the manifest:")
         for u in undescribed:
             print("   " + u)
+
+
+README_TEMPLATE = open(Path(__file__).with_name("readme_template.md"), encoding="utf-8").read()
 
 
 if __name__ == "__main__":

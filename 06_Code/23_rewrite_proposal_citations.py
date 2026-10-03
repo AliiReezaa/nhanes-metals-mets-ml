@@ -36,11 +36,17 @@ from pathlib import Path
 from docx import Document
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "docx_final" / "Metabolic_Syndrome_Proposal_Revised_FINAL3.docx"
-DST = ROOT / "docx_final" / "Metabolic_Syndrome_Proposal_Revised_FINAL4.docx"
+# 2026-10 audit (C24): this was a ONE-TIME conversion of the earlier proposal draft
+# (Metabolic_Syndrome_Proposal_Revised_FINAL3.docx, kept in the study's working folder,
+# not in this package) into 02_Proposal/Research_Proposal.docx. The proposal has since
+# been corrected directly (checklist P1-P9), so this script must not be re-run over it;
+# it is kept as the audit record of what the conversion changed and why. To re-run the
+# conversion itself, pass the old draft's path:  python 23_... <FINAL3.docx> <out.docx>
+SRC = Path(sys.argv[1]) if len(sys.argv) > 1 else None
+DST = Path(sys.argv[2]) if len(sys.argv) > 2 else None
 
 spec = importlib.util.spec_from_file_location(
-    "propref", ROOT / "scripts" / "22_proposal_references.py")
+    "propref", ROOT / "06_Code" / "22_proposal_references.py")
 propref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(propref)
 REFS, format_reference, collapse = propref.REFS, propref.format_reference, propref.collapse
@@ -331,6 +337,11 @@ def clusters_in(text: str) -> list[tuple[int, int]]:
 
 
 def main() -> int:
+    if SRC is None or DST is None or not SRC.exists():
+        print("23_rewrite_proposal_citations.py is a one-time conversion that has already been "
+              "applied; 02_Proposal/Research_Proposal.docx is its (since corrected) output. "
+              "Nothing to do. See the module docstring to re-run it on the old draft.")
+        return 0
     doc = Document(SRC)
     paras = doc.paragraphs
 
@@ -439,7 +450,7 @@ def main() -> int:
     doc.save(DST)
 
     unused = [k for k in REFS if k not in order]
-    print(f"wrote {DST.relative_to(ROOT)}")
+    print(f"wrote {DST}")
     print(f"marker clusters rewritten : {len(CLUSTER_MAP) + sum(len(PLACEHOLDER.findall(t)) for t in PARA_REPLACE.values()) + sum(len(PLACEHOLDER.findall(n)) for v in SUBSTR_REPLACE.values() for _, n in v)}")
     print(f"references cited          : {len(order)}")
     print(f"references in bank, unused: {len(unused)}")

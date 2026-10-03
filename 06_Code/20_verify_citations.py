@@ -135,7 +135,8 @@ def check_identifiers(ids):
     return ok
 
 
-AUDIT = ROOT / "outputs" / "metrics" / "reference_verification.json"
+# 2026-10 audit (C24): the audit record ships in 04_Results_Tables/.
+AUDIT = ROOT / "04_Results_Tables" / "reference_verification.json"
 
 
 def check_external(ids):

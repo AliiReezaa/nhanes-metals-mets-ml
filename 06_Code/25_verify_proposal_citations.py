@@ -29,11 +29,13 @@ from pathlib import Path
 from docx import Document
 
 ROOT = Path(__file__).resolve().parents[1]
-DOC = ROOT / "docx_final" / "Metabolic_Syndrome_Proposal_Revised_FINAL4.docx"
-AUDIT = ROOT / "outputs" / "metrics" / "proposal_reference_verification.json"
+# 2026-10 audit (C24): paths of this package (the earlier version expected a
+# docx_final/ and scripts/ working layout that is not shipped).
+DOC = ROOT / "02_Proposal" / "Research_Proposal.docx"
+AUDIT = ROOT / "04_Results_Tables" / "proposal_reference_verification.json"
 
 spec = importlib.util.spec_from_file_location(
-    "propref", ROOT / "scripts" / "22_proposal_references.py")
+    "propref", ROOT / "06_Code" / "22_proposal_references.py")
 propref = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(propref)
 REFS, format_reference = propref.REFS, propref.format_reference
@@ -142,7 +144,7 @@ def main() -> int:
     # ---------------- external audit record ----------------
     if not AUDIT.is_file():
         failures.append("EXTERNAL: the PubMed audit record is missing; run "
-                        "scripts/24_audit_proposal_references.py")
+                        "06_Code/24_audit_proposal_references.py")
     else:
         records = json.loads(AUDIT.read_text()).get("records", {})
         for k in order_keys:

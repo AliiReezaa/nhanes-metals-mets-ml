@@ -1,5 +1,8 @@
-# Analysis environment (Python 3.11). python-docx is required for the
-# document-building steps (16, 17, 21, 23) and is installed separately.
+# Analysis environment. Tested on Python 3.11-3.13 (Linux, macOS, Windows).
+# Install with:  pip install -r 06_Code/requirements.txt
+# (The one-click launcher RUN_ME.py does this for you in a private .venv.)
+# 2026-10 audit (C10): every third-party package that any script imports is
+# listed and pinned here; 27_verify_submission.py checks this against the code.
 catboost==1.2.10
 imbalanced-learn==0.14.2
 joblib==1.6.0
@@ -7,9 +10,15 @@ lightgbm==4.7.0
 matplotlib==3.11.2
 numpy==2.4.6
 pandas==3.0.5
+patsy==1.0.3
+plotly==7.1.0
+python-docx==1.2.0
 scikit-learn==1.9.1
 scipy==1.17.1
+seaborn==0.13.2
 shap==0.51.0
 statsmodels==0.15.0
 xgboost==2.1.4
-python-docx
+# Optional: only 14_generate_diagrams.py uses playwright, to render two HTML
+# diagrams to PNG; without it that script skips those two images.
+# playwright

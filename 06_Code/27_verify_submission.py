@@ -1,9 +1,11 @@
 """
 Final check on the assembled submission package.
 
-This runs over SUBMISSION/ as a reader would receive it, not over the working tree, so it
-catches the failure mode the other verification scripts cannot: a package that was built
-from stale inputs, or that is missing a file the text refers to.
+This runs over the published folders as a reader would receive them, so it catches the
+failure mode the other verification scripts cannot: a package that was built from stale
+inputs, or that is missing a file the text refers to. (2026-10 audit, C11: the package is
+the repository itself; the earlier version looked for a SUBMISSION/ sub-folder and
+failed immediately.)
 
 Checks:
 
@@ -14,7 +16,9 @@ Checks:
   TABLES       every "Table N" and "Table SN" cited in the text is defined exactly once
   BLANK PAGES  no PDF in the package contains a page with essentially no content
   DOCUMENTS    the four source documents carry the expected page counts and no unresolved
-               placeholder or leftover draft marker
+               placeholder or leftover draft marker (including phrases such as "earlier draft")
+  PACKAGES     every third-party package imported by any script is pinned in
+               06_Code/requirements.txt (2026-10 audit, C10)
 """
 from __future__ import annotations
 
@@ -28,7 +32,18 @@ from pathlib import Path
 from docx import Document
 
 ROOT = Path(__file__).resolve().parents[1]
-PKG = ROOT / "SUBMISSION"
+PKG = ROOT
+NOT_PUBLISHED = {".git", ".venv", "venv", "outputs", "data_processed", "NHANES_data",
+                 "manuscript", "__pycache__", ".pytest_cache"}
+
+# import name -> pip package name, for the PACKAGES check
+IMPORT_TO_PIP = {"sklearn": "scikit-learn", "imblearn": "imbalanced-learn", "docx": "python-docx",
+                 "catboost": "catboost", "lightgbm": "lightgbm", "xgboost": "xgboost",
+                 "shap": "shap", "pandas": "pandas", "numpy": "numpy", "scipy": "scipy",
+                 "statsmodels": "statsmodels", "matplotlib": "matplotlib", "joblib": "joblib",
+                 "seaborn": "seaborn", "patsy": "patsy", "plotly": "plotly",
+                 "playwright": "playwright"}
+OPTIONAL_PACKAGES = {"playwright"}
 
 DOCS = {
     "Methods":     PKG / "01_Manuscript" / "01_Methods_AI.docx",
@@ -41,7 +56,7 @@ FIG_CITE = re.compile(r"\bFigure\s(S?\d+)")
 FIG_DEF = re.compile(r"^Figure\s(S?\d+)\.")
 TAB_CITE = re.compile(r"\bTable\s(S?\d+)")
 TAB_DEF = re.compile(r"^Table\s(S?\d+)\.")
-PLACEHOLDER = re.compile(r"\{\{|\}\}|TODO|TBD|XXX|\[REF\]|Lorem ipsum", re.I)
+PLACEHOLDER = re.compile(r"\{\{|\}\}|TODO|TBD|XXX|\[REF\]|Lorem ipsum|earlier draft|previous draft", re.I)
 
 FIG_STEMS = {
     "1": "Main/Figure_1_Participant_Flow",
@@ -75,16 +90,22 @@ def doc_lines(path: Path) -> list[str]:
 
 
 def main() -> int:
-    if not PKG.is_dir():
-        print("FAIL: SUBMISSION/ does not exist; run scripts/26_build_submission.py")
+    if not (PKG / "00_MANIFEST.csv").exists():
+        print("FAIL: 00_MANIFEST.csv does not exist; run 06_Code/26_build_submission.py")
         return 1
     problems: list[str] = []
 
     # ---------------- manifest ----------------
     manifest = {r["path"]: r for r in
                 csv.DictReader((PKG / "00_MANIFEST.csv").open(encoding="utf-8"))}
-    on_disk = {str(f.relative_to(PKG)) for f in PKG.rglob("*")
-               if f.is_file() and f.name != "00_MANIFEST.csv"}
+    on_disk = set()
+    for f in PKG.rglob("*"):
+        if not f.is_file() or f.name in ("00_MANIFEST.csv", ".DS_Store") or f.name.startswith("~$"):
+            continue
+        rel = f.relative_to(PKG)
+        if any(part in NOT_PUBLISHED for part in rel.parts):
+            continue
+        on_disk.add(str(rel).replace("\\", "/"))
     for extra in sorted(on_disk - set(manifest)):
         problems.append(f"MANIFEST: {extra} is in the package but not in the manifest")
     for gone in sorted(set(manifest) - on_disk):
@@ -161,8 +182,22 @@ def main() -> int:
         if blank:
             problems.append(f"BLANK PAGES: {pdf.name} page(s) {blank} are essentially empty")
 
+    # ---------------- packages ----------------
+    req = {ln.split("==")[0].strip().lower() for ln in
+           (PKG / "06_Code" / "requirements.txt").read_text(encoding="utf-8").splitlines()
+           if ln.strip() and not ln.startswith("#")}
+    imported = set()
+    for py in PKG.rglob("*.py"):
+        if any(part in NOT_PUBLISHED for part in py.relative_to(PKG).parts):
+            continue
+        for m in re.finditer(r"^\s*(?:from|import)\s+([A-Za-z_][A-Za-z0-9_]*)", py.read_text(encoding="utf-8"), re.M):
+            if m.group(1) in IMPORT_TO_PIP:
+                imported.add(IMPORT_TO_PIP[m.group(1)])
+    for pkg in sorted(imported - req - OPTIONAL_PACKAGES):
+        problems.append(f"PACKAGES: {pkg} is imported by the code but not pinned in requirements.txt")
+
     # ---------------- report ----------------
-    print(f"package        : {PKG.relative_to(ROOT)}")
+    print(f"package        : {PKG}")
     print(f"files          : {len(on_disk)} on disk, {len(manifest)} in the manifest")
     print(f"figures cited  : {', '.join(sorted(cited_figs, key=lambda s: (s[0] == 'S', s)))}")
     print(f"tables cited   : {', '.join(sorted(cited_tabs, key=lambda s: (s[0] == 'S', s)))}")
@@ -174,7 +209,7 @@ def main() -> int:
         for p in problems:
             print("   " + p)
         return 1
-    print("\nRESULT: MANIFEST, FIGURES, TABLES, DOCUMENTS and BLANK PAGES checks all pass.")
+    print("\nRESULT: MANIFEST, FIGURES, TABLES, DOCUMENTS, BLANK PAGES and PACKAGES checks all pass.")
     return 0
 
 
