@@ -2,13 +2,18 @@
 Verified reference list for the manuscript Methods section.
 
 EVERY entry here was retrieved and confirmed through the PubMed E-utilities API
-(or, for the two computer-science sources that PubMed does not index, resolved
+(or, for the computer-science sources that PubMed does not index, resolved
 through the publisher's own DOI record) on 2026-09-18. The PMID / DOI recorded
 with each entry is the one the database returned, not one reconstructed from
 memory. Nothing in this file should be edited by hand without re-verifying the
 identifier it carries.
 
-VERIFICATION NOTE for the two non-PubMed entries:
+2026-10 audit (P12): Altmann et al. 2010 (a corrected, p-value-based
+variant) was replaced by the sources of the permutation method actually used:
+Breiman 2001 (publisher record checked on 2026-10-03) and Fisher, Rudin and
+Dominici 2019 (PMID 34335110, PMC8323609, checked on 2026-10-03).
+
+VERIFICATION NOTE for the non-PubMed entries:
   * Chawla 2002 - DOI 10.1613/jair.953 resolves to the JAIR record for "SMOTE:
     Synthetic Minority Over-sampling Technique", vol 16, pp 321-357. The
     SMOTE-NC variant used here is attributed to this paper by the canonical
@@ -93,9 +98,11 @@ REFS = [
     ("lundberg", "Lundberg SM, Erion G, Chen H, DeGrave A, Prutkin JM, Nair B, et al. From local "
                  "explanations to global understanding with explainable AI for trees. Nat Mach "
                  "Intell. 2020;2(1):56–67. doi:10.1038/s42256-019-0138-9."),
-    ("altmann", "Altmann A, Toloşi L, Sander O, Lengauer T. Permutation importance: a corrected "
-                "feature importance measure. Bioinformatics. 2010;26(10):1340–7. "
-                "doi:10.1093/bioinformatics/btq134."),
+    ("breiman", "Breiman L. Random forests. Mach Learn. 2001;45(1):5–32. "
+                "doi:10.1023/A:1010933404324."),
+    ("fisher_mcr", "Fisher A, Rudin C, Dominici F. All models are wrong, but many are useful: "
+                   "learning a variable's importance by studying an entire class of prediction "
+                   "models simultaneously. J Mach Learn Res. 2019;20:177. PMID: 34335110."),
 ]
 
 NUM = {key: i + 1 for i, (key, _) in enumerate(REFS)}

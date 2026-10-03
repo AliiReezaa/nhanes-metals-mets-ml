@@ -205,17 +205,6 @@
    "doi": "10.1038/s42256-019-0138-9",
    "source": "pubmed"
   },
-  "altmann": {
-   "pmid": "20385727",
-   "first_author": "Altmann",
-   "journal": "Bioinformatics",
-   "year": "2010",
-   "volume": "26",
-   "pages": "1340-7",
-   "issue": "10",
-   "doi": "10.1093/bioinformatics/btq134",
-   "source": "pubmed"
-  },
   "bulka": {
    "pmid": "30388496",
    "first_author": "Bulka",
@@ -225,6 +214,29 @@
    "pages": "397-405",
    "doi": "10.1016/j.envres.2018.10.022",
    "source": "pubmed"
+  },
+  "breiman": {
+   "pmid": null,
+   "first_author": "Breiman",
+   "journal": "Mach Learn",
+   "year": "2001",
+   "volume": "45",
+   "pages": "5-32",
+   "issue": "1",
+   "doi": "10.1023/A:1010933404324",
+   "source": "publisher",
+   "verification": "Springer DOI record 10.1023/A:1010933404324 checked 2026-10-03: 'Random Forests', Machine Learning 45(1):5-32."
+  },
+  "fisher_mcr": {
+   "pmid": "34335110",
+   "first_author": "Fisher",
+   "journal": "J Mach Learn Res",
+   "year": "2019",
+   "volume": "20",
+   "pages": "177",
+   "doi": null,
+   "source": "pubmed",
+   "verification": "PMC8323609 record checked 2026-10-03."
   }
  }
 }
