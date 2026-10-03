@@ -70,7 +70,6 @@ CORE_STEPS = [
     ("Step 13 sensitivity analyses",                "10_sensitivity.py",            {"quick": ["--cv", "3"]},        True,  {"full", "packaged", "quick"}),
     ("Step 14 STROBE flow and Table 1",             "11_reporting.py",              {},                              True,  {"full", "packaged", "quick"}),
     ("Extra   comparison charts and dashboard",     "12_visualize.py",              {},                              False, {"full", "packaged", "quick"}),
-    ("Extra   publication extras",                  "13_publication_extras.py",     {},                              False, {"full", "packaged", "quick"}),
     ("Step 15 publication figures and numbers",     "15_publication_figures.py",    {},                              True,  {"full", "packaged", "quick"}),
     ("Docs    write Methods .docx",                 "16_write_methods_docx.py",     {},                              False, {"full", "packaged", "quick"}),
     ("Docs    write Results .docx",                 "17_write_results_docx.py",     {},                              False, {"full", "packaged", "quick"}),
