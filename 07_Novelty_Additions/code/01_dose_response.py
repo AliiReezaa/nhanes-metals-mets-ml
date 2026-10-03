@@ -1,10 +1,15 @@
 """
-Addition 1: confirm the non-monotonic dose-response shapes seen in the
-CatBoost SHAP dependence plot (Figure 5) with an independent, non-ML
-model: a logistic GAM (natural cubic spline per metal) adjusted for age,
-BMI, sex and income-to-poverty ratio, fit on the full analytic cohort
-(n=11,144; more power than the n=2,229 test-only SHAP plot). For each
-metal:
+Addition 1: check the dose-response shapes seen in the SHAP dependence plot
+(Figure 5) with an independent, non-ML model: a logistic regression with a
+natural cubic spline per metal, fitted on the whole analytic cohort (more power
+than the test-set-only SHAP plot).
+
+2026-10 audit (A6): the adjustment set now includes smoking (ever and current
+intensity), survey cycle, race and ethnicity, education and alcohol in addition
+to age, BMI, sex and income (see additions_common.ADJUST_TERMS); smoking and
+cycle were the most important omissions for cadmium and lead. All five metals
+are analysed (selenium and manganese on the 2011-2018 cycles that measured
+them). For each metal:
   1. Likelihood-ratio test: spline term vs. linear term (is the curve
      really non-linear, or is that shape sampling noise in the SHAP plot?)
   2. Predicted-probability curve with 95% CI across the metal's range,
@@ -15,6 +20,12 @@ most consequential and most surprising pattern): a two-piece (hinge)
 segmented logistic model, breakpoint chosen by profile-likelihood grid
 search, with a bootstrap CI on the breakpoint location.
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
+
 import numpy as np
 import pandas as pd
 import patsy
@@ -25,32 +36,36 @@ import matplotlib.pyplot as plt
 import pubstyle as ps
 
 ps.apply_style()
+TABLES, FIGURES = ac.out_dirs("07_Novelty_Additions")
 
 RNG = np.random.default_rng(42)
-
-
-def _fmt_p(p: float) -> str:
-    """Journal-standard p-value formatting: 3 decimals down to 0.001, then
-    scientific notation, never a bare 0.0."""
-    if p < 0.001:
-        return f"{p:.1e}"
-    return f"{p:.3f}"
+_fmt_p = ac.fmt_p
 
 CLINICAL = {
     "LBXBPB": ("Blood lead", "µg/dL"),
     "LBXBCD": ("Blood cadmium", "µg/L"),
+    "LBXTHG": ("Blood mercury", "µg/L"),
     "LBXBSE": ("Blood selenium", "µg/L"),
+    "LBXBMN": ("Blood manganese", "µg/L"),
 }
-ADJUST = "RIDAGEYR + BMXBMI + sex_female + INDFMPIR"
+ADJUST = ac.ADJUST_FORMULA
 
 
 def load_full_cohort():
-    df = pd.read_csv("SUBMISSION/05_Data_Processed/model_ready.csv", low_memory=False)
-    return df
+    return ac.analysis_frame()
+
+
+def covariate_reference(sub):
+    """Covariate values for the predicted curves: means for numeric
+    covariates, the most common level for categorical ones."""
+    ref = {}
+    for c in ac.ADJUST_COLUMNS:
+        ref[c] = sub[c].mode().iloc[0] if c in ("RIDRETH1", "cycle") else sub[c].mean()
+    return ref
 
 
 def fit_linear_and_spline(df, metal, outcome="mets_status", df_spline=4):
-    cols_needed = [metal, "RIDAGEYR", "BMXBMI", "sex_female", "INDFMPIR", outcome]
+    cols_needed = [metal, outcome] + ac.ADJUST_COLUMNS
     sub = df[cols_needed].dropna().copy()
     n = len(sub)
 
@@ -84,12 +99,7 @@ def predicted_curve(res, metal, n_points=60):
     sub = res["sub"]
     spl_model = res["spl_model"]
     grid = np.linspace(sub[metal].quantile(0.01), sub[metal].quantile(0.99), n_points)
-    means = sub[["RIDAGEYR", "BMXBMI", "sex_female", "INDFMPIR"]].mean()
-    new_df = pd.DataFrame({
-        metal: grid,
-        "RIDAGEYR": means["RIDAGEYR"], "BMXBMI": means["BMXBMI"],
-        "sex_female": means["sex_female"], "INDFMPIR": means["INDFMPIR"],
-    })
+    new_df = pd.DataFrame({metal: grid, **covariate_reference(sub)})
     # Build design matrix using the same spline basis (patsy handles this via design_info)
     X_new = patsy.build_design_matrices([res["design_info"]], new_df)[0]
     pred = spl_model.get_prediction(X_new)
@@ -101,8 +111,8 @@ N_BOOT = 80
 
 
 def segmented_breakpoint_search(df, metal="LBXBPB", outcome="mets_status",
-                                  candidate_range=None, n_candidates=25):
-    cols_needed = [metal, "RIDAGEYR", "BMXBMI", "sex_female", "INDFMPIR", outcome]
+                                  candidate_range=None, n_candidates=20):
+    cols_needed = [metal, outcome] + ac.ADJUST_COLUMNS
     sub = df[cols_needed].dropna().copy()
     if candidate_range is None:
         lo, hi = sub[metal].quantile(0.10), sub[metal].quantile(0.90)
@@ -154,9 +164,9 @@ def main():
     df = load_full_cohort()
     results = {}
     rows = []
-    fig, axes = plt.subplots(1, 3, figsize=(ps.W_DOUBLE, ps.W_DOUBLE / 3.1))
-    panel_letters = ["A", "B", "C"]
-    for ax, metal, letter in zip(axes, ["LBXBPB", "LBXBCD", "LBXBSE"], panel_letters):
+    fig, axes = plt.subplots(1, 5, figsize=(ps.W_DOUBLE * 1.25, ps.W_DOUBLE / 3.3))
+    panel_letters = ["A", "B", "C", "D", "E"]
+    for ax, metal, letter in zip(axes, list(CLINICAL), panel_letters):
         res = fit_linear_and_spline(df, metal)
         results[metal] = res
         grid, mean, lo, hi = predicted_curve(res, metal)
@@ -166,9 +176,10 @@ def main():
         ax.axhline(df["mets_status"].mean(), color="#999999", ls="--", lw=0.8, zorder=1)
         ax.set_xlabel(f"{name} ({unit})")
         ax.set_ylabel("Predicted P(MetS)" if metal == "LBXBPB" else "")
-        sig = "p < 0.001" if res["lr_p"] < 0.001 else f"p = {res['lr_p']:.3f}"
-        ax.text(0.04, 0.96, f"n = {res['n']:,}\nspline vs. linear: {sig}",
-                 transform=ax.transAxes, fontsize=7.5, va="top", ha="left",
+        ax.tick_params(labelsize=7)
+        sig = f"p = {_fmt_p(res['lr_p'])}"
+        ax.text(0.04, 0.97, f"n = {res['n']:,}\nnon-linearity {sig}",
+                 transform=ax.transAxes, fontsize=6.6, va="top", ha="left",
                  color="#333333")
         ps.panel_label(ax, letter, dx=-0.16, dy=1.12)
         rows.append({
@@ -179,11 +190,12 @@ def main():
         })
     fig.tight_layout(rect=[0, 0, 1, 0.94])
     fig.subplots_adjust(wspace=0.32)
-    ps.save(fig, "fig_dose_response_confirmation")
+    ps.save(fig, FIGURES / "fig_dose_response_confirmation")
     print("Saved fig_dose_response_confirmation.png/.pdf")
 
     lrt_table = pd.DataFrame(rows)
-    lrt_table.to_csv("table_dose_response_lrt.csv", index=False)
+    lrt_table["Adjusted for"] = "age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"
+    lrt_table.to_csv(TABLES / "table_dose_response_lrt.csv", index=False)
     print(lrt_table.to_string(index=False))
 
     # Lead breakpoint search
@@ -197,20 +209,16 @@ def main():
         "Breakpoint (µg/dL)": round(seg["breakpoint"], 2),
         "95% CI low": round(seg["ci_low"], 2), "95% CI high": round(seg["ci_high"], 2),
         "Bootstrap reps": f"{seg['n_boot']}/{N_BOOT}",
-        "Method": "segmented logistic GLM, profile-likelihood breakpoint search, "
-                  "adjusted for age/BMI/sex/PIR",
-    }]).to_csv("table_lead_breakpoint.csv", index=False)
+        "Method": "segmented logistic GLM, profile-likelihood breakpoint search, adjusted for "
+                  "age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle",
+    }]).to_csv(TABLES / "table_lead_breakpoint.csv", index=False)
 
     # Plot the segmented fit for lead specifically
     sub = seg["sub"]
     bp = seg["breakpoint"]
     grid = np.linspace(sub["LBXBPB"].quantile(0.01), sub["LBXBPB"].quantile(0.99), 100)
-    means = sub[["RIDAGEYR", "BMXBMI", "sex_female", "INDFMPIR"]].mean()
-    new_df = pd.DataFrame({
-        "LBXBPB": grid, "hinge": np.clip(grid - bp, 0, None),
-        "RIDAGEYR": means["RIDAGEYR"], "BMXBMI": means["BMXBMI"],
-        "sex_female": means["sex_female"], "INDFMPIR": means["INDFMPIR"],
-    })
+    new_df = pd.DataFrame({"LBXBPB": grid, "hinge": np.clip(grid - bp, 0, None),
+                           **covariate_reference(sub)})
     X_new = patsy.build_design_matrices([seg["design_info"]], new_df)[0]
     pred = seg["model"].get_prediction(X_new).summary_frame(alpha=0.05)
     fig2, ax2 = plt.subplots(figsize=(ps.W_SINGLE * 1.55, ps.W_SINGLE * 1.2))
@@ -220,13 +228,17 @@ def main():
     ax2.axvline(bp, color="#333333", ls=":", lw=1.2, zorder=1)
     ax2.text(bp, ax2.get_ylim()[1] * 0.97, f"  breakpoint = {bp:.2f} µg/dL",
               fontsize=8, va="top", color="#333333")
-    ax2.text(0.97, 0.06, f"bootstrap 95% CI: {seg['ci_low']:.2f}–{seg['ci_high']:.2f} µg/dL\n"
-                          "(spans most of the search range -- not localized)",
+    # 2026-10 audit: this note used to be hard-coded; it is now written only
+    # when the interval really covers most of the searched range.
+    lo_r, hi_r = sub["LBXBPB"].quantile(0.10), sub["LBXBPB"].quantile(0.90)
+    wide = (seg["ci_high"] - seg["ci_low"]) > 0.5 * (hi_r - lo_r)
+    ax2.text(0.97, 0.06, f"bootstrap 95% CI: {seg['ci_low']:.2f}–{seg['ci_high']:.2f} µg/dL"
+                          + ("\n(spans most of the search range: not localized)" if wide else ""),
               transform=ax2.transAxes, fontsize=7.5, va="bottom", ha="right", color="#333333")
     ax2.set_xlabel("Blood lead (µg/dL)")
     ax2.set_ylabel("Predicted P(MetS)")
     fig2.tight_layout()
-    ps.save(fig2, "fig_lead_breakpoint")
+    ps.save(fig2, FIGURES / "fig_lead_breakpoint")
     print("Saved fig_lead_breakpoint.png/.pdf")
 
 

@@ -1,10 +1,9 @@
 """
-Q1 rigor addition 2: a real Weighted Quantile Sum (WQS) regression, replacing
-the lightweight proxy used in 07_Novelty_Additions/code/05_mixture_score.py
-(which was honestly flagged there as "the lightweight analogue" -- a single
-unconstrained logistic regression collapsed into one weighted index, not the
-actual WQS estimator). This implements the standard Carrico et al. (2015)
-WQS methodology used throughout environmental-epidemiology metals-mixture
+Q1 rigor addition 2: Weighted Quantile Sum (WQS) regression of the five-metal
+mixture (it replaces the earlier 07_Novelty_Additions/code/05_mixture_score.py
+proxy, removed in the 2026-10 audit because it estimated and tested its index
+on the same rows). This implements the standard Carrico et al. (2015) WQS
+methodology used throughout environmental-epidemiology metals-mixture
 papers:
 
   1. Split the metals-complete-case cohort into a 40% training partition
@@ -22,7 +21,11 @@ papers:
      constrained to the simplex (each w_j >= 0, sum w_j = 1) and the
      index's own coefficient constrained positive (a priori "harmful
      direction" WQS, standard when testing a mixture hypothesized to raise
-     risk) -- adjusted for age/BMI/sex/income-to-poverty ratio throughout.
+     risk) -- adjusted throughout for age, BMI, sex, income, race/ethnicity,
+     education, smoking (ever and current intensity), alcohol and survey
+     cycle (2026-10 audit, A6: the earlier set had only the first four, so
+     smoking -- the main non-dietary source of cadmium -- and the 2007-2018
+     fall in blood lead were uncontrolled).
   4. Average the bootstrapped weights into one final component-weight
      signature (this IS the headline WQS output: which metals are actually
      driving the mixture's association, as opposed to which one has the
@@ -31,7 +34,15 @@ papers:
      the training-derived breakpoints and the averaged weights, and test its
      association with MetS in a single adjusted logistic regression fit
      only on that validation partition.
+
+Run (after the main pipeline): python 08_Q1_Rigor_Additions/code/11_wqs_mixture.py
 """
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -44,21 +55,24 @@ import matplotlib.pyplot as plt
 import pubstyle as ps
 
 ps.apply_style()
+TABLES, FIGURES = ac.out_dirs("08_Q1_Rigor_Additions")
 
 RNG = np.random.default_rng(42)
 METALS = ["LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN"]
 METAL_LABELS = {"LBXBPB": "Lead", "LBXBCD": "Cadmium", "LBXTHG": "Mercury",
                  "LBXBSE": "Selenium", "LBXBMN": "Manganese"}
-ADJUST = ["RIDAGEYR", "BMXBMI", "sex_female", "INDFMPIR"]
+ADJUST = ac.ADJUST_COLUMNS
+
+
+def cov_matrix(frame):
+    """Numeric covariate design (dummy-coded categoricals, no intercept)."""
+    return np.asarray(patsy.dmatrix(ac.ADJUST_FORMULA + " - 1", frame, return_type="dataframe"))
 G = 4          # quartile scoring (0..G-1)
 N_BOOT = 200
 TRAIN_FRAC = 0.40
 
 
-def _fmt_p(p: float) -> str:
-    if p < 0.001:
-        return f"{p:.1e}"
-    return f"{p:.3f}"
+_fmt_p = ac.fmt_p
 
 
 def quantile_edges(values, g):
@@ -97,7 +111,7 @@ def fit_constrained_wqs(Q, cov, y, n_metals, n_cov):
 
 
 def main():
-    df = pd.read_csv("SUBMISSION/05_Data_Processed/model_ready.csv", low_memory=False)
+    df = ac.analysis_frame()
     sub = df[METALS + ADJUST + ["mets_status", "SEQN"]].dropna().reset_index(drop=True)
     n = len(sub)
     print(f"Metals-complete-case cohort: n={n}")
@@ -112,8 +126,8 @@ def main():
     print(f"WQS training partition (weight estimation): n={len(train)}")
     print(f"WQS validation partition (index testing, held out from weight estimation): n={len(valid)}")
 
-    n_metals, n_cov = len(METALS), len(ADJUST)
-    cov_train_full = train[ADJUST].values
+    n_metals = len(METALS)
+    n_cov = cov_matrix(train).shape[1]
     y_train_full = train["mets_status"].values
 
     print(f"\nRunning {N_BOOT} bootstrap resamples to estimate WQS component weights...")
@@ -124,7 +138,7 @@ def main():
         boot_df = train.iloc[bidx]
         edges_b = {m: quantile_edges(boot_df[m].values, G) for m in METALS}
         Q_b = np.column_stack([apply_quantile_score(boot_df[m].values, edges_b[m], G) for m in METALS])
-        cov_b = boot_df[ADJUST].values
+        cov_b = cov_matrix(boot_df)
         y_b = boot_df["mets_status"].values
         res = fit_constrained_wqs(Q_b, cov_b, y_b, n_metals, n_cov)
         if not res.success:
@@ -146,7 +160,7 @@ def main():
         "95% CI low": ci_low.round(4),
         "95% CI high": ci_high.round(4),
     }).sort_values("Mean WQS weight", ascending=False)
-    weight_table.to_csv("table_wqs_component_weights.csv", index=False)
+    weight_table.to_csv(TABLES / "table_wqs_component_weights.csv", index=False)
     print("\nWQS component weights (average across bootstraps, sum to 1):")
     print(weight_table.to_string(index=False))
 
@@ -160,8 +174,7 @@ def main():
     valid["wqs_index"] = wqs_index_valid
 
     y_v, X_v = patsy.dmatrices(
-        "mets_status ~ wqs_index + RIDAGEYR + BMXBMI + sex_female + INDFMPIR",
-        valid, return_type="dataframe")
+        "mets_status ~ wqs_index + " + ac.ADJUST_FORMULA, valid, return_type="dataframe")
     final_model = sm.GLM(y_v, X_v, family=sm.families.Binomial()).fit()
     beta1 = final_model.params["wqs_index"]
     se1 = final_model.bse["wqs_index"]
@@ -181,18 +194,15 @@ def main():
         "SE": round(se1, 4), "P value": _fmt_p(p1),
         "OR per 1-quartile increase": round(or_per_unit, 3),
         "OR: top vs. bottom quartile-index category": round(or_full_range, 3),
-    }]).to_csv("table_wqs_validation_test.csv", index=False)
+        "Adjusted for": "age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle",
+    }]).to_csv(TABLES / "table_wqs_validation_test.csv", index=False)
 
     # Adjusted predicted probability by WQS index category (0..G-1), holding
     # covariates at the validation-partition means -- the standard WQS
     # dose-response display.
-    means = valid[ADJUST].mean()
     levels = np.arange(G)
-    new_df = pd.DataFrame({
-        "wqs_index": levels,
-        "RIDAGEYR": means["RIDAGEYR"], "BMXBMI": means["BMXBMI"],
-        "sex_female": means["sex_female"], "INDFMPIR": means["INDFMPIR"],
-    })
+    ref = {c: (valid[c].mode().iloc[0] if c in ("RIDRETH1", "cycle") else valid[c].mean()) for c in ADJUST}
+    new_df = pd.DataFrame({"wqs_index": levels, **ref})
     X_new = patsy.build_design_matrices([X_v.design_info], new_df)[0]
     pred = final_model.get_prediction(X_new).summary_frame(alpha=0.05)
 
@@ -211,7 +221,7 @@ def main():
     ax.set_xlabel("WQS component weight (bootstrap mean, 95% CI)")
     ax.legend(loc="lower right", fontsize=7.5, frameon=False)
     fig.tight_layout()
-    ps.save(fig, "fig_wqs_component_weights")
+    ps.save(fig, FIGURES / "fig_wqs_component_weights")
     print("Saved fig_wqs_component_weights.png/.pdf")
 
     # Figure 2: validation-partition dose-response by WQS index category
@@ -228,7 +238,7 @@ def main():
                           f"index P = {_fmt_p(p1)}\nOR (top vs. bottom) = {or_full_range:.2f}",
               transform=ax2.transAxes, fontsize=7.5, va="top", ha="left", color="#333333")
     fig2.tight_layout()
-    ps.save(fig2, "fig_wqs_dose_response")
+    ps.save(fig2, FIGURES / "fig_wqs_dose_response")
     print("Saved fig_wqs_dose_response.png/.pdf")
 
 
