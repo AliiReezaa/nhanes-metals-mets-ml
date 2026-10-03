@@ -10,19 +10,22 @@ For every fitted model in outputs/models/*.joblib:
   - apply the OOF-derived threshold from outputs/metrics/thresholds.json
     (not a threshold picked on the test set itself)
   - compute AUROC, AUPRC, accuracy, sensitivity, specificity, PPV, NPV, F1,
-    kappa, Brier score, plus a bootstrap 95% CI on AUROC
+    kappa and Brier score, each with a 1,000-resample percentile bootstrap
+    95% CI (2026-10 audit, P14: the Methods promised intervals for the
+    threshold metrics, but only AUROC had one)
   - also report metrics at a fixed 0.5 cutoff for transparency
 
 REBUILD NOTE / FIX: the original pipeline picked a single "best" model by the
 top test-AUC point estimate and treated the resulting 1-through-11 ranking as
 reliable, even though the top handful of models sat within about 0.005 AUC of
 each other -- well inside plausible sampling noise for a 2,229-row test set.
-This script now adds a PAIRED bootstrap significance test (same resampled
-test-set indices used for every model in a given bootstrap draw, so the
-comparison is paired rather than treating each model's uncertainty as
-independent) between the top-ranked model and every other model, and reports
-which models are statistically indistinguishable from the top at the 95%
-level. Downstream scripts (09_explain_shap.py in particular) use this to
+This script compares the top-ranked model with every other model on the
+same test participants: the p-value comes from DeLong's test for correlated
+AUROCs (2026-10 audit, C8: the earlier bootstrap p-value could not resolve
+values below about 0.002 but was printed as "p < 0.001"), and the 95% CI of
+the AUROC difference from a paired bootstrap (same resampled indices for both
+models in each draw). Models whose difference CI includes zero are reported
+as statistically indistinguishable from the top model. Downstream scripts (09_explain_shap.py in particular) use this to
 avoid overclaiming that whichever model won by a coin-flip-sized margin is
 definitively "the best."
 
@@ -54,6 +57,7 @@ from sklearn.metrics import (
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as cfg
 import pipeline_utils as pu
+import stats_utils as su
 
 N_BOOTSTRAP = 1000
 
@@ -96,11 +100,9 @@ def bootstrap_auc_ci(y_true, y_prob, n_boot=N_BOOTSTRAP, seed=None):
 
 
 def paired_bootstrap_auc_diff(y_true, prob_top, prob_other, n_boot=N_BOOTSTRAP, seed=None):
-    """Same resampled indices applied to BOTH models in every bootstrap draw
-    (a paired design), so the resulting distribution is of (AUC_top - AUC_other)
-    under the test set's own resampling variability, not two independently
-    noisy estimates compared naively. Two-sided p-value via the fraction of
-    bootstrap draws on the other side of zero from the observed difference."""
+    """Paired comparison of two models on the same participants: the
+    difference and its paired-bootstrap 95% CI (same resampled indices for
+    both models in every draw), and the two-sided DeLong p-value."""
     seed = cfg.RANDOM_STATE if seed is None else seed
     rng = np.random.default_rng(seed)
     y_true = np.asarray(y_true)
@@ -113,20 +115,32 @@ def paired_bootstrap_auc_diff(y_true, prob_top, prob_other, n_boot=N_BOOTSTRAP, 
         yt = y_true[idx]
         if len(np.unique(yt)) < 2:
             continue
-        auc_top = roc_auc_score(yt, prob_top[idx])
-        auc_other = roc_auc_score(yt, prob_other[idx])
-        diffs.append(auc_top - auc_other)
+        diffs.append(roc_auc_score(yt, prob_top[idx]) - roc_auc_score(yt, prob_other[idx]))
     diffs = np.array(diffs)
-    observed = roc_auc_score(y_true, prob_top) - roc_auc_score(y_true, prob_other)
     ci_lo, ci_hi = float(np.percentile(diffs, 2.5)), float(np.percentile(diffs, 97.5))
-    # two-sided bootstrap p-value: proportion of draws at least as extreme as
-    # zero relative to the observed sign, doubled, capped at 1
-    if observed >= 0:
-        p = 2 * np.mean(diffs <= 0)
-    else:
-        p = 2 * np.mean(diffs >= 0)
-    p = float(min(p, 1.0))
+    _, _, observed, _, _, p = su.delong_test(y_true, prob_top, prob_other)
     return observed, ci_lo, ci_hi, p
+
+
+def bootstrap_metric_cis(y_true, y_prob, cutoff, n_boot=N_BOOTSTRAP, seed=None):
+    """Percentile bootstrap 95% CIs for AUPRC, Brier and every threshold
+    metric at the given cutoff, from one shared set of resamples."""
+    seed = cfg.RANDOM_STATE if seed is None else seed
+    rng = np.random.default_rng(seed)
+    y_true, y_prob = np.asarray(y_true), np.asarray(y_prob)
+    n = len(y_true)
+    draws = []
+    for _ in range(n_boot):
+        idx = rng.integers(0, n, n)
+        yt, yp = y_true[idx], y_prob[idx]
+        if len(np.unique(yt)) < 2:
+            continue
+        m = metrics_at_cutoff(yt, yp, cutoff)
+        m["AUPRC"] = average_precision_score(yt, yp)
+        m["Brier"] = brier_score_loss(yt, yp)
+        draws.append(m)
+    d = pd.DataFrame(draws).drop(columns=["Cutoff"])
+    return {k: (float(d[k].quantile(0.025)), float(d[k].quantile(0.975))) for k in d.columns}
 
 
 def main():
@@ -143,7 +157,11 @@ def main():
         with open(thr_path) as f:
             thresholds = json.load(f)
 
-    model_files = sorted(cfg.OUT_MODELS.glob("*.joblib"))
+    # FIX (2026-10 audit, C17): evaluate only the models trained in the
+    # current run (the ones 07_train_models.py wrote thresholds for), never a
+    # stale .joblib left over from an earlier run.
+    model_files = [cfg.OUT_MODELS / f"{n.replace(' ', '_')}.joblib" for n in sorted(thresholds)]
+    model_files = [p for p in model_files if p.exists()]
     if not model_files:
         raise SystemExit("No fitted models found in outputs/models/. Run 07_train_models.py first.")
 
@@ -177,6 +195,11 @@ def main():
         }
         row.update({f"{k}_tuned_cutoff": round(v, 4) if isinstance(v, float) else v for k, v in m_tuned.items()})
         row.update({f"{k}_at_0.5": round(v, 4) if isinstance(v, float) else v for k, v in m_default.items()})
+        cis = bootstrap_metric_cis(y_test, prob, cutoff)
+        for k, (lo, hi) in cis.items():
+            suffix = "" if k in ("AUPRC", "Brier") else "_tuned_cutoff"
+            row[f"{k}{suffix}_95CI_low"] = round(lo, 4)
+            row[f"{k}{suffix}_95CI_high"] = round(hi, 4)
         rows.append(row)
 
         fpr, tpr, _ = roc_curve(y_test, prob)
@@ -193,8 +216,8 @@ def main():
     top_name = results_df.iloc[0]["Model"]
     prob_top = prob_by_model[top_name]
     sig_rows = []
-    print(f"\nPaired bootstrap test: '{top_name}' (top by point-estimate AUC) vs. every other model, "
-          f"n_boot={N_BOOTSTRAP}, same resampled indices per draw:")
+    print(f"\nPaired comparison: '{top_name}' (top by point-estimate AUC) vs. every other model "
+          f"(DeLong p-value; paired bootstrap CI, n_boot={N_BOOTSTRAP}):")
     for name in results_df["Model"]:
         if name == top_name:
             sig_rows.append({"model": name, "is_top_model": True, "auc_diff_vs_top": 0.0,
@@ -205,9 +228,10 @@ def main():
         indistinguishable = (lo <= 0 <= hi)
         sig_rows.append({"model": name, "is_top_model": False, "auc_diff_vs_top": round(diff, 4),
                           "diff_95ci_low": round(lo, 4), "diff_95ci_high": round(hi, 4),
-                          "p_value": round(p, 4), "statistically_indistinguishable_from_top": indistinguishable})
+                          "p_value": float(f"{p:.3g}"), "p_method": "DeLong",
+                          "statistically_indistinguishable_from_top": indistinguishable})
         flag = "  <-- NOT distinguishable from top model at 95%" if indistinguishable else ""
-        print(f"  {top_name} - {name}: {diff:+.4f} (95% CI {lo:+.4f} to {hi:+.4f}), p={p:.4f}{flag}")
+        print(f"  {top_name} - {name}: {diff:+.4f} (95% CI {lo:+.4f} to {hi:+.4f}), DeLong p={p:.3g}{flag}")
 
     sig_df = pd.DataFrame(sig_rows)
     sig_path = cfg.OUT_METRICS / "model_comparison_significance.csv"
