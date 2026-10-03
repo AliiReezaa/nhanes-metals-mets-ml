@@ -10,7 +10,7 @@ set, undermining the point of holding it out at all.
   (a) Primary predictor set vs. predictor set + DIQ010 (diagnosed diabetes)
   (b) SMOTE vs. class-weighting, for the top few models
   (c) Blood lead only vs. all 5 metals
-  (d) FIX (new): the harmonized (medication-adjusted) outcome label used
+  (d) Outcome-definition arms: the harmonized (medication-adjusted) label used
       throughout this rebuild vs. the original pipeline's lab/exam-only
       label -- quantifies how much of a difference the Step-3 label fix
       (02_clean_and_outcome.py) makes to apparent model discrimination,
@@ -20,6 +20,15 @@ set, undermining the point of holding it out at all.
       outputs/metrics/outcome_definition_comparison.csv for the raw
       prevalence/reclassification numbers), so it gets its own dedicated
       sensitivity arm rather than being left as a footnote.
+      2026-10 audit (A8): two further label arms for the two definition
+      choices -- cholesterol medication NOT applied to the TG/HDL components
+      (mets_status_nolipidmed), and blood pressure from the first reading
+      only (mets_status_bpfirst).
+
+2026-10 audit (C21): every arm now uses each model's TUNED hyperparameters
+from best_params.json (the earlier version used library defaults, so its
+"primary" arm was not the primary model), and Gradient Boosting, which has
+no class_weight option, gets balanced sample weights in arm (b).
 
 Output: outputs/metrics/sensitivity_diq010.csv
         outputs/metrics/sensitivity_smote_vs_classweight.csv
@@ -43,6 +52,18 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as cfg
 import pipeline_utils as pu
+import json
+from sklearn.utils.class_weight import compute_sample_weight
+
+_TUNED = None
+
+
+def tuned_params(name):
+    global _TUNED
+    if _TUNED is None:
+        path = cfg.OUT_METRICS / "best_params.json"
+        _TUNED = json.loads(path.read_text()) if path.exists() else {}
+    return _TUNED.get(name, {}).get("best_params", {})
 
 
 def parse_args():
@@ -56,9 +77,14 @@ def parse_args():
     return ap.parse_args()
 
 
-def cv_auc(estimator_ctor, X, y, cont_cols, cat_cols, use_smote, skf):
-    pipe = pu.build_pipeline(estimator_ctor(), cont_cols, cat_cols, use_smote=use_smote)
-    scores = cross_val_score(pipe, X, y, scoring="roc_auc", cv=skf, n_jobs=1)
+def cv_auc(name, estimator_ctor, X, y, cont_cols, cat_cols, use_smote, skf, estimator=None, params=None):
+    """Mean and SD of the CV AUROC for one model with its tuned hyperparameters."""
+    pipe = pu.build_pipeline(estimator if estimator is not None else estimator_ctor(),
+                             cont_cols, cat_cols, use_smote=use_smote)
+    best = tuned_params(name)
+    if best:
+        pipe.set_params(**best)
+    scores = cross_val_score(pipe, X, y, scoring="roc_auc", cv=skf, n_jobs=1, params=params)
     return scores.mean(), scores.std()
 
 
@@ -166,8 +192,8 @@ def main():
     top3 = [m.strip() for m in args.models.split(",")] if args.models else top_models_by_ranked_metric(3)
     for name in top3:
         ctor = registry[name]["estimator"]
-        auc_primary, sd_primary = cv_auc(ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
-        auc_plus, sd_plus = cv_auc(ctor, X_train_plus_diq, y_train, cont_plus, cat_plus, True, skf)
+        auc_primary, sd_primary = cv_auc(name, ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
+        auc_plus, sd_plus = cv_auc(name, ctor, X_train_plus_diq, y_train, cont_plus, cat_plus, True, skf)
         rows_a.append({"model": name, "cv_auc_primary": round(auc_primary, 4), "cv_auc_plus_diq010": round(auc_plus, 4),
                         "delta": round(auc_plus - auc_primary, 4)})
         print(f"  {name}: primary={auc_primary:.4f}  +DIQ010={auc_plus:.4f}  delta={auc_plus-auc_primary:+.4f}")
@@ -181,18 +207,16 @@ def main():
     rows_b = []
     for name in top_models:
         ctor = registry[name]["estimator"]
-        auc_smote, _ = cv_auc(ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
+        auc_smote, _ = cv_auc(name, ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
 
         weighted_est = class_weighted_estimator(name, ctor, y_train)
+        fit_params = None
         if weighted_est is None:
-            print(f"  {name}: no class_weight/class_weights/auto_class_weights/scale_pos_weight "
-                  f"support -- skipped for this comparison")
-            rows_b.append({"model": name, "cv_auc_smote": round(auc_smote, 4),
-                            "cv_auc_class_weight": None, "delta": None})
-            continue
-        pipe_cw = pu.build_pipeline(weighted_est, cont_cols, cat_cols, use_smote=False)
-        scores_cw = cross_val_score(pipe_cw, X_train, y_train, scoring="roc_auc", cv=skf, n_jobs=1)
-        auc_cw = scores_cw.mean()
+            # no class-weight option (Gradient Boosting): balanced sample weights instead
+            weighted_est = ctor()
+            fit_params = {"model__sample_weight": compute_sample_weight("balanced", y_train)}
+        auc_cw, _ = cv_auc(name, ctor, X_train, y_train, cont_cols, cat_cols, False, skf,
+                           estimator=weighted_est, params=fit_params)
         rows_b.append({"model": name, "cv_auc_smote": round(auc_smote, 4), "cv_auc_class_weight": round(auc_cw, 4),
                         "delta": round(auc_cw - auc_smote, 4)})
         print(f"  {name}: SMOTE={auc_smote:.4f}  class-weight={auc_cw:.4f}  delta={auc_cw-auc_smote:+.4f}")
@@ -214,8 +238,8 @@ def main():
     rows_c = []
     for name in top3:
         ctor = registry[name]["estimator"]
-        auc_full, _ = cv_auc(ctor, X_train[feature_cols_full], y_train, cont_cols, cat_cols, True, skf)
-        auc_lead, _ = cv_auc(ctor, X_train[feature_cols_lead], y_train, cont_lead, cat_lead, True, skf)
+        auc_full, _ = cv_auc(name, ctor, X_train[feature_cols_full], y_train, cont_cols, cat_cols, True, skf)
+        auc_lead, _ = cv_auc(name, ctor, X_train[feature_cols_lead], y_train, cont_lead, cat_lead, True, skf)
         rows_c.append({"model": name, "cv_auc_all_5_metals": round(auc_full, 4),
                         "cv_auc_lead_only": round(auc_lead, 4), "delta": round(auc_lead - auc_full, 4)})
         print(f"  {name}: all-5-metals={auc_full:.4f}  lead-only={auc_lead:.4f}  delta={auc_lead-auc_full:+.4f}")
@@ -232,27 +256,35 @@ def main():
     # the point is "how much does the label definition itself move apparent
     # performance," not a hypothesis test of two models on identical rows.
     # ---------------------------------------------------------------
-    print("\n=== (d) FIX: harmonized (medication-adjusted) outcome label vs. original lab-only label ===")
+    print("\n=== (d) Outcome-definition arms: harmonized vs. lab-only, no lipid clause, first BP reading ===")
     if "mets_status_labonly" not in train_df.columns:
         print("  [SKIPPED] mets_status_labonly column not found in model_ready.csv -- "
               "re-run 02_clean_and_outcome.py / 03_feature_engineering.py to regenerate it.")
     else:
         y_train_labonly = train_df["mets_status_labonly"]
+        y_nolipid = train_df["mets_status_nolipidmed"]
+        y_bpfirst = train_df["mets_status_bpfirst"]
         rows_d = []
         for name in top3:
             ctor = registry[name]["estimator"]
-            auc_harmonized, _ = cv_auc(ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
-            auc_labonly, _ = cv_auc(ctor, X_train, y_train_labonly, cont_cols, cat_cols, True, skf)
+            auc_harmonized, _ = cv_auc(name, ctor, X_train, y_train, cont_cols, cat_cols, True, skf)
+            auc_labonly, _ = cv_auc(name, ctor, X_train, y_train_labonly, cont_cols, cat_cols, True, skf)
+            auc_nolipid, _ = cv_auc(name, ctor, X_train, y_nolipid, cont_cols, cat_cols, True, skf)
+            auc_bpfirst, _ = cv_auc(name, ctor, X_train, y_bpfirst, cont_cols, cat_cols, True, skf)
             rows_d.append({
                 "model": name,
                 "cv_auc_harmonized_label": round(auc_harmonized, 4),
                 "cv_auc_labonly_label": round(auc_labonly, 4),
                 "delta": round(auc_harmonized - auc_labonly, 4),
+                "cv_auc_nolipidmed_label": round(auc_nolipid, 4),
+                "cv_auc_bpfirst_label": round(auc_bpfirst, 4),
                 "harmonized_prevalence_pct": round(y_train.mean() * 100, 2),
                 "labonly_prevalence_pct": round(y_train_labonly.mean() * 100, 2),
+                "nolipidmed_prevalence_pct": round(y_nolipid.mean() * 100, 2),
+                "bpfirst_prevalence_pct": round(y_bpfirst.mean() * 100, 2),
             })
             print(f"  {name}: harmonized={auc_harmonized:.4f}  lab-only={auc_labonly:.4f}  "
-                  f"delta={auc_harmonized-auc_labonly:+.4f}")
+                  f"no-lipid-clause={auc_nolipid:.4f}  first-BP-reading={auc_bpfirst:.4f}")
         pd.DataFrame(rows_d).to_csv(cfg.OUT_METRICS / "sensitivity_outcome_definition.csv", index=False)
         print(f"  NOTE: this compares apparent AUC under two label definitions on the SAME features/model; "
               f"it is not a claim that one AUC is 'better' in isolation -- prevalence differs between the two "
