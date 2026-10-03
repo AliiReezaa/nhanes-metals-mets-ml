@@ -86,3 +86,25 @@ def bootstrap_ci(metric_fn, y_true, y_prob, n_boot=1000, seed=42, alpha=0.05):
         vals.append(metric_fn(y_true[idx], y_prob[idx]))
     vals = np.asarray(vals)
     return float(np.percentile(vals, 100 * alpha / 2)), float(np.percentile(vals, 100 * (1 - alpha / 2)))
+
+
+def calibration_slope_intercept(y, p):
+    """Calibration slope (logistic recalibration on logit(p)) and calibration
+    intercept with the slope fixed at 1 (calibration-in-the-large, offset
+    model). Slope 1 and intercept 0 mean perfect calibration. Shared by
+    15_publication_figures.py and the temporal validation, so both report the
+    same quantity (2026-10 audit, C25)."""
+    from scipy.optimize import minimize_scalar
+    from sklearn.linear_model import LogisticRegression
+    y = np.asarray(y)
+    eps = 1e-6
+    pc = np.clip(np.asarray(p, float), eps, 1 - eps)
+    lp = np.log(pc / (1 - pc))
+    slope = float(LogisticRegression(penalty=None, max_iter=1000).fit(lp.reshape(-1, 1), y).coef_[0][0])
+
+    def nll(a):
+        pr = np.clip(1 / (1 + np.exp(-(a + lp))), eps, 1 - eps)
+        return -np.sum(y * np.log(pr) + (1 - y) * np.log(1 - pr))
+
+    intercept = float(minimize_scalar(nll, bounds=(-5, 5), method="bounded").x)
+    return slope, intercept

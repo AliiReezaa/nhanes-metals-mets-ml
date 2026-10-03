@@ -1,148 +1,129 @@
 """
-Q1 rigor addition 1: temporal (forward-in-time) validation. Every result so
-far -- the manuscript's own AUROC 0.8567 and every novelty addition -- comes
-from ONE random SEQN split that pools all six NHANES cycles (2007-2018)
-together before splitting. That never tests whether the model generalizes
-FORWARD in time; it only tests whether it generalizes to a random subsample
-of the same pooled distribution it was trained on.
+Q1 rigor addition 1: temporal (forward-in-time) validation. The main result
+comes from one random split that pools all six NHANES cycles before
+splitting, which tests generalization to a random subsample of the same
+pooled population, not forward in time.
 
-Design: train on the four earlier cycles (2007_2008 - 2013_2014, n~8,102),
-test on the two most recent cycles the model has never seen in any form
-(2015_2016 + 2017_2018, n~3,042). Same predictors, same leakage-safe
-preprocessing, same tuned CatBoost hyperparameters as the primary model --
-only the train/test partition changes, from random-by-SEQN to a hard
-temporal cutoff.
+Design: develop on the four earlier cycles (2007-2008 to 2013-2014) and test
+on the two most recent ones (2015-2016 and 2017-2018), which the model never
+sees in any form. Same predictors, same leakage-safe pipeline, same model
+type as the primary (leading) model.
+
+2026-10 audit:
+  * A7: the hyperparameters are RE-TUNED by stratified 10-fold cross-validation
+    on the 2007-2014 cycles only, over the same grid as 06_cv_tuning.py. The
+    earlier version reused the settings tuned on the random-split training
+    set, which contained about 80% of the 2015-2018 participants it was then
+    tested on.
+  * C25: the calibration intercept is calibration-in-the-large (slope fixed
+    at 1), the same quantity as in the main calibration table; the earlier
+    version took the intercept from the joint slope-and-intercept model, so
+    its "random split" row disagreed with the manuscript.
+
+Run (after the main pipeline):
+    python 08_Q1_Rigor_Additions/code/06_temporal_validation.py [--quick]
 """
+import argparse
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
+import additions_common as ac  # noqa: E402
+
+import json
 import numpy as np
 import pandas as pd
-import joblib
 from sklearn.metrics import roc_auc_score, roc_curve, brier_score_loss
-import statsmodels.api as sm
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
+import config as cfg
+import pipeline_utils as pu
 import pubstyle as ps
+import stats_utils as su
 
 ps.apply_style()
-
-import importlib.util
-spec = importlib.util.spec_from_file_location("setup00", "00_setup_and_fit.py")
-setup00 = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(setup00)
-
-PREDICTORS = setup00.PREDICTORS
-build_preprocessor = setup00.build_preprocessor
-smotenc_cat_indices = setup00.smotenc_cat_indices
-
-from imblearn.over_sampling import SMOTENC
-from imblearn.pipeline import Pipeline as ImbPipeline
-from catboost import CatBoostClassifier
-
-RANDOM_STATE = 42
+TABLES, FIGURES = ac.out_dirs("08_Q1_Rigor_Additions")
 TRAIN_CYCLES = ["2007_2008", "2009_2010", "2011_2012", "2013_2014"]
 TEST_CYCLES = ["2015_2016", "2017_2018"]
 
 
-def _fmt_p(p: float) -> str:
-    if p < 0.001:
-        return f"{p:.1e}"
-    return f"{p:.3f}"
-
-
-def calibration_stats(y_true, p_pred):
-    eps = 1e-6
-    p_clip = np.clip(p_pred, eps, 1 - eps)
-    logit_p = np.log(p_clip / (1 - p_clip))
-    X = sm.add_constant(logit_p)
-    m = sm.GLM(y_true, X, family=sm.families.Binomial()).fit()
-    intercept, slope = m.params
-    oe_ratio = y_true.mean() / p_pred.mean()
-    brier = brier_score_loss(y_true, p_pred)
-    return {"slope": slope, "intercept": intercept, "oe_ratio": oe_ratio, "brier": brier}
+def calibration_stats(y, p):
+    slope, intercept = su.calibration_slope_intercept(y, p)
+    return {"slope": slope, "intercept": intercept, "oe_ratio": float(np.mean(y) / np.mean(p)),
+            "brier": brier_score_loss(y, p)}
 
 
 def main():
-    df = pd.read_csv("SUBMISSION/05_Data_Processed/model_ready.csv", low_memory=False)
-    train_df = df[df["cycle"].isin(TRAIN_CYCLES)].reset_index(drop=True)
-    test_df = df[df["cycle"].isin(TEST_CYCLES)].reset_index(drop=True)
-    print(f"Temporal train (cycles {TRAIN_CYCLES}): n={len(train_df)}, "
-          f"prevalence={train_df['mets_status'].mean():.3f}")
-    print(f"Temporal test  (cycles {TEST_CYCLES}): n={len(test_df)}, "
-          f"prevalence={test_df['mets_status'].mean():.3f}")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--quick", action="store_true", help="3-fold tuning (testing only)")
+    args = ap.parse_args()
 
-    X_train, y_train = train_df[PREDICTORS], train_df["mets_status"]
-    X_test, y_test = test_df[PREDICTORS], test_df["mets_status"]
+    st = ac.primary_state()
+    name = st["model_name"]
+    df = pd.read_csv(cfg.DATA_PROC_DIR / "model_ready.csv", low_memory=False)
+    feats, cont, cat = st["feature_cols"], st["cont_cols"], st["cat_cols"]
+    tr = df[df[cfg.CYCLE_VAR].isin(TRAIN_CYCLES)].reset_index(drop=True)
+    te = df[df[cfg.CYCLE_VAR].isin(TEST_CYCLES)].reset_index(drop=True)
+    print(f"Temporal development set (2007-2014): n={len(tr)}, prevalence={tr[cfg.OUTCOME_VAR].mean():.3f}")
+    print(f"Temporal test set (2015-2018): n={len(te)}, prevalence={te[cfg.OUTCOME_VAR].mean():.3f}")
 
-    preprocessor = build_preprocessor()
-    cat_idx = smotenc_cat_indices()
-    model = CatBoostClassifier(
-        random_state=RANDOM_STATE, verbose=False,
-        learning_rate=0.05, iterations=200, depth=6,
-    )
-    pipe = ImbPipeline(steps=[
-        ("preprocess", preprocessor),
-        ("smote", SMOTENC(categorical_features=cat_idx, random_state=RANDOM_STATE)),
-        ("model", model),
-    ])
-    pipe.fit(X_train, y_train)
-    proba_temporal = pipe.predict_proba(X_test)[:, 1]
-    auc_temporal = roc_auc_score(y_test, proba_temporal)
-    cal_temporal = calibration_stats(y_test.values, proba_temporal)
-    print(f"\nTemporal-holdout test AUROC: {auc_temporal:.4f}")
-    print(f"Temporal-holdout calibration: slope={cal_temporal['slope']:.3f}, "
-          f"intercept={cal_temporal['intercept']:.3f}, O:E={cal_temporal['oe_ratio']:.3f}, "
-          f"Brier={cal_temporal['brier']:.4f}")
+    registry = pu.get_model_registry()
+    pipe = pu.build_pipeline(registry[name]["estimator"](), cont, cat, use_smote=True)
+    grid = registry[name]["param_grid"]
+    skf = StratifiedKFold(n_splits=3 if args.quick else 10, shuffle=True, random_state=cfg.RANDOM_STATE)
+    if grid:
+        search = GridSearchCV(pipe, grid, scoring="roc_auc", cv=skf, n_jobs=1, refit=True)
+        search.fit(tr[feats], tr[cfg.OUTCOME_VAR])
+        best, cv_auc, model = search.best_params_, search.best_score_, search.best_estimator_
+    else:
+        best, cv_auc, model = {}, float("nan"), pipe.fit(tr[feats], tr[cfg.OUTCOME_VAR])
+    print(f"Re-tuned on 2007-2014 ({name}): {best}, CV AUROC {cv_auc:.4f}")
 
-    # Reference: the manuscript's original random-SEQN-split model (already
-    # fit and cached in shared_state.joblib) for a direct side-by-side
-    state = joblib.load("shared_state.joblib")
-    proba_random = state["pipe"].predict_proba(state["X_test_raw"])[:, 1]
-    auc_random = roc_auc_score(state["y_test"], proba_random)
-    cal_random = calibration_stats(state["y_test"].values, proba_random)
-    print(f"\nOriginal random-split test AUROC (reference): {auc_random:.4f}")
+    p_t = model.predict_proba(te[feats])[:, 1]
+    y_t = te[cfg.OUTCOME_VAR].values
+    auc_t = roc_auc_score(y_t, p_t)
+    ci_t = su.bootstrap_ci(roc_auc_score, y_t, p_t)
+    cal_t = calibration_stats(y_t, p_t)
 
-    comparison = pd.DataFrame([
-        {
-            "Validation design": "Random SEQN split (original manuscript)",
-            "Train n": len(state["X_train_raw"]), "Test n": len(state["X_test_raw"]),
-            "Test AUROC": round(auc_random, 4),
-            "Calibration slope": round(cal_random["slope"], 3),
-            "Calibration intercept": round(cal_random["intercept"], 3),
-            "O:E ratio": round(cal_random["oe_ratio"], 3),
-            "Brier score": round(cal_random["brier"], 4),
-        },
-        {
-            "Validation design": f"Temporal holdout (train {TRAIN_CYCLES[0]}-{TRAIN_CYCLES[-1]}, "
-                                  f"test {TEST_CYCLES[0]}-{TEST_CYCLES[-1]})",
-            "Train n": len(X_train), "Test n": len(X_test),
-            "Test AUROC": round(auc_temporal, 4),
-            "Calibration slope": round(cal_temporal["slope"], 3),
-            "Calibration intercept": round(cal_temporal["intercept"], 3),
-            "O:E ratio": round(cal_temporal["oe_ratio"], 3),
-            "Brier score": round(cal_temporal["brier"], 4),
-        },
-    ])
-    comparison.to_csv("table_temporal_validation.csv", index=False)
-    print()
-    print(comparison.to_string(index=False))
+    p_r = st["pipe"].predict_proba(st["X_test_raw"])[:, 1]
+    y_r = st["y_test"].values
+    auc_r = roc_auc_score(y_r, p_r)
+    ci_r = su.bootstrap_ci(roc_auc_score, y_r, p_r)
+    cal_r = calibration_stats(y_r, p_r)
 
-    # ROC curves, both designs overlaid
-    fpr_r, tpr_r, _ = roc_curve(state["y_test"], proba_random)
-    fpr_t, tpr_t, _ = roc_curve(y_test, proba_temporal)
+    rows = []
+    for label, ntr, nte, auc, ci, cal, params in [
+        ("Random split (primary analysis)", len(st["X_train_raw"]), len(y_r), auc_r, ci_r, cal_r,
+         json.loads((cfg.OUT_METRICS / "best_params.json").read_text())[name]["best_params"]),
+        ("Temporal holdout (develop 2007-2014, test 2015-2018; re-tuned)", len(tr), len(y_t), auc_t,
+         ci_t, cal_t, best)]:
+        rows.append({"Validation design": label, "Model": name, "Train n": ntr, "Test n": nte,
+                     "Test AUROC": round(auc, 4), "AUROC 95% CI low": round(ci[0], 4),
+                     "AUROC 95% CI high": round(ci[1], 4),
+                     "Calibration slope": round(cal["slope"], 3),
+                     "Calibration intercept (in-the-large)": round(cal["intercept"], 3),
+                     "O:E ratio": round(cal["oe_ratio"], 3), "Brier score": round(cal["brier"], 4),
+                     "Hyperparameters": json.dumps(params)})
+    out = pd.DataFrame(rows)
+    out.to_csv(TABLES / "table_temporal_validation.csv", index=False)
+    print(out.drop(columns="Hyperparameters").to_string(index=False))
 
+    fpr_r, tpr_r, _ = roc_curve(y_r, p_r)
+    fpr_t, tpr_t, _ = roc_curve(y_t, p_t)
     fig, ax = plt.subplots(figsize=(ps.W_SINGLE * 1.55, ps.W_SINGLE * 1.45))
-    ax.plot(fpr_r, tpr_r, color=ps.OKABE_BLUE, lw=1.6,
-            label=f"Random split (AUROC = {auc_random:.3f})", zorder=3)
-    ax.plot(fpr_t, tpr_t, color=ps.OKABE_VERMIL, lw=1.6,
-            label=f"Temporal holdout (AUROC = {auc_temporal:.3f})", zorder=3)
+    ax.plot(fpr_r, tpr_r, color=ps.OKABE_BLUE, lw=1.6, label=f"Random split (AUROC = {auc_r:.3f})", zorder=3)
+    ax.plot(fpr_t, tpr_t, color=ps.OKABE_VERMIL, lw=1.6, label=f"Temporal holdout (AUROC = {auc_t:.3f})",
+            zorder=3)
     ax.plot([0, 1], [0, 1], color="#999999", lw=0.8, ls="--", zorder=1)
     ax.set_xlabel("1 − Specificity")
     ax.set_ylabel("Sensitivity")
     ax.legend(loc="lower right", fontsize=7.5, frameon=False)
     ax.set_xlim(-0.02, 1.02); ax.set_ylim(-0.02, 1.02)
     fig.tight_layout()
-    ps.save(fig, "fig_temporal_validation_roc")
-    print("Saved fig_temporal_validation_roc.png/.pdf")
+    ps.save(fig, FIGURES / "fig_temporal_validation_roc")
 
 
 if __name__ == "__main__":

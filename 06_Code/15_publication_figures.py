@@ -330,22 +330,8 @@ def fig3_auc_forest(cmp_df, sig_df):
 # Figure 4 -- calibration
 # ======================================================================
 def calibration_slope_intercept(y, p):
-    """Standard recalibration model: logit(p) as the sole predictor.
-    Slope 1 / intercept 0 = perfect calibration."""
-    eps = 1e-6
-    lp = np.log(np.clip(p, eps, 1 - eps) / (1 - np.clip(p, eps, 1 - eps))).reshape(-1, 1)
-    lr = LogisticRegression(penalty=None, solver="lbfgs", max_iter=1000).fit(lp, y)
-    slope = float(lr.coef_[0][0])
-    # calibration-in-the-large: intercept with slope fixed at 1 (offset model)
-    from scipy.optimize import minimize_scalar
-    def nll(a):
-        z = a + lp.ravel()
-        pr = 1 / (1 + np.exp(-z))
-        pr = np.clip(pr, eps, 1 - eps)
-        return -np.sum(y * np.log(pr) + (1 - y) * np.log(1 - pr))
-    res = minimize_scalar(nll, bounds=(-5, 5), method="bounded")
-    intercept = float(res.x)
-    return slope, intercept
+    """Slope and calibration-in-the-large intercept; see stats_utils."""
+    return su.calibration_slope_intercept(y, p)
 
 
 def fig4_calibration(preds, cmp_df):
