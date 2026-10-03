@@ -20,13 +20,12 @@ REBUILD NOTE / FIX (two changes from the original 09_explain_shap.py):
 
 1. Column layout. The original script assumed the ColumnTransformer's
    output columns were simply `cont_cols + cat_cols`. That stopped being
-   true the moment pipeline_utils.py added the always-present per-
-   continuous-variable missing-value flag block (see that module's FIX 1):
-   the real output layout is now `cont_cols + [missingindicator_<c> for c
-   in cont_cols] + cat_cols`. Silently keeping the old
+   true the moment pipeline_utils.py added the missing-value flag block
+   (see that module's docstring, point 1): the real output layout is now
+   `cont_cols + [missingindicator_<c> for c in flagged cont_cols] + cat_cols`. Silently keeping the old
    `transformed_cols = cont_cols + cat_cols` here would have handed SHAP's
    arrays column labels that no longer line up with the columns those
-   arrays actually contain (an N-column array labeled with N-13 names,
+   arrays actually contain (an N-column array labeled with fewer names,
    silently mis-assigning every label after the continuous block). This
    script now gets the layout from the single source of truth,
    pipeline_utils.transformed_feature_names(), the same function
@@ -47,8 +46,8 @@ Output: outputs/figures/shap_*.png
         outputs/metrics/permutation_importance.csv
 
 Run:
-    python scripts/09_explain_shap.py
-    python scripts/09_explain_shap.py --model "Random Forest"
+    python 06_Code/09_explain_shap.py
+    python 06_Code/09_explain_shap.py --model "Random Forest"
 """
 import argparse
 import sys
@@ -153,13 +152,13 @@ def build_raw_display(X_test, X_test_t, cont_cols, cat_cols, transformed_cols, d
       X_test (so plots show '55 years', not a StandardScaler z-score).
     - missingindicator_<c> columns: these have no separate 'raw' form --
       MissingIndicator's own 0/1 output IS already the natural-units value
-      ("was this observed"), so they're taken directly from the transformed
+      (1 = the value was missing and imputed), so they're taken directly from the transformed
       frame X_test_t, not reconstructed from X_test.
     - categorical/binary columns: original values from X_test (only mode-
       imputation happens to these downstream; the original code already
       used the raw values here and that's unchanged).
     """
-    flag_cols = [f"missingindicator_{c}" for c in cont_cols]
+    flag_cols = [f"missingindicator_{c}" for c in pu.get_flag_cols(cont_cols)]
     parts = [X_test[cont_cols], X_test_t[flag_cols], X_test[cat_cols]]
     raw = pd.concat(parts, axis=1)[transformed_cols]  # enforce exact column order
     raw.columns = display_cols

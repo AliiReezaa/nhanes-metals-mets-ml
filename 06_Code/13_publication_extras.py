@@ -34,7 +34,7 @@ already-aggregated model_comparison.csv, never on the transformed
 ColumnTransformer output that changed.
 
 Run:
-    python scripts/13_publication_extras.py
+    python 06_Code/13_publication_extras.py
 """
 import sys
 from pathlib import Path

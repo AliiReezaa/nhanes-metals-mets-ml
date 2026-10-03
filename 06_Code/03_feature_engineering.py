@@ -27,7 +27,7 @@ Output: data_processed/model_ready.csv
         outputs/metrics/predictors_used.csv
 
 Run:
-    python scripts/03_feature_engineering.py
+    python 06_Code/03_feature_engineering.py
 """
 import sys
 from pathlib import Path
@@ -51,6 +51,7 @@ def check_encoding_completeness():
         | set(cfg.NOMINAL_ONEHOT)
         | set(cfg.BINARY_RENAME.keys())
         | set(cfg.CONTINUOUS_AS_IS)
+        | set(cfg.BINARY_01_AS_IS)
     )
     missing = predictors - covered
     extra = covered - predictors
@@ -88,8 +89,12 @@ def encode(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
         out.loc[df[col].isna(), new_name] = pd.NA
         feature_cols.append(new_name)
 
-    # continuous, untouched (includes ALQ_EVER, already a clean 0/1 built in
-    # 02_clean_and_outcome.py from the harmonized ALQ101/ALQ111 source)
+    # binary 0/1 built upstream in 02 (ALQ_PAST12): categorical path (C19)
+    for col in cfg.BINARY_01_AS_IS:
+        out[col] = df[col]
+        feature_cols.append(col)
+
+    # continuous, untouched
     for col in cfg.CONTINUOUS_AS_IS:
         out[col] = df[col]
         feature_cols.append(col)
@@ -99,7 +104,11 @@ def encode(df: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
     # known category sets, not data-driven groupings, so no distributional
     # information leaks from test into train by doing this before the split.
     for col in cfg.NOMINAL_ONEHOT:
-        dummies = pd.get_dummies(df[col], prefix=col, dummy_na=True, drop_first=True)
+        # FIX (2026-10 audit, C18): a "<col>_nan" dummy only when the column
+        # actually has missing values (RIDRETH1 has none, so its old _nan
+        # dummy was a column of zeros).
+        dummies = pd.get_dummies(df[col], prefix=col, dummy_na=bool(df[col].isna().any()),
+                                 drop_first=True)
         dummies = dummies.astype(int)
         out = pd.concat([out, dummies], axis=1)
         feature_cols.extend(dummies.columns.tolist())
@@ -135,6 +144,7 @@ def main():
         + ["mets_trigly_labonly", "mets_hdl_labonly", "mets_bp_labonly", "mets_glu_labonly",
            "mets_score_labonly", "mets_status_labonly"]
         + ["on_bp_med", "on_lipid_med", "on_glu_med"]
+        + ["mets_status_nolipidmed", "mets_status_bpfirst", "SBP_MEAN", "DBP_MEAN"]
         + [cfg.DIQ_SENSITIVITY_VAR]
         + [cfg.SURVEY_WEIGHT_MEC, cfg.SURVEY_WEIGHT_FASTING, cfg.METALS_WEIGHT_VAR,
            cfg.SURVEY_PSU, cfg.SURVEY_STRATA]
@@ -151,9 +161,29 @@ def main():
     pd.Series(feature_cols, name="predictor").to_csv(pred_path, index=False)
     print(f"Saved predictor list ({len(feature_cols)} columns): {pred_path}")
 
+    # FIX (2026-10 audit, C18): missing-value flags only for continuous
+    # predictors that actually have missing values, and one shared flag when
+    # two predictors are missing for exactly the same participants (selenium
+    # and manganese, not assayed in 2007-2010). This is a structural property
+    # of the survey design, not of the outcome, so deciding it on the whole
+    # cohort leaks nothing. pipeline_utils reads this list.
+    flags, patterns = [], []
+    for col in cfg.CONTINUOUS_AS_IS:
+        if col not in X.columns or not X[col].isna().any():
+            continue
+        pat = X[col].isna().values
+        if any((pat == p).all() for p in patterns):
+            print(f"  missing-flag for {col} dropped: identical to an earlier flag")
+            continue
+        flags.append(col)
+        patterns.append(pat)
+    flag_path = cfg.OUT_METRICS / "missing_flag_columns.csv"
+    pd.Series(flags, name="flagged_predictor").to_csv(flag_path, index=False)
+    print(f"Saved missing-flag list ({len(flags)} columns: {flags}): {flag_path}")
+
     # Sanity printout: value ranges after encoding
     print("\nSanity check -- encoded value ranges (should look right, not raw NHANES codes):")
-    for col in ["sex_female", "exam_summer", "SMQ040", "ALQ_EVER"] + cfg.BINARY_YESNO_1_2:
+    for col in ["sex_female", "exam_summer", "SMQ040", "ALQ_PAST12"] + cfg.BINARY_YESNO_1_2:
         if col in X.columns:
             print(f"  {col}: {sorted(X[col].dropna().unique().tolist())}")
 

@@ -56,8 +56,8 @@ ABBREV: dict[str, str] = {
     # smoking, alcohol, diet
     "SMQ020":       "Ever smoked",
     "SMQ040":       "Smoking intensity",
-    "ALQ_EVER":     "Ever drank",
-    "ALQ130":       "Drinks/day",
+    "ALQ_PAST12":   "Drank past 12 mo",
+    "ALQ130":       "Drinks/drinking day",
     "DBQ700":       "Diet quality",
 
     # one-hot categories
@@ -84,7 +84,7 @@ GLOSS_REQUIRED: set[str] = {
     "BMXBMI", "INDFMPIR", "BPXPLS", "exam_summer",
     "LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN",
     "PAQ605", "PAQ650", "PAQ665", "PAD645",
-    "SMQ020", "SMQ040", "ALQ_EVER", "ALQ130", "DBQ700",
+    "SMQ020", "SMQ040", "ALQ_PAST12", "ALQ130", "DBQ700",
     "RIDRETH1_1.0", "RIDRETH1_2.0", "RIDRETH1_3.0", "RIDRETH1_4.0",
     "RIDRETH1_5.0", "RIDRETH1_nan",
 }
@@ -101,9 +101,13 @@ def abbrev(code: str) -> str:
     """
     if code in ABBREV:
         return ABBREV[code]
+    # FIX (2026-10 audit, C4): MissingIndicator = 1 means MISSING, so the
+    # short label says "(missing)", not "(obs.)".
+    if code == _cfg.SE_MN_FLAG_NAME:
+        return "Se/Mn not measured"
     if code.startswith(MISSING_PREFIX):
         base = code[len(MISSING_PREFIX):]
-        return f"{abbrev(base)} (obs.)"
+        return f"{abbrev(base)} (missing)"
     return _cfg.label_feature(code)
 
 

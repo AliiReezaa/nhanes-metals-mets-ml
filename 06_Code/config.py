@@ -197,7 +197,7 @@ PREDICTOR_VARS = {
     "metals": ["LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN"],
     "demographic": ["RIDAGEYR", "RIAGENDR", "RIDRETH1", "DMDEDUC2", "DMDMARTL",
                      "DMDHHSIZ", "INDFMPIR", "RIDEXMON"],
-    # BMXHIP dropped: r=0.9367 with BMXBMI and 81.97% missing, both computed
+    # BMXHIP dropped: r about 0.93 with BMXBMI and about 81% missing, both computed
     # on the training partition only, from real data, by the dedicated
     # candidate-variable screen in 04_split.py (see its FIX note -- this
     # number used to be a hardcoded, never-actually-reproduced comment here;

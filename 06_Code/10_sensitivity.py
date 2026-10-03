@@ -27,8 +27,8 @@ Output: outputs/metrics/sensitivity_diq010.csv
         outputs/metrics/sensitivity_outcome_definition.csv
 
 Run:
-    python scripts/10_sensitivity.py
-    python scripts/10_sensitivity.py --cv 5 --top-n 3
+    python 06_Code/10_sensitivity.py
+    python 06_Code/10_sensitivity.py --cv 5 --top-n 3
 """
 import argparse
 import inspect

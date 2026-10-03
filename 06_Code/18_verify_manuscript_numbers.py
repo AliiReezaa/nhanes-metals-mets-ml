@@ -142,7 +142,7 @@ NUM_RE = re.compile(r"(?<![A-Za-z0-9_])[−-]?\d[\d,]*(?:\.\d+)?(?![\d])")
 def doc_text(path: Path):
     """Body text only. The reference list is excluded deliberately: its numbers are
     years, volumes, pages and DOIs, which are not pipeline outputs and are audited
-    instead by scripts/20_verify_citations.py against captured PubMed metadata."""
+    instead by 06_Code/20_verify_citations.py against captured PubMed metadata."""
     doc = Document(path)
     out = []
     in_refs = False

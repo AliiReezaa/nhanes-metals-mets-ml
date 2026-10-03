@@ -71,7 +71,7 @@ Output: outputs/metrics/strobe_flow.csv
         outputs/metrics/table1_by_mets_status.csv
 
 Run:
-    python scripts/11_reporting.py
+    python 06_Code/11_reporting.py
 """
 import sys
 from pathlib import Path

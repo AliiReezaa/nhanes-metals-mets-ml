@@ -32,7 +32,7 @@ Output: outputs/metrics/model_comparison.csv
         outputs/figures/calibration_curves.png
 
 Run:
-    python scripts/08_evaluate.py
+    python 06_Code/08_evaluate.py
 """
 import json
 import sys

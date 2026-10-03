@@ -29,7 +29,7 @@ correction made in 08_evaluate.py/09_explain_shap.py is visible everywhere
 these results get looked at, not just in the raw CSV.
 
 Run:
-    python scripts/12_visualize.py
+    python 06_Code/12_visualize.py
 """
 import json
 import sys

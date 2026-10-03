@@ -6,7 +6,7 @@ Length discipline: a Q1 Results section carries roughly five or six display
 items and under ~2,000 words. Everything that supports rather than carries the
 argument -- threshold-level classification metrics, the calibration and
 decision curves, the subgroup forest, the full importance table and the
-sensitivity grid -- lives in the combined supplement (scripts/21_write_supplement.py)
+sensitivity grid -- lives in the combined supplement (06_Code/21_write_supplement.py)
 and is cited from here.
 
 Display items retained in the main text:
@@ -38,7 +38,7 @@ OUT = ROOT / "manuscript"
 OUT.mkdir(parents=True, exist_ok=True)
 
 N = json.loads((MET / "publication_numbers.json").read_text())
-# Caption glossaries, written by scripts/15_publication_figures.py at the moment each
+# Caption glossaries, written by 06_Code/15_publication_figures.py at the moment each
 # figure was drawn. Read rather than restated, so a label on an axis and its expansion in
 # the caption cannot drift apart when the figures are regenerated.
 AB = N["figure_abbreviations"]

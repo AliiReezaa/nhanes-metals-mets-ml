@@ -25,7 +25,7 @@ Output: data_processed/train_seqn.csv
         outputs/metrics/collinearity_flags.csv
 
 Run:
-    python scripts/04_split.py
+    python 06_Code/04_split.py
 """
 import sys
 from pathlib import Path

@@ -16,21 +16,18 @@ in the prior pipeline.
 
 REBUILD NOTE / FIX (two changes from the original pipeline_utils.py):
 
-1. Missingness indicators. Several predictors here are not missing at random
-   in the textbook sense -- e.g. selenium/manganese are structurally absent
-   for two entire pooled cycles (2007-2010), and even the harmonized
-   ALQ_EVER variable still carries some genuine non-response. Silently
-   median/mode-imputing those and feeding the model a value indistinguishable
-   from a real measurement both throws away real information (whether a
-   value was observed at all can itself be predictive/confounded with
-   cohort/era) and can manufacture the illusion of a stable per-feature
-   signal that is really just "which imputed constant did this row get."
-   Every continuous predictor now gets an explicit, always-present
-   "was this value observed?" flag (via sklearn's MissingIndicator with
-   features="all", not the default "missing-only" mode) alongside its
-   imputed value, so the model can use both. "all" (not "missing-only") is
-   deliberate: it guarantees a FIXED output width every single fold/fit,
-   which the next fix depends on.
+1. Missingness indicators. Several predictors are not missing at random in
+   the textbook sense (selenium and manganese were not assayed at all in
+   2007-2010). Each continuous predictor that has missing values gets a
+   binary flag alongside its imputed value: 1 = the value was MISSING and
+   imputed, 0 = it was measured. (2026-10 audit, C4: earlier text and labels
+   said the flag meant "observed", which is the opposite of what sklearn's
+   MissingIndicator outputs.) The list of flagged predictors is decided once
+   in 03_feature_engineering.py (missing_flag_columns.csv): only predictors
+   that have missing values, and one shared flag for selenium and manganese,
+   which are missing for exactly the same participants (C18). Fixing the list
+   up front keeps the output width identical in every fold, which the SMOTENC
+   index calculation below depends on.
 
 2. SMOTE -> SMOTENC. The original pipeline ran plain SMOTE across a feature
    matrix that mixes ~13 continuous columns with ~20 binary/one-hot/ordinal
@@ -71,19 +68,28 @@ def get_feature_lists():
     pred_path = cfg.OUT_METRICS / "predictors_used.csv"
     feature_cols = pd.read_csv(pred_path)["predictor"].tolist()
     continuous_cols = [c for c in feature_cols if c in cfg.CONTINUOUS_AS_IS]
+    # everything else (binary 0/1, ordinal, one-hot) takes the categorical path
     categorical_cols = [c for c in feature_cols if c not in cfg.CONTINUOUS_AS_IS]
     return feature_cols, continuous_cols, categorical_cols
 
 
+def get_flag_cols(continuous_cols) -> list[str]:
+    """Continuous predictors that get a missing-value flag, in the order of
+    continuous_cols (see module docstring, point 1)."""
+    path = cfg.OUT_METRICS / "missing_flag_columns.csv"
+    flagged = set(pd.read_csv(path)["flagged_predictor"]) if path.exists() else set(continuous_cols)
+    return [c for c in continuous_cols if c in flagged]
+
+
 def build_preprocessor(continuous_cols, categorical_cols) -> ColumnTransformer:
-    """Continuous vars: median-impute + standardize, PLUS an always-present
-    per-column "was this observed?" flag (see module docstring, FIX 1).
+    """Continuous vars: median-impute + standardize, PLUS a missing-value flag
+    (1 = missing) for each flagged predictor (see module docstring, point 1).
     Categorical/binary/one-hot vars: mode-impute, left on their 0/1 (or
     ordinal integer) scale -- scaling a 0/1 dummy doesn't help tree or
     linear models and just makes coefficients harder to read.
 
     Output column order (deterministic, same every fold): all continuous
-    columns (imputed+scaled) -> one missing-flag per continuous column
+    columns (imputed+scaled) -> one missing-flag per flagged predictor
     (always emitted, even if that fold has zero missing values for it) ->
     all categorical columns (mode-imputed). transformed_feature_names()
     below returns the matching clean names, and get_smotenc_categorical_indices()
@@ -94,23 +100,24 @@ def build_preprocessor(continuous_cols, categorical_cols) -> ColumnTransformer:
         ("impute", SimpleImputer(strategy="median")),
         ("scale", StandardScaler()),
     ])
-    cont_missing_flag = MissingIndicator(features="all")  # fixed width: len(continuous_cols)
+    flag_cols = get_flag_cols(continuous_cols)
+    cont_missing_flag = MissingIndicator(features="all")  # fixed width: len(flag_cols)
     cat_impute = SimpleImputer(strategy="most_frequent")
 
-    return ColumnTransformer(transformers=[
-        ("cont", cont_impute_scale, continuous_cols),
-        ("cont_flag", cont_missing_flag, continuous_cols),
-        ("cat", cat_impute, categorical_cols),
-    ])
+    transformers = [("cont", cont_impute_scale, continuous_cols)]
+    if flag_cols:
+        transformers.append(("cont_flag", cont_missing_flag, flag_cols))
+    transformers.append(("cat", cat_impute, categorical_cols))
+    return ColumnTransformer(transformers=transformers)
 
 
 def transformed_feature_names(continuous_cols, categorical_cols) -> list[str]:
     """Clean, human/SHAP-friendly names matching build_preprocessor's fixed
     output layout exactly: continuous_cols, then 'missingindicator_<col>' for
-    each continuous col (in the same order), then categorical_cols."""
+    each flagged continuous col (in the same order), then categorical_cols."""
     return (
         list(continuous_cols)
-        + [f"missingindicator_{c}" for c in continuous_cols]
+        + [f"missingindicator_{c}" for c in get_flag_cols(continuous_cols)]
         + list(categorical_cols)
     )
 
@@ -123,7 +130,7 @@ def get_smotenc_categorical_indices(continuous_cols, categorical_cols) -> list[i
     so it is guaranteed identical across every fold and every script that
     calls build_pipeline."""
     n_cont = len(continuous_cols)
-    n_flag = len(continuous_cols)
+    n_flag = len(get_flag_cols(continuous_cols))
     n_cat = len(categorical_cols)
     return list(range(n_cont, n_cont + n_flag + n_cat))
 

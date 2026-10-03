@@ -4,7 +4,7 @@ standalone, submission-formatted .docx, condensed to fit an 8-page limit and
 referenced throughout.
 
 Every quantity is pulled from outputs/metrics/* at build time, and every
-citation marker resolves against scripts/references.py, whose entries were each
+citation marker resolves against 06_Code/references.py, whose entries were each
 verified against PubMed (or the publisher's DOI record) before use.
 
 Numbering convention, chosen so this file and the Results file can be assembled

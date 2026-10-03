@@ -26,8 +26,8 @@ Output: outputs/models/<model_name>.joblib
         outputs/metrics/thresholds.json
 
 Run:
-    python scripts/07_train_models.py
-    python scripts/07_train_models.py --models "Logistic Regression,LightGBM"
+    python 06_Code/07_train_models.py
+    python 06_Code/07_train_models.py --models "Logistic Regression,LightGBM"
 """
 import argparse
 import json

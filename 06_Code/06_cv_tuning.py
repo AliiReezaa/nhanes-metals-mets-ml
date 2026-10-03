@@ -21,12 +21,12 @@ Output: outputs/metrics/best_params.json   (per-model best hyperparameters + CV 
 Run (defaults to the full 10-fold search described in the plan -- this is
 slow; expect anywhere from tens of minutes to a few hours depending on your
 machine, mostly driven by SVM and MLP):
-    python scripts/06_cv_tuning.py
+    python 06_Code/06_cv_tuning.py
 
 Faster options while developing/debugging:
-    python scripts/06_cv_tuning.py --quick                     # cv=3, n_iter=3, all models
-    python scripts/06_cv_tuning.py --models "Logistic Regression,Decision Tree"
-    python scripts/06_cv_tuning.py --cv 5 --n-iter 10
+    python 06_Code/06_cv_tuning.py --quick                     # cv=3, n_iter=3, all models
+    python 06_Code/06_cv_tuning.py --models "Logistic Regression,Decision Tree"
+    python 06_Code/06_cv_tuning.py --cv 5 --n-iter 10
 """
 import argparse
 import json

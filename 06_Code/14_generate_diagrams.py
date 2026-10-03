@@ -32,7 +32,7 @@ Output: diagrams/figure1_data_cleaning_pipeline.png
 
 Run (after the full pipeline, 01 through 13, has been run at least once --
 every number below is read from their outputs, not computed here):
-    python scripts/14_generate_diagrams.py
+    python 06_Code/14_generate_diagrams.py
 """
 import json
 import subprocess
