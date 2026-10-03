@@ -1,0 +1,15 @@
+# Analysis environment (Python 3.11). python-docx is required for the
+# document-building steps (16, 17, 21, 23) and is installed separately.
+catboost==1.2.10
+imbalanced-learn==0.14.2
+joblib==1.6.0
+lightgbm==4.7.0
+matplotlib==3.11.2
+numpy==2.4.6
+pandas==3.0.5
+scikit-learn==1.9.1
+scipy==1.17.1
+shap==0.51.0
+statsmodels==0.15.0
+xgboost==2.1.4
+python-docx

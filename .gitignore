@@ -1,0 +1,12 @@
+# Operating-system and editor clutter
+.DS_Store
+~$*
+__pycache__/
+*.pyc
+
+# Created by RUN_ME.py / the pipeline on each run (regenerated, never committed)
+.venv/
+NHANES_data/
+data_processed/
+outputs/
+manuscript/

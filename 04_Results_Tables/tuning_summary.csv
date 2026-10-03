@@ -1,0 +1,12 @@
+model,cv_auc,seconds,cv_folds,n_iter_actual,search_method,best_params
+CatBoost,0.8463,348.6,10.0,12.0,RandomizedSearchCV,"{""model__learning_rate"": 0.05, ""model__iterations"": 200, ""model__depth"": 6}"
+XGBoost,0.8446,301.3,10.0,12.0,RandomizedSearchCV,"{""model__n_estimators"": 200, ""model__max_depth"": 3, ""model__learning_rate"": 0.05}"
+Gradient Boosting,0.8443,392.4,10.0,8.0,RandomizedSearchCV,"{""model__n_estimators"": 200, ""model__max_depth"": 2, ""model__learning_rate"": 0.1}"
+LightGBM,0.8438,321.4,10.0,12.0,RandomizedSearchCV,"{""model__num_leaves"": 15, ""model__n_estimators"": 500, ""model__learning_rate"": 0.01}"
+SVM,0.8398,1593.3,10.0,6.0,RandomizedSearchCV,"{""model__kernel"": ""rbf"", ""model__C"": 1}"
+Logistic Regression,0.8396,85.5,10.0,4.0,RandomizedSearchCV,"{""model__penalty"": ""l2"", ""model__C"": 0.01}"
+Random Forest,0.8377,659.5,10.0,12.0,RandomizedSearchCV,"{""model__n_estimators"": 500, ""model__min_samples_leaf"": 5, ""model__max_depth"": null}"
+Decision Tree,0.8238,258.3,10.0,12.0,RandomizedSearchCV,"{""model__min_samples_leaf"": 20, ""model__max_depth"": 5}"
+KNN,0.7991,58.8,10.0,3.0,RandomizedSearchCV,"{""model__n_neighbors"": 25}"
+MLP,0.7943,518.1,10.0,4.0,RandomizedSearchCV,"{""model__hidden_layer_sizes"": [64], ""model__alpha"": 0.001}"
+Naive Bayes,0.7472,20.7,10.0,,cross_val_score (no hyperparameters to search),{}

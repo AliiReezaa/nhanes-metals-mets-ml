@@ -1,0 +1,4 @@
+model,cv_auc_smote,cv_auc_class_weight,delta
+CatBoost,0.8416,0.842,0.0005
+XGBoost,0.8186,0.8196,0.001
+Gradient Boosting,0.8442,,

@@ -1,0 +1,11 @@
+Metal 1,Metal 2,Mean |SHAP interaction|
+Blood lead,Blood manganese,0.01183
+Blood mercury,Blood manganese,0.01025
+Blood lead,Blood cadmium,0.00927
+Blood cadmium,Blood selenium,0.00721
+Blood cadmium,Blood manganese,0.00528
+Blood mercury,Blood selenium,0.00516
+Blood lead,Blood mercury,0.00434
+Blood selenium,Blood manganese,0.00319
+Blood cadmium,Blood mercury,0.0031
+Blood lead,Blood selenium,0.00301

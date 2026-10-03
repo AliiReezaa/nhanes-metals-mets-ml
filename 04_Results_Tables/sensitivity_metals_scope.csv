@@ -1,0 +1,4 @@
+model,cv_auc_all_5_metals,cv_auc_lead_only,delta
+CatBoost,0.8416,0.8427,0.0011
+XGBoost,0.8186,0.8188,0.0002
+Gradient Boosting,0.8442,0.8445,0.0003

@@ -1,0 +1,27 @@
+{
+  "_note": "Metadata returned by the PubMed E-utilities connector for every reference cited in the Methods. Each record was retrieved by PMID on 2026-09-18 and is stored verbatim as the audit record for scripts/20_verify_citations.py. The two non-PubMed entries are marked source='publisher' and were resolved through the publisher's DOI record instead.",
+  "_retrieved": "2026-09-18",
+  "records": {
+    "nhanes_design": {"pmid": "25090154", "first_author": "Johnson", "journal": "Vital Health Stat 2", "year": "2013", "volume": null, "pages": "1-24", "issue": "161", "source": "pubmed"},
+    "nhanes_weights": {"pmid": "29775431", "first_author": "Chen", "journal": "Vital Health Stat 2", "year": "2018", "volume": null, "pages": "1-26", "issue": "177", "source": "pubmed"},
+    "tripod": {"pmid": "38626948", "first_author": "Collins", "journal": "BMJ", "year": "2024", "volume": "385", "pages": "e078378", "doi": "10.1136/bmj-2023-078378", "source": "pubmed"},
+    "strobe": {"pmid": "18064739", "first_author": "von Elm", "journal": "Lancet", "year": "2007", "volume": "370", "pages": "1453-7", "issue": "9596", "doi": "10.1016/S0140-6736(07)61602-X", "source": "pubmed"},
+    "alberti": {"pmid": "19805654", "first_author": "Alberti", "journal": "Circulation", "year": "2009", "volume": "120", "pages": "1640-5", "issue": "16", "doi": "10.1161/CIRCULATIONAHA.109.192644", "source": "pubmed"},
+    "grundy": {"pmid": "16157765", "first_author": "Grundy", "journal": "Circulation", "year": "2005", "volume": "112", "pages": "2735-52", "issue": "17", "doi": "10.1161/CIRCULATIONAHA.105.169404", "source": "pubmed"},
+    "bernett": {"pmid": "39122953", "first_author": "Bernett", "journal": "Nat Methods", "year": "2024", "volume": "21", "pages": "1444-1453", "issue": "8", "doi": "10.1038/s41592-024-02362-y", "source": "pubmed"},
+    "lo_metals": {"pmid": "33774283", "first_author": "Lo", "journal": "Sci Total Environ", "year": "2021", "volume": "780", "pages": "146527", "doi": "10.1016/j.scitotenv.2021.146527", "source": "pubmed"},
+    "heinze": {"pmid": "29292533", "first_author": "Heinze", "journal": "Biom J", "year": "2018", "volume": "60", "pages": "431-449", "issue": "3", "doi": "10.1002/bimj.201700067", "source": "pubmed"},
+    "sterne": {"pmid": "19564179", "first_author": "Sterne", "journal": "BMJ", "year": "2009", "volume": "338", "pages": "b2393", "doi": "10.1136/bmj.b2393", "source": "pubmed"},
+    "sisk": {"pmid": "37105540", "first_author": "Sisk", "journal": "Stat Methods Med Res", "year": "2023", "volume": "32", "pages": "1461-1477", "issue": "8", "doi": "10.1177/09622802231165001", "source": "pubmed"},
+    "riley": {"pmid": "32188600", "first_author": "Riley", "journal": "BMJ", "year": "2020", "volume": "368", "pages": "m441", "doi": "10.1136/bmj.m441", "source": "pubmed"},
+    "kapoor": {"pmid": "37720327", "first_author": "Kapoor", "journal": "Patterns (N Y)", "year": "2023", "volume": "4", "pages": "100804", "issue": "9", "doi": "10.1016/j.patter.2023.100804", "source": "pubmed"},
+    "chawla": {"pmid": null, "first_author": "Chawla", "journal": "J Artif Intell Res", "year": "2002", "volume": "16", "pages": "321-357", "doi": "10.1613/jair.953", "source": "publisher", "verification": "DOI 10.1613/jair.953 resolves to the JAIR record for 'SMOTE: Synthetic Minority Over-sampling Technique', vol 16 pp 321-357; SMOTE-NC attribution confirmed against the imbalanced-learn API documentation."},
+    "goorbergh": {"pmid": "35686364", "first_author": "van den Goorbergh", "journal": "J Am Med Inform Assoc", "year": "2022", "volume": "29", "pages": "1525-1534", "issue": "9", "doi": "10.1093/jamia/ocac093", "source": "pubmed"},
+    "youden": {"pmid": "15405679", "first_author": "Youden", "journal": "Cancer", "year": "1950", "volume": "3", "pages": "32-5", "issue": "1", "doi": "10.1002/1097-0142(1950)3:1<32::aid-cncr2820030106>3.0.co;2-3", "source": "pubmed"},
+    "delong": {"pmid": "3203132", "first_author": "DeLong", "journal": "Biometrics", "year": "1988", "volume": "44", "pages": "837-45", "issue": "3", "source": "pubmed"},
+    "vancalster": {"pmid": "31842878", "first_author": "Van Calster", "journal": "BMC Med", "year": "2019", "volume": "17", "pages": "230", "issue": "1", "doi": "10.1186/s12916-019-1466-7", "source": "pubmed"},
+    "vickers": {"pmid": "17099194", "first_author": "Vickers", "journal": "Med Decis Making", "year": "2006", "volume": "26", "pages": "565-74", "issue": "6", "doi": "10.1177/0272989X06295361", "source": "pubmed"},
+    "lundberg": {"pmid": "32607472", "first_author": "Lundberg", "journal": "Nat Mach Intell", "year": "2020", "volume": "2", "pages": "56-67", "issue": "1", "doi": "10.1038/s42256-019-0138-9", "source": "pubmed"},
+    "altmann": {"pmid": "20385727", "first_author": "Altmann", "journal": "Bioinformatics", "year": "2010", "volume": "26", "pages": "1340-7", "issue": "10", "doi": "10.1093/bioinformatics/btq134", "source": "pubmed"}
+  }
+}

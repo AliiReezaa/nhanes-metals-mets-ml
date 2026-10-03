@@ -1,0 +1,47 @@
+feature_code,mean_abs_shap,clinical_name
+BMXBMI,1.0254143667893576,Body mass index (kg/m²)
+RIDAGEYR,0.9913405943249665,Age (years)
+PAQ650,0.19409278331938343,Vigorous recreational activity
+BPXPLS,0.16441273319940633,Resting pulse (60 sec)
+RIDRETH1_4.0,0.07960279204563706,Race/ethnicity: Non-Hispanic Black
+DBQ700,0.07468247530064757,Self-rated diet quality (1=excellent...5=poor)
+DMDMARTL_5.0,0.06715072427014883,Marital status: Never married
+DMDEDUC2,0.06296712874074079,Education level
+RIDRETH1_5.0,0.046209429632010184,Race/ethnicity: Other/Multi-Racial
+LBXBCD,0.04370570857391122,Blood cadmium (µg/L)
+LBXBPB,0.039075166878273775,Blood lead (µg/dL)
+LBXBSE,0.038847396694087946,Blood selenium (µg/L)
+sex_female,0.037730748562933826,Sex: Female
+LBXTHG,0.0362133529131223,"Blood mercury, total (µg/L)"
+INDFMPIR,0.034872873253082796,Income-to-poverty ratio
+ALQ130,0.03343720246367314,Avg. alcoholic drinks/day (past 12 mo)
+SMQ040,0.02575798016221207,"Current smoking intensity (0=none, 1=some days, 2=every day)"
+PAQ665,0.024184932547747,Moderate recreational activity
+DMDHHSIZ,0.02153120350689651,Household size
+missingindicator_ALQ130,0.021275800578951534,Avg. alcoholic drinks/day (past 12 mo): was measured/observed
+PAD645,0.019424818490685516,Minutes walking/biking for transportation
+missingindicator_INDFMPIR,0.019107590759229808,Income-to-poverty ratio: was measured/observed
+LBXBMN,0.01685790757540932,Blood manganese (µg/L)
+DMDMARTL_4.0,0.014703641568542697,Marital status: Separated
+SMQ020,0.014663475251368461,Smoked ≥100 cigarettes in life
+exam_summer,0.012553184046336466,Exam month: May-Oct (vs. Nov-Apr)
+missingindicator_ALQ_EVER,0.012031336913091691,Ever consumed alcohol (harmonized ALQ101/ALQ111): was measured/observed
+DMDMARTL_6.0,0.011959969525567162,Marital status: Living with partner
+DMDMARTL_3.0,0.009766461011820327,Marital status: Divorced
+RIDRETH1_2.0,0.0065652922324858694,Race/ethnicity: Other Hispanic
+RIDRETH1_3.0,0.004795572530650579,Race/ethnicity: Non-Hispanic White
+missingindicator_LBXBSE,0.004616730418264617,Blood selenium (µg/L): was measured/observed
+PAQ605,0.004394380391609189,Vigorous work activity
+ALQ_EVER,0.003596758388571585,Ever consumed alcohol (harmonized ALQ101/ALQ111)
+DMDMARTL_2.0,0.0035047039206687986,Marital status: Widowed
+missingindicator_LBXBMN,0.0015269927511222488,Blood manganese (µg/L): was measured/observed
+missingindicator_BMXBMI,0.0001979014833431887,Body mass index (kg/m²): was measured/observed
+missingindicator_RIDAGEYR,0.0,Age (years): was measured/observed
+missingindicator_LBXTHG,0.0,"Blood mercury, total (µg/L): was measured/observed"
+missingindicator_LBXBCD,0.0,Blood cadmium (µg/L): was measured/observed
+missingindicator_BPXPLS,0.0,Resting pulse (60 sec): was measured/observed
+missingindicator_LBXBPB,0.0,Blood lead (µg/dL): was measured/observed
+missingindicator_DMDHHSIZ,0.0,Household size: was measured/observed
+missingindicator_PAD645,0.0,Minutes walking/biking for transportation: was measured/observed
+RIDRETH1_nan,0.0,Race/ethnicity: missing
+DMDMARTL_nan,0.0,Marital status: missing

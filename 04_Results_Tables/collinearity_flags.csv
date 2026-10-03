@@ -1,0 +1,2 @@
+var_1,var_2,pearson_r,pct_missing_var_1_train,decision
+BMXHIP,BMXBMI,0.9367,81.97,excluded from predictor set (PREDICTOR_VARS in config.py): redundant with BMXBMI and majority-missing

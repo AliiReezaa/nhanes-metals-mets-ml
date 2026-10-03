@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cross-Validation: How Many Folds?</title>
+<style>
+  :root{
+    --bg:#0a0e1a;
+    --panel:rgba(255,255,255,0.045);
+    --panel-border:rgba(255,255,255,0.09);
+    --text:#e7ecf5;
+    --muted:#8b96ad;
+    --accent:#38d6d1;
+    --accent2:#7c9cff;
+    --good:#59d98e;
+    --warn:#f6a94a;
+    --train:rgba(255,255,255,0.10);
+    --train-border:rgba(255,255,255,0.16);
+    --mono: 'SFMono-Regular', Consolas, 'Cascadia Code', 'Liberation Mono', Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{ margin:0; padding:0; min-height:100%; }
+  body{
+    background:
+      radial-gradient(1200px 800px at 15% -10%, #142042 0%, transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, #10233a 0%, transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    padding: 34px 5vw 60px;
+  }
+  .wrap{ max-width:1280px; margin:0 auto; }
+  header h1{ font-size:1.9rem; margin:0 0 8px; font-weight:750; letter-spacing:-.01em; }
+  header .sub{ color:var(--muted); font-size:1.02rem; line-height:1.55; max-width:760px; margin:0 0 18px; }
+
+  .legend{ display:flex; gap:18px; flex-wrap:wrap; align-items:center; margin-bottom:22px; }
+  .legend .item{ display:flex; align-items:center; gap:7px; font-size:.8rem; color:var(--muted); }
+  .swatch{ width:14px; height:14px; border-radius:4px; display:inline-block; }
+  .swatch.train{ background:var(--train); border:1px solid var(--train-border); }
+  .swatch.val{ background:var(--accent); box-shadow:0 0 8px rgba(56,214,209,.6); }
+  .swatch.used{ background:rgba(89,217,142,.18); border:1px solid rgba(89,217,142,.5); }
+
+  .grid3{ display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; align-items:stretch; }
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:16px;
+    padding:20px; display:flex; flex-direction:column;
+  }
+  .kicker{
+    color:var(--accent); font-family:var(--mono); letter-spacing:.12em;
+    text-transform:uppercase; font-size:.68rem; font-weight:700; margin-bottom:6px;
+  }
+  .card h2{ font-size:1.15rem; margin:0 0 6px; font-weight:700; }
+  .card .desc{ color:var(--muted); font-size:.84rem; line-height:1.5; margin:0 0 14px; min-height:58px; }
+
+  .blocks{
+    display:grid; grid-template-columns:repeat(15, 1fr); gap:4px;
+    margin-bottom:12px;
+  }
+  .blk{
+    aspect-ratio:1; border-radius:4px; background:var(--train); border:1px solid var(--train-border);
+    transition: background .35s ease, border-color .35s ease, transform .25s ease, box-shadow .35s ease;
+  }
+  .blk.val{ background:var(--accent); border-color:var(--accent); transform:scale(1.12); box-shadow:0 0 10px rgba(56,214,209,.55); }
+  .blk.used{ background:rgba(89,217,142,.16); border-color:rgba(89,217,142,.45); }
+  .blk.test{ background:var(--accent2); border-color:var(--accent2); }
+
+  .controls{ display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  button.ctrl{
+    background:rgba(255,255,255,.06); border:1px solid var(--panel-border); color:var(--text);
+    font-family:var(--mono); font-size:.72rem; padding:7px 12px; border-radius:8px; cursor:pointer;
+    transition:.15s;
+  }
+  button.ctrl:hover{ background:rgba(255,255,255,.12); border-color:var(--accent); }
+  button.ctrl.primary{ background:rgba(56,214,209,.14); border-color:rgba(56,214,209,.45); color:var(--accent); }
+  button.ctrl:disabled{ opacity:.35; cursor:default; }
+
+  .foldlbl{ font-family:var(--mono); font-size:.78rem; color:var(--muted); margin-left:auto; }
+
+  .scorebar{ display:flex; gap:3px; align-items:flex-end; height:46px; margin-bottom:10px; }
+  .scorebar .sb{ flex:1; background:rgba(56,214,209,.25); border-top:2px solid var(--accent); border-radius:2px 2px 0 0; min-width:4px; transition:height .4s ease; }
+  .scorebar .sb.empty{ background:rgba(255,255,255,.04); border-top:2px solid rgba(255,255,255,.08); }
+
+  .result{
+    font-family:var(--mono); font-size:.86rem; padding:10px 12px; border-radius:10px;
+    background:rgba(255,255,255,.03); border:1px dashed var(--panel-border); color:var(--muted);
+    min-height:40px; display:flex; align-items:center;
+  }
+  .result strong{ color:var(--text); }
+  .result.ready{ color:var(--good); border-color:rgba(89,217,142,.4); background:rgba(89,217,142,.06); }
+  .result.ready strong{ color:var(--good); }
+
+  .stat-row{ display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .mini-stat{ flex:1; min-width:90px; background:rgba(255,255,255,.03); border:1px solid var(--panel-border); border-radius:8px; padding:8px 10px; }
+  .mini-stat .n{ font-family:var(--mono); font-size:1.1rem; font-weight:800; color:var(--accent2); }
+  .mini-stat .l{ font-size:.66rem; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
+
+  .slider-row{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+  input[type="range"]{ flex:1; accent-color:var(--accent); }
+  .kval{ font-family:var(--mono); font-weight:800; color:var(--accent); min-width:34px; text-align:right; }
+
+  .history{ display:flex; gap:5px; align-items:flex-end; height:30px; margin-top:4px; }
+  .history .h{ width:10px; border-radius:2px 2px 0 0; background:var(--warn); opacity:.85; transition:height .3s ease; }
+
+  table.cmp{ width:100%; border-collapse:collapse; font-size:.84rem; margin-top:26px; }
+  table.cmp th{ text-align:left; color:var(--muted); font-weight:600; font-size:.68rem; text-transform:uppercase; letter-spacing:.05em; padding:8px 10px; border-bottom:1px solid var(--panel-border); }
+  table.cmp td{ padding:9px 10px; border-bottom:1px solid rgba(255,255,255,.04); }
+  table.cmp tr:last-child td{ border-bottom:none; }
+  table.cmp td.hi{ color:var(--accent); font-weight:700; font-family:var(--mono); }
+
+  .footnote{ color:var(--muted); font-size:.78rem; margin-top:10px; line-height:1.5; }
+
+  @media (max-width: 980px){
+    .grid3{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>How many folds should cross-validation use?</h1>
+    <p class="sub">A toy dataset of 30 rows, split three different ways. Press play on each card and
+      watch which rows get used to validate the model, and how many times the model has to be refit.</p>
+  </header>
+
+  <div class="legend">
+    <span class="item"><span class="swatch train"></span> Training rows this round</span>
+    <span class="item"><span class="swatch val"></span> Validation row(s) this round</span>
+    <span class="item"><span class="swatch used"></span> Already used for validation</span>
+  </div>
+
+  <div class="grid3">
+
+    <!-- ============ PANEL 1: NO FOLDS ============ -->
+    <section class="card" id="panel-none">
+      <div class="kicker">No Folds</div>
+      <h2>Single train/test split</h2>
+      <p class="desc">The whole dataset is split once: some rows for training, the rest for testing. One
+        fit, one score, done. Fast, but that score depends entirely on which rows happened to land in the
+        test set.</p>
+      <div class="blocks" id="blocks-none"></div>
+      <div class="controls">
+        <button class="ctrl primary" id="btn-reshuffle">Try a new random split</button>
+        <span class="foldlbl" id="lbl-none">80% train / 20% test</span>
+      </div>
+      <div class="result" id="result-none">Test accuracy: <strong>not yet run</strong></div>
+      <div class="footnote">Score history across splits (same model, same data, just a different random
+        cut):</div>
+      <div class="history" id="history-none"></div>
+      <div class="stat-row">
+        <div class="mini-stat"><div class="n">1</div><div class="l">Model fits</div></div>
+        <div class="mini-stat"><div class="n">6/30</div><div class="l">Test rows</div></div>
+        <div class="mini-stat"><div class="n">high</div><div class="l">Estimate variance</div></div>
+      </div>
+    </section>
+
+    <!-- ============ PANEL 2: 10-FOLD ============ -->
+    <section class="card" id="panel-10">
+      <div class="kicker">10 Folds</div>
+      <h2>10-fold cross-validation</h2>
+      <p class="desc">The dataset is cut into 10 equal chunks. The model is trained 10 times, each time
+        validating on a different chunk, so every row gets validated exactly once. This is the common
+        default: a stable estimate without excessive compute.</p>
+      <div class="blocks" id="blocks-10"></div>
+      <div class="controls">
+        <button class="ctrl primary" id="play-10">Play</button>
+        <button class="ctrl" id="step-10">Step</button>
+        <button class="ctrl" id="reset-10">Reset</button>
+        <span class="foldlbl" id="lbl-10">Fold 0 / 10</span>
+      </div>
+      <div class="scorebar" id="bars-10"></div>
+      <div class="result" id="result-10">CV estimate: <strong>not yet run</strong></div>
+      <div class="stat-row">
+        <div class="mini-stat"><div class="n">10</div><div class="l">Model fits</div></div>
+        <div class="mini-stat"><div class="n">3/30</div><div class="l">Val. rows/fold</div></div>
+        <div class="mini-stat"><div class="n">balanced</div><div class="l">Bias/variance</div></div>
+      </div>
+    </section>
+
+    <!-- ============ PANEL 3: ADJUSTABLE ============ -->
+    <section class="card" id="panel-k">
+      <div class="kicker">Other Number of Folds</div>
+      <h2 id="title-k">Try k = 5</h2>
+      <p class="desc" id="desc-k">Drag the slider to see what changes when k is smaller (fewer, bigger
+        validation chunks, cheaper but noisier) or larger, all the way up to leave-one-out, where every
+        single row gets its own fold.</p>
+      <div class="slider-row">
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted);">k=2</span>
+        <input type="range" id="k-slider" min="2" max="30" value="5" step="1">
+        <span style="font-family:var(--mono); font-size:.7rem; color:var(--muted);">k=30</span>
+        <span class="kval" id="k-val">5</span>
+      </div>
+      <div class="blocks" id="blocks-k"></div>
+      <div class="controls">
+        <button class="ctrl primary" id="play-k">Play</button>
+        <button class="ctrl" id="step-k">Step</button>
+        <button class="ctrl" id="reset-k">Reset</button>
+        <span class="foldlbl" id="lbl-k">Fold 0 / 5</span>
+      </div>
+      <div class="scorebar" id="bars-k"></div>
+      <div class="result" id="result-k">CV estimate: <strong>not yet run</strong></div>
+      <div class="stat-row">
+        <div class="mini-stat"><div class="n" id="fits-k">5</div><div class="l">Model fits</div></div>
+        <div class="mini-stat"><div class="n" id="valsize-k">~6/30</div><div class="l">Val. rows/fold</div></div>
+        <div class="mini-stat"><div class="n" id="tradeoff-k">low cost</div><div class="l">Compute cost</div></div>
+      </div>
+    </section>
+
+  </div>
+
+  <table class="cmp">
+    <tr><th>Approach</th><th>Model fits</th><th>Validation size</th><th>Typical use</th></tr>
+    <tr><td>No folds (single split)</td><td class="hi">1</td><td>~20% of the data, once</td><td>Very large datasets, quick prototyping, early experiments</td></tr>
+    <tr><td>10-fold CV</td><td class="hi">10</td><td>~10% of the data, 10 times over</td><td>The standard default for small/medium tabular datasets</td></tr>
+    <tr><td>Leave-one-out (k = n)</td><td class="hi">n</td><td>1 row, n times over</td><td>Very small datasets only; expensive and can be high-variance model to model</td></tr>
+    <tr id="row-live"><td>Your current slider setting</td><td class="hi" id="cmp-fits">5</td><td id="cmp-val">~6 rows, 5 times over</td><td id="cmp-use">A middle ground between speed and stability</td></tr>
+  </table>
+  <p class="footnote">All three panels reuse the same 30-row toy dataset and the same underlying model, so
+    the only thing changing between them is how the data gets split. Scores here are illustrative, not
+    numbers from the actual project pipeline; the point is the shape of the tradeoff, not the exact digits.</p>
+</div>
+
+<script>
+const N = 30;
+
+function seededFrac(seedA, seedB, seedC){
+  let x = Math.sin(seedA*12.9898 + seedB*78.233 + seedC*37.719) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+function makeFolds(n, k){
+  const base = Math.floor(n / k);
+  const rem = n % k;
+  const folds = [];
+  let idx = 0;
+  for (let i = 0; i < k; i++){
+    const size = base + (i < rem ? 1 : 0);
+    folds.push(Array.from({length: size}, (_, j) => idx + j));
+    idx += size;
+  }
+  return folds;
+}
+
+function buildBlocks(containerId, n){
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const cells = [];
+  for (let i = 0; i < n; i++){
+    const d = document.createElement('div');
+    d.className = 'blk';
+    el.appendChild(d);
+    cells.push(d);
+  }
+  return cells;
+}
+
+/* ===================== PANEL 1: NO FOLDS ===================== */
+const cellsNone = buildBlocks('blocks-none', N);
+let splitSeed = 1;
+const historyEl = document.getElementById('history-none');
+const scoreHistory = [];
+
+function renderSplit(){
+  const order = Array.from({length: N}, (_, i) => i)
+    .map(i => ({ i, r: seededFrac(i, splitSeed, 7.1) }))
+    .sort((a, b) => a.r - b.r)
+    .map(o => o.i);
+  const testCount = 6;
+  const testSet = new Set(order.slice(0, testCount));
+  cellsNone.forEach((c, i) => {
+    c.className = 'blk' + (testSet.has(i) ? ' test' : '');
+  });
+  const score = 0.55 + seededFrac(splitSeed, 3.3, 9.9) * 0.40;
+  document.getElementById('result-none').innerHTML = `Test accuracy: <strong>${(score*100).toFixed(1)}%</strong>`;
+  scoreHistory.push(score);
+  if (scoreHistory.length > 8) scoreHistory.shift();
+  historyEl.innerHTML = '';
+  const maxH = 28, minH = 6;
+  scoreHistory.forEach(s => {
+    const bar = document.createElement('div');
+    bar.className = 'h';
+    const h = minH + (s - 0.5) / 0.5 * (maxH - minH);
+    bar.style.height = Math.max(minH, Math.min(maxH, h)) + 'px';
+    historyEl.appendChild(bar);
+  });
+}
+renderSplit();
+document.getElementById('btn-reshuffle').addEventListener('click', () => {
+  splitSeed += 1;
+  renderSplit();
+});
+
+/* ===================== PANEL 2: 10-FOLD (fixed) ===================== */
+setupFoldPanel({
+  blocksId: 'blocks-10', playId: 'play-10', stepId: 'step-10', resetId: 'reset-10',
+  lblId: 'lbl-10', barsId: 'bars-10', resultId: 'result-10', k: 10, seedBase: 100
+});
+
+/* ===================== PANEL 3: ADJUSTABLE K ===================== */
+const kSlider = document.getElementById('k-slider');
+let panelK = null;
+
+function describeK(k){
+  if (k <= 3) return { cost: 'very cheap', tone: 'few, large validation chunks: cheaper, but each estimate is noisier and slightly more pessimistic.' };
+  if (k <= 7) return { cost: 'cheap', tone: 'a common lighter-weight alternative to 10-fold, still a reasonable bias/variance balance.' };
+  if (k <= 12) return { cost: 'balanced', tone: 'similar territory to the 10-fold default: a solid balance of stability and compute cost.' };
+  if (k < 30) return { cost: 'expensive', tone: 'many small validation chunks: closer to an unbiased estimate, but that many model fits adds up fast.' };
+  return { cost: 'very expensive', tone: 'leave-one-out: every row gets its own fold. About as unbiased as it gets, but n model fits is a lot, and the resulting estimate can swing a surprising amount between models.' };
+}
+
+function rebuildPanelK(){
+  const k = parseInt(kSlider.value, 10);
+  document.getElementById('k-val').textContent = k;
+  document.getElementById('title-k').textContent = (k === N) ? 'Try leave-one-out (k = n)' : `Try k = ${k}`;
+  const info = describeK(k);
+  document.getElementById('desc-k').textContent =
+    (k === N)
+      ? 'Every row becomes its own validation fold: the model is refit n times, each time tested on the single row it never saw.'
+      : `With k = ${k}: ${info.tone}`;
+  document.getElementById('tradeoff-k').textContent = info.cost;
+  document.getElementById('fits-k').textContent = k;
+  const approxSize = (N / k).toFixed(1);
+  document.getElementById('valsize-k').textContent = (k === N) ? '1/30' : `~${approxSize}/30`;
+  document.getElementById('cmp-fits').textContent = k;
+  document.getElementById('cmp-val').textContent = (k === N) ? '1 row, 30 times over' : `~${approxSize} rows, ${k} times over`;
+  document.getElementById('cmp-use').textContent = info.tone.charAt(0).toUpperCase() + info.tone.slice(1);
+
+  if (panelK) panelK.teardown();
+  panelK = setupFoldPanel({
+    blocksId: 'blocks-k', playId: 'play-k', stepId: 'step-k', resetId: 'reset-k',
+    lblId: 'lbl-k', barsId: 'bars-k', resultId: 'result-k', k: k, seedBase: 500
+  });
+}
+
+kSlider.addEventListener('input', rebuildPanelK);
+rebuildPanelK();
+
+/* ===================== shared fold-panel engine ===================== */
+function setupFoldPanel({ blocksId, playId, stepId, resetId, lblId, barsId, resultId, k, seedBase }){
+  const cells = buildBlocks(blocksId, N);
+  const folds = makeFolds(N, k);
+  const playBtn = document.getElementById(playId);
+  const stepBtn = document.getElementById(stepId);
+  const resetBtn = document.getElementById(resetId);
+  const lbl = document.getElementById(lblId);
+  const barsEl = document.getElementById(barsId);
+  const resultEl = document.getElementById(resultId);
+
+  barsEl.innerHTML = '';
+  const barEls = folds.map(() => {
+    const b = document.createElement('div');
+    b.className = 'sb empty';
+    b.style.height = '4px';
+    barsEl.appendChild(b);
+    return b;
+  });
+
+  let current = -1;
+  let timer = null;
+  const scores = [];
+
+  function paint(){
+    cells.forEach((c, i) => (c.className = 'blk'));
+    for (let f = 0; f <= current; f++){
+      folds[f].forEach(i => {
+        cells[i].className = 'blk' + (f === current ? ' val' : ' used');
+      });
+    }
+    lbl.textContent = current < 0 ? `Fold 0 / ${k}` : `Fold ${current + 1} / ${k}`;
+  }
+
+  function scoreFold(f){
+    return 0.72 + seededFrac(seedBase, f, k * 1.7) * 0.20;
+  }
+
+  function stepOnce(){
+    if (current >= k - 1){
+      stopPlay();
+      return;
+    }
+    current += 1;
+    const s = scoreFold(current);
+    scores.push(s);
+    const h = 6 + s * 40;
+    barEls[current].style.height = h + 'px';
+    barEls[current].className = 'sb';
+    paint();
+    if (current === k - 1){
+      const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+      const variance = scores.reduce((a, b) => a + (b - mean) * (b - mean), 0) / scores.length;
+      const sd = Math.sqrt(variance);
+      resultEl.innerHTML = `CV estimate: <strong>${(mean*100).toFixed(1)}% &plusmn; ${(sd*100).toFixed(1)}%</strong>`;
+      resultEl.classList.add('ready');
+      stopPlay();
+      stepBtn.disabled = true;
+      playBtn.disabled = true;
+    }
+  }
+
+  function startPlay(){
+    if (current >= k - 1) return;
+    playBtn.textContent = 'Pause';
+    timer = setInterval(stepOnce, Math.max(160, Math.min(500, 3200 / k)));
+  }
+  function stopPlay(){
+    playBtn.textContent = 'Play';
+    if (timer){ clearInterval(timer); timer = null; }
+  }
+  function togglePlay(){
+    if (timer) stopPlay(); else startPlay();
+  }
+  function doReset(){
+    stopPlay();
+    current = -1;
+    scores.length = 0;
+    barEls.forEach(b => { b.className = 'sb empty'; b.style.height = '4px'; });
+    resultEl.innerHTML = 'CV estimate: <strong>not yet run</strong>';
+    resultEl.classList.remove('ready');
+    stepBtn.disabled = false;
+    playBtn.disabled = false;
+    paint();
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+  stepBtn.addEventListener('click', stepOnce);
+  resetBtn.addEventListener('click', doReset);
+
+  paint();
+
+  return {
+    teardown(){
+      stopPlay();
+      playBtn.replaceWith(playBtn.cloneNode(true));
+      stepBtn.replaceWith(stepBtn.cloneNode(true));
+      resetBtn.replaceWith(resetBtn.cloneNode(true));
+    }
+  };
+}
+</script>
+</body>
+</html>

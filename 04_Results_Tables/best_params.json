@@ -1,0 +1,148 @@
+{
+  "Logistic Regression": {
+    "best_params": {
+      "model__penalty": "l2",
+      "model__C": 0.01
+    },
+    "cv_auc": 0.8395585896413064,
+    "seconds": 85.5,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 4,
+    "grid_size": 4,
+    "search_method": "RandomizedSearchCV"
+  },
+  "Decision Tree": {
+    "best_params": {
+      "model__min_samples_leaf": 20,
+      "model__max_depth": 5
+    },
+    "cv_auc": 0.8238422431475302,
+    "seconds": 258.3,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 12,
+    "grid_size": 12,
+    "search_method": "RandomizedSearchCV"
+  },
+  "Random Forest": {
+    "best_params": {
+      "model__n_estimators": 500,
+      "model__min_samples_leaf": 5,
+      "model__max_depth": null
+    },
+    "cv_auc": 0.8377288592016697,
+    "seconds": 659.5,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 12,
+    "grid_size": 12,
+    "search_method": "RandomizedSearchCV"
+  },
+  "Gradient Boosting": {
+    "best_params": {
+      "model__n_estimators": 200,
+      "model__max_depth": 2,
+      "model__learning_rate": 0.1
+    },
+    "cv_auc": 0.8443061446296014,
+    "seconds": 392.4,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 8,
+    "grid_size": 8,
+    "search_method": "RandomizedSearchCV"
+  },
+  "LightGBM": {
+    "best_params": {
+      "model__num_leaves": 15,
+      "model__n_estimators": 500,
+      "model__learning_rate": 0.01
+    },
+    "cv_auc": 0.8437784774250051,
+    "seconds": 321.4,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 12,
+    "grid_size": 12,
+    "search_method": "RandomizedSearchCV"
+  },
+  "XGBoost": {
+    "best_params": {
+      "model__n_estimators": 200,
+      "model__max_depth": 3,
+      "model__learning_rate": 0.05
+    },
+    "cv_auc": 0.8446451585598871,
+    "seconds": 301.3,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 12,
+    "grid_size": 12,
+    "search_method": "RandomizedSearchCV"
+  },
+  "SVM": {
+    "best_params": {
+      "model__kernel": "rbf",
+      "model__C": 1
+    },
+    "cv_auc": 0.8398144934673386,
+    "seconds": 1593.3,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 6,
+    "grid_size": 6,
+    "search_method": "RandomizedSearchCV"
+  },
+  "Naive Bayes": {
+    "best_params": {},
+    "cv_auc": 0.7472380061036805,
+    "seconds": 20.7,
+    "cv_folds": 10,
+    "n_iter_requested": null,
+    "n_iter_actual": null,
+    "grid_size": 0,
+    "search_method": "cross_val_score (no hyperparameters to search)"
+  },
+  "MLP": {
+    "best_params": {
+      "model__hidden_layer_sizes": [
+        64
+      ],
+      "model__alpha": 0.001
+    },
+    "cv_auc": 0.7943249535914827,
+    "seconds": 518.1,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 4,
+    "grid_size": 4,
+    "search_method": "RandomizedSearchCV"
+  },
+  "KNN": {
+    "best_params": {
+      "model__n_neighbors": 25
+    },
+    "cv_auc": 0.7990969017496439,
+    "seconds": 58.8,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 3,
+    "grid_size": 3,
+    "search_method": "RandomizedSearchCV"
+  },
+  "CatBoost": {
+    "best_params": {
+      "model__learning_rate": 0.05,
+      "model__iterations": 200,
+      "model__depth": 6
+    },
+    "cv_auc": 0.8462899951910563,
+    "seconds": 348.6,
+    "cv_folds": 10,
+    "n_iter_requested": 20,
+    "n_iter_actual": 12,
+    "grid_size": 12,
+    "search_method": "RandomizedSearchCV"
+  }
+}

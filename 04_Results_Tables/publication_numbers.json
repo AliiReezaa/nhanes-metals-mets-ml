@@ -1,0 +1,1550 @@
+{
+  "flow": {
+    "pooled": 59842,
+    "adults": 34770,
+    "complete_mets": 13337,
+    "final_cohort": 11144,
+    "excluded_age": 25072,
+    "excluded_mets": 21433,
+    "excluded_metals": 2193,
+    "train_n": 8915,
+    "test_n": 2229
+  },
+  "roc": {
+    "CatBoost": {
+      "auc": 0.8567,
+      "ci": [
+        0.84,
+        0.8722
+      ]
+    },
+    "LightGBM": {
+      "auc": 0.8561,
+      "ci": [
+        0.84,
+        0.8708
+      ]
+    },
+    "XGBoost": {
+      "auc": 0.8551,
+      "ci": [
+        0.8387,
+        0.8697
+      ]
+    },
+    "Gradient Boosting": {
+      "auc": 0.8547,
+      "ci": [
+        0.8385,
+        0.8697
+      ]
+    },
+    "SVM": {
+      "auc": 0.8463,
+      "ci": [
+        0.8289,
+        0.8622
+      ]
+    },
+    "Logistic Regression": {
+      "auc": 0.8448,
+      "ci": [
+        0.8276,
+        0.8606
+      ]
+    },
+    "Random Forest": {
+      "auc": 0.8447,
+      "ci": [
+        0.8268,
+        0.861
+      ]
+    },
+    "Decision Tree": {
+      "auc": 0.83,
+      "ci": [
+        0.8114,
+        0.8462
+      ]
+    },
+    "MLP": {
+      "auc": 0.8062,
+      "ci": [
+        0.7879,
+        0.823
+      ]
+    },
+    "KNN": {
+      "auc": 0.802,
+      "ci": [
+        0.7823,
+        0.8205
+      ]
+    },
+    "Naive Bayes": {
+      "auc": 0.7301,
+      "ci": [
+        0.7088,
+        0.752
+      ]
+    }
+  },
+  "significance": {
+    "CatBoost": {
+      "auc_diff": 0.0,
+      "ci": [
+        0.0,
+        0.0
+      ],
+      "p": 1.0,
+      "tied": true
+    },
+    "LightGBM": {
+      "auc_diff": 0.0006,
+      "ci": [
+        -0.0026,
+        0.004
+      ],
+      "p": 0.732,
+      "tied": true
+    },
+    "XGBoost": {
+      "auc_diff": 0.0017,
+      "ci": [
+        -0.0013,
+        0.0046
+      ],
+      "p": 0.268,
+      "tied": true
+    },
+    "Gradient Boosting": {
+      "auc_diff": 0.0021,
+      "ci": [
+        -0.001,
+        0.0052
+      ],
+      "p": 0.172,
+      "tied": true
+    },
+    "SVM": {
+      "auc_diff": 0.0104,
+      "ci": [
+        0.0049,
+        0.0153
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "Logistic Regression": {
+      "auc_diff": 0.0119,
+      "ci": [
+        0.0056,
+        0.0181
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "Random Forest": {
+      "auc_diff": 0.012,
+      "ci": [
+        0.0075,
+        0.0165
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "Decision Tree": {
+      "auc_diff": 0.0267,
+      "ci": [
+        0.0185,
+        0.035
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "MLP": {
+      "auc_diff": 0.0506,
+      "ci": [
+        0.0385,
+        0.0622
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "KNN": {
+      "auc_diff": 0.0548,
+      "ci": [
+        0.0434,
+        0.0655
+      ],
+      "p": 0.0,
+      "tied": false
+    },
+    "Naive Bayes": {
+      "auc_diff": 0.1266,
+      "ci": [
+        0.1082,
+        0.1432
+      ],
+      "p": 0.0,
+      "tied": false
+    }
+  },
+  "top_model": "CatBoost",
+  "n_tied": 4,
+  "calibration": {
+    "CatBoost": {
+      "model": "CatBoost",
+      "calibration_slope": 1.064,
+      "calibration_intercept": -0.091,
+      "brier": 0.1534,
+      "observed_expected_ratio": 0.97
+    },
+    "LightGBM": {
+      "model": "LightGBM",
+      "calibration_slope": 1.104,
+      "calibration_intercept": -0.102,
+      "brier": 0.1541,
+      "observed_expected_ratio": 0.966
+    },
+    "XGBoost": {
+      "model": "XGBoost",
+      "calibration_slope": 1.089,
+      "calibration_intercept": -0.102,
+      "brier": 0.1544,
+      "observed_expected_ratio": 0.966
+    },
+    "Gradient Boosting": {
+      "model": "Gradient Boosting",
+      "calibration_slope": 1.061,
+      "calibration_intercept": -0.09,
+      "brier": 0.1544,
+      "observed_expected_ratio": 0.97
+    },
+    "SVM": {
+      "model": "SVM",
+      "calibration_slope": 0.992,
+      "calibration_intercept": -0.108,
+      "brier": 0.1594,
+      "observed_expected_ratio": 0.964
+    },
+    "Logistic Regression": {
+      "model": "Logistic Regression",
+      "calibration_slope": 1.079,
+      "calibration_intercept": -0.125,
+      "brier": 0.1609,
+      "observed_expected_ratio": 0.956
+    },
+    "Random Forest": {
+      "model": "Random Forest",
+      "calibration_slope": 1.401,
+      "calibration_intercept": -0.077,
+      "brier": 0.1629,
+      "observed_expected_ratio": 0.97
+    },
+    "Decision Tree": {
+      "model": "Decision Tree",
+      "calibration_slope": 0.915,
+      "calibration_intercept": -0.116,
+      "brier": 0.1676,
+      "observed_expected_ratio": 0.962
+    },
+    "MLP": {
+      "model": "MLP",
+      "calibration_slope": 0.43,
+      "calibration_intercept": -0.275,
+      "brier": 0.1957,
+      "observed_expected_ratio": 0.941
+    },
+    "KNN": {
+      "model": "KNN",
+      "calibration_slope": 1.094,
+      "calibration_intercept": -0.305,
+      "brier": 0.1847,
+      "observed_expected_ratio": 0.89
+    },
+    "Naive Bayes": {
+      "model": "Naive Bayes",
+      "calibration_slope": 0.178,
+      "calibration_intercept": 0.364,
+      "brier": 0.2651,
+      "observed_expected_ratio": 1.06
+    }
+  },
+  "dca": {
+    "prevalence_test": 0.4634,
+    "top_model": "CatBoost",
+    "points": {
+      "0.10": {
+        "model_nb": 0.41807,
+        "treat_all_nb": 0.40382,
+        "delta": 0.0142,
+        "net_true_positives_per_1000": 14.2
+      },
+      "0.20": {
+        "model_nb": 0.37629,
+        "treat_all_nb": 0.3293,
+        "delta": 0.047,
+        "net_true_positives_per_1000": 47.0
+      },
+      "0.30": {
+        "model_nb": 0.33449,
+        "treat_all_nb": 0.23348,
+        "delta": 0.101,
+        "net_true_positives_per_1000": 101.0
+      },
+      "0.40": {
+        "model_nb": 0.28294,
+        "treat_all_nb": 0.10573,
+        "delta": 0.1772,
+        "net_true_positives_per_1000": 177.2
+      }
+    }
+  },
+  "figure_abbreviations": {
+    "fig6_shap_beeswarm": "Abbreviations: BMI, body mass index (kg/m\u00b2); Vigorous rec. PA, vigorous recreational activity; Resting pulse, resting pulse (60 sec); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Blood Cd, blood cadmium (\u00b5g/L); Blood Pb, blood lead (\u00b5g/dL); Blood Se, blood selenium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); PIR, income-to-poverty ratio; Drinks/day, avg. alcoholic drinks/day (past 12 mo); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Moderate rec. PA, moderate recreational activity.",
+    "fig7_importance_concordance": "Abbreviations: Blood Mn, blood manganese (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); BMI, body mass index (kg/m\u00b2); Resting pulse, resting pulse (60 sec); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Vigorous rec. PA, vigorous recreational activity; Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Active transport, minutes walking/biking for transportation; Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Drinks/day, avg. alcoholic drinks/day (past 12 mo); PIR, income-to-poverty ratio.",
+    "fig8_metals_shap_dependence": "Abbreviations: Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Mn, blood manganese (\u00b5g/L)."
+  },
+  "metal_ranks": {
+    "LBXBPB": {
+      "clinical_name": "Blood lead (\u00b5g/dL)",
+      "shap_rank": 11,
+      "perm_rank": 9,
+      "mean_abs_shap": 0.0390751668782737,
+      "per_model_perm_rank": {
+        "CatBoost": 9,
+        "LightGBM": 7,
+        "XGBoost": 8,
+        "Gradient Boosting": 4
+      }
+    },
+    "LBXBCD": {
+      "clinical_name": "Blood cadmium (\u00b5g/L)",
+      "shap_rank": 10,
+      "perm_rank": 18,
+      "mean_abs_shap": 0.0437057085739112,
+      "per_model_perm_rank": {
+        "CatBoost": 18,
+        "LightGBM": 29,
+        "XGBoost": 17,
+        "Gradient Boosting": 28
+      }
+    },
+    "LBXTHG": {
+      "clinical_name": "Blood mercury, total (\u00b5g/L)",
+      "shap_rank": 14,
+      "perm_rank": 27,
+      "mean_abs_shap": 0.0362133529131223,
+      "per_model_perm_rank": {
+        "CatBoost": 27,
+        "LightGBM": 33,
+        "XGBoost": 15,
+        "Gradient Boosting": 33
+      }
+    },
+    "LBXBSE": {
+      "clinical_name": "Blood selenium (\u00b5g/L)",
+      "shap_rank": 12,
+      "perm_rank": 11,
+      "mean_abs_shap": 0.0388473966940879,
+      "per_model_perm_rank": {
+        "CatBoost": 11,
+        "LightGBM": 12,
+        "XGBoost": 14,
+        "Gradient Boosting": 27
+      }
+    },
+    "LBXBMN": {
+      "clinical_name": "Blood manganese (\u00b5g/L)",
+      "shap_rank": 21,
+      "perm_rank": 22,
+      "mean_abs_shap": 0.0168579075754093,
+      "per_model_perm_rank": {
+        "CatBoost": 22,
+        "LightGBM": 19,
+        "XGBoost": 26,
+        "Gradient Boosting": 29
+      }
+    }
+  },
+  "spearman_shap_perm": 0.622,
+  "n_predictors_ranked": 33,
+  "shap_top": [
+    {
+      "feature": "BMXBMI",
+      "name": "Body mass index (kg/m\u00b2)",
+      "mean_abs_shap": 1.0254143667893576,
+      "rank": 1
+    },
+    {
+      "feature": "RIDAGEYR",
+      "name": "Age (years)",
+      "mean_abs_shap": 0.9913405943249664,
+      "rank": 2
+    },
+    {
+      "feature": "PAQ650",
+      "name": "Vigorous recreational activity",
+      "mean_abs_shap": 0.1940927833193834,
+      "rank": 3
+    },
+    {
+      "feature": "BPXPLS",
+      "name": "Resting pulse (60 sec)",
+      "mean_abs_shap": 0.1644127331994063,
+      "rank": 4
+    },
+    {
+      "feature": "RIDRETH1_4.0",
+      "name": "Race/ethnicity: Non-Hispanic Black",
+      "mean_abs_shap": 0.079602792045637,
+      "rank": 5
+    },
+    {
+      "feature": "DBQ700",
+      "name": "Self-rated diet quality (1=excellent...5=poor)",
+      "mean_abs_shap": 0.0746824753006475,
+      "rank": 6
+    },
+    {
+      "feature": "DMDMARTL_5.0",
+      "name": "Marital status: Never married",
+      "mean_abs_shap": 0.0671507242701488,
+      "rank": 7
+    },
+    {
+      "feature": "DMDEDUC2",
+      "name": "Education level",
+      "mean_abs_shap": 0.0629671287407407,
+      "rank": 8
+    },
+    {
+      "feature": "RIDRETH1_5.0",
+      "name": "Race/ethnicity: Other/Multi-Racial",
+      "mean_abs_shap": 0.0462094296320101,
+      "rank": 9
+    },
+    {
+      "feature": "LBXBCD",
+      "name": "Blood cadmium (\u00b5g/L)",
+      "mean_abs_shap": 0.0437057085739112,
+      "rank": 10
+    },
+    {
+      "feature": "LBXBPB",
+      "name": "Blood lead (\u00b5g/dL)",
+      "mean_abs_shap": 0.0390751668782737,
+      "rank": 11
+    },
+    {
+      "feature": "LBXBSE",
+      "name": "Blood selenium (\u00b5g/L)",
+      "mean_abs_shap": 0.0388473966940879,
+      "rank": 12
+    }
+  ],
+  "perm_top": [
+    {
+      "feature": "BMXBMI",
+      "name": "Body mass index (kg/m\u00b2)",
+      "perm_importance": 0.1603445010311883,
+      "rank": 1
+    },
+    {
+      "feature": "RIDAGEYR",
+      "name": "Age (years)",
+      "perm_importance": 0.1563162299630586,
+      "rank": 2
+    },
+    {
+      "feature": "BPXPLS",
+      "name": "Resting pulse (60 sec)",
+      "perm_importance": 0.0084457064043747,
+      "rank": 3
+    },
+    {
+      "feature": "sex_female",
+      "name": "Sex: Female",
+      "perm_importance": 0.002535638316816,
+      "rank": 4
+    },
+    {
+      "feature": "RIDRETH1_4.0",
+      "name": "Race/ethnicity: Non-Hispanic Black",
+      "perm_importance": 0.0021194397588607,
+      "rank": 5
+    },
+    {
+      "feature": "PAQ650",
+      "name": "Vigorous recreational activity",
+      "perm_importance": 0.001908669427294,
+      "rank": 6
+    },
+    {
+      "feature": "RIDRETH1_5.0",
+      "name": "Race/ethnicity: Other/Multi-Racial",
+      "perm_importance": 0.0016163915212698,
+      "rank": 7
+    },
+    {
+      "feature": "DBQ700",
+      "name": "Self-rated diet quality (1=excellent...5=poor)",
+      "perm_importance": 0.0013021786076208,
+      "rank": 8
+    },
+    {
+      "feature": "LBXBPB",
+      "name": "Blood lead (\u00b5g/dL)",
+      "perm_importance": 0.0012252846694533,
+      "rank": 9
+    },
+    {
+      "feature": "PAD645",
+      "name": "Minutes walking/biking for transportation",
+      "perm_importance": 0.0012033496618286,
+      "rank": 10
+    },
+    {
+      "feature": "LBXBSE",
+      "name": "Blood selenium (\u00b5g/L)",
+      "perm_importance": 0.0006919645025206,
+      "rank": 11
+    },
+    {
+      "feature": "SMQ040",
+      "name": "Current smoking intensity (0=none, 1=some days, 2=every day)",
+      "perm_importance": 0.0006697057309457,
+      "rank": 12
+    }
+  ],
+  "missingness_indicator_shap": [
+    {
+      "feature": "missingindicator_ALQ130",
+      "name": "Avg. alcoholic drinks/day (past 12 mo): was measured/observed",
+      "mean_abs_shap": 0.02128
+    },
+    {
+      "feature": "missingindicator_INDFMPIR",
+      "name": "Income-to-poverty ratio: was measured/observed",
+      "mean_abs_shap": 0.01911
+    },
+    {
+      "feature": "missingindicator_ALQ_EVER",
+      "name": "Ever consumed alcohol (harmonized ALQ101/ALQ111): was measured/observed",
+      "mean_abs_shap": 0.01203
+    },
+    {
+      "feature": "missingindicator_LBXBSE",
+      "name": "Blood selenium (\u00b5g/L): was measured/observed",
+      "mean_abs_shap": 0.00462
+    }
+  ],
+  "n_transformed_columns_shap": 46,
+  "metals_dependence": {
+    "LBXBPB": {
+      "binned_centers": [
+        0.38,
+        0.54,
+        0.67,
+        0.8,
+        0.95,
+        1.1,
+        1.27,
+        1.46,
+        1.72,
+        2.07,
+        2.6,
+        4.045
+      ],
+      "binned_mean_shap": [
+        -0.0049,
+        0.0083,
+        0.0182,
+        0.0271,
+        0.0233,
+        0.0145,
+        0.0118,
+        0.0105,
+        0.0058,
+        -0.0097,
+        -0.0417,
+        -0.1507
+      ],
+      "n_observed": 2229
+    },
+    "LBXBCD": {
+      "binned_centers": [
+        0.14,
+        0.14,
+        0.19,
+        0.23,
+        0.27,
+        0.31,
+        0.37,
+        0.44,
+        0.54,
+        0.7,
+        1.015,
+        1.9
+      ],
+      "binned_mean_shap": [
+        0.0501,
+        0.0489,
+        0.0096,
+        -0.048,
+        -0.0486,
+        -0.0333,
+        -0.0357,
+        -0.0321,
+        -0.0268,
+        -0.0044,
+        0.0281,
+        0.1037
+      ],
+      "n_observed": 2229
+    },
+    "LBXTHG": {
+      "binned_centers": [
+        0.2,
+        0.23,
+        0.38,
+        0.495,
+        0.62,
+        0.75,
+        0.92,
+        1.15,
+        1.46,
+        2.025,
+        2.955,
+        5.345
+      ],
+      "binned_mean_shap": [
+        0.0533,
+        0.0458,
+        0.0235,
+        0.0189,
+        0.018,
+        0.0171,
+        -0.002,
+        -0.0119,
+        -0.023,
+        -0.0455,
+        -0.0665,
+        -0.0282
+      ],
+      "n_observed": 2229
+    },
+    "LBXBSE": {
+      "binned_centers": [
+        155.685,
+        167.365,
+        173.98,
+        179.16,
+        184.015,
+        188.38,
+        192.51,
+        198.11,
+        202.995,
+        209.335,
+        219.84,
+        240.135
+      ],
+      "binned_mean_shap": [
+        -0.0389,
+        -0.0415,
+        -0.0381,
+        -0.0304,
+        -0.0263,
+        -0.0218,
+        -0.0148,
+        0.0004,
+        0.0197,
+        0.058,
+        0.0823,
+        0.2351
+      ],
+      "n_observed": 1309
+    },
+    "LBXBMN": {
+      "binned_centers": [
+        5.345,
+        6.55,
+        7.34,
+        8.01,
+        8.66,
+        9.31,
+        9.85,
+        10.51,
+        11.51,
+        12.58,
+        14.39,
+        17.7
+      ],
+      "binned_mean_shap": [
+        0.0434,
+        -0.0026,
+        -0.0035,
+        -0.0026,
+        -0.0013,
+        0.0,
+        -0.0039,
+        -0.0032,
+        0.0,
+        0.0016,
+        0.0048,
+        -0.0257
+      ],
+      "n_observed": 1309
+    }
+  },
+  "subgroups": [
+    {
+      "subgroup": "Overall",
+      "n": 2229,
+      "n_positive": 1033,
+      "prevalence_pct": 46.3,
+      "auc": 0.8567,
+      "ci_low": 0.84,
+      "ci_high": 0.8722,
+      "calibration_slope": 1.064,
+      "slope_ci_low": 0.975,
+      "slope_ci_high": 1.154,
+      "calibration_intercept": -0.091,
+      "intercept_ci_low": -0.193,
+      "intercept_ci_high": 0.0,
+      "observed_expected_ratio": 0.97,
+      "oe_ci_low": 0.935,
+      "oe_ci_high": 1.0
+    },
+    {
+      "subgroup": "Male",
+      "n": 1094,
+      "n_positive": 521,
+      "prevalence_pct": 47.6,
+      "auc": 0.8477,
+      "ci_low": 0.824,
+      "ci_high": 0.8687,
+      "calibration_slope": 1.054,
+      "slope_ci_low": 0.925,
+      "slope_ci_high": 1.197,
+      "calibration_intercept": -0.008,
+      "intercept_ci_low": -0.149,
+      "intercept_ci_high": 0.131,
+      "observed_expected_ratio": 0.997,
+      "oe_ci_low": 0.949,
+      "oe_ci_high": 1.045
+    },
+    {
+      "subgroup": "Female",
+      "n": 1135,
+      "n_positive": 512,
+      "prevalence_pct": 45.1,
+      "auc": 0.8653,
+      "ci_low": 0.8424,
+      "ci_high": 0.885,
+      "calibration_slope": 1.079,
+      "slope_ci_low": 0.958,
+      "slope_ci_high": 1.207,
+      "calibration_intercept": -0.177,
+      "intercept_ci_low": -0.314,
+      "intercept_ci_high": -0.023,
+      "observed_expected_ratio": 0.943,
+      "oe_ci_low": 0.9,
+      "oe_ci_high": 0.993
+    },
+    {
+      "subgroup": "Age 20\u201340 y",
+      "n": 763,
+      "n_positive": 176,
+      "prevalence_pct": 23.1,
+      "auc": 0.8612,
+      "ci_low": 0.8339,
+      "ci_high": 0.8883,
+      "calibration_slope": 1.135,
+      "slope_ci_low": 0.976,
+      "slope_ci_high": 1.339,
+      "calibration_intercept": -0.009,
+      "intercept_ci_low": -0.196,
+      "intercept_ci_high": 0.193,
+      "observed_expected_ratio": 0.995,
+      "oe_ci_low": 0.894,
+      "oe_ci_high": 1.111
+    },
+    {
+      "subgroup": "Age 41\u201360 y",
+      "n": 755,
+      "n_positive": 340,
+      "prevalence_pct": 45.0,
+      "auc": 0.8259,
+      "ci_low": 0.7942,
+      "ci_high": 0.8546,
+      "calibration_slope": 1.189,
+      "slope_ci_low": 1.018,
+      "slope_ci_high": 1.388,
+      "calibration_intercept": -0.265,
+      "intercept_ci_low": -0.421,
+      "intercept_ci_high": -0.099,
+      "observed_expected_ratio": 0.902,
+      "oe_ci_low": 0.845,
+      "oe_ci_high": 0.964
+    },
+    {
+      "subgroup": "Age > 60 y",
+      "n": 711,
+      "n_positive": 517,
+      "prevalence_pct": 72.7,
+      "auc": 0.7407,
+      "ci_low": 0.7007,
+      "ci_high": 0.7835,
+      "calibration_slope": 0.875,
+      "slope_ci_low": 0.711,
+      "slope_ci_high": 1.069,
+      "calibration_intercept": 0.05,
+      "intercept_ci_low": -0.127,
+      "intercept_ci_high": 0.24,
+      "observed_expected_ratio": 1.011,
+      "oe_ci_low": 0.971,
+      "oe_ci_high": 1.052
+    },
+    {
+      "subgroup": "Non-Hispanic White",
+      "n": 877,
+      "n_positive": 445,
+      "prevalence_pct": 50.7,
+      "auc": 0.8503,
+      "ci_low": 0.8261,
+      "ci_high": 0.8742,
+      "calibration_slope": 1.08,
+      "slope_ci_low": 0.959,
+      "slope_ci_high": 1.232,
+      "calibration_intercept": -0.08,
+      "intercept_ci_low": -0.247,
+      "intercept_ci_high": 0.078,
+      "observed_expected_ratio": 0.975,
+      "oe_ci_low": 0.924,
+      "oe_ci_high": 1.024
+    },
+    {
+      "subgroup": "Mexican American",
+      "n": 363,
+      "n_positive": 165,
+      "prevalence_pct": 45.5,
+      "auc": 0.8644,
+      "ci_low": 0.8271,
+      "ci_high": 0.9004,
+      "calibration_slope": 1.099,
+      "slope_ci_low": 0.883,
+      "slope_ci_high": 1.395,
+      "calibration_intercept": -0.159,
+      "intercept_ci_low": -0.41,
+      "intercept_ci_high": 0.091,
+      "observed_expected_ratio": 0.947,
+      "oe_ci_low": 0.864,
+      "oe_ci_high": 1.031
+    },
+    {
+      "subgroup": "Non-Hispanic Black",
+      "n": 478,
+      "n_positive": 208,
+      "prevalence_pct": 43.5,
+      "auc": 0.8401,
+      "ci_low": 0.8048,
+      "ci_high": 0.8747,
+      "calibration_slope": 0.965,
+      "slope_ci_low": 0.803,
+      "slope_ci_high": 1.179,
+      "calibration_intercept": -0.128,
+      "intercept_ci_low": -0.338,
+      "intercept_ci_high": 0.101,
+      "observed_expected_ratio": 0.955,
+      "oe_ci_low": 0.883,
+      "oe_ci_high": 1.035
+    },
+    {
+      "subgroup": "Other Hispanic",
+      "n": 236,
+      "n_positive": 117,
+      "prevalence_pct": 49.6,
+      "auc": 0.8622,
+      "ci_low": 0.8161,
+      "ci_high": 0.9065,
+      "calibration_slope": 1.162,
+      "slope_ci_low": 0.908,
+      "slope_ci_high": 1.526,
+      "calibration_intercept": -0.036,
+      "intercept_ci_low": -0.332,
+      "intercept_ci_high": 0.262,
+      "observed_expected_ratio": 0.988,
+      "oe_ci_low": 0.889,
+      "oe_ci_high": 1.086
+    },
+    {
+      "subgroup": "Other/Multi-racial",
+      "n": 275,
+      "n_positive": 98,
+      "prevalence_pct": 35.6,
+      "auc": 0.8777,
+      "ci_low": 0.8315,
+      "ci_high": 0.9195,
+      "calibration_slope": 1.089,
+      "slope_ci_low": 0.84,
+      "slope_ci_high": 1.492,
+      "calibration_intercept": -0.013,
+      "intercept_ci_low": -0.329,
+      "intercept_ci_high": 0.306,
+      "observed_expected_ratio": 0.995,
+      "oe_ci_low": 0.871,
+      "oe_ci_high": 1.127
+    }
+  ],
+  "subgroup_model": "CatBoost",
+  "performance": {
+    "CatBoost": {
+      "AUC": 0.8567,
+      "AUC_95CI_low": 0.84,
+      "AUC_95CI_high": 0.8722,
+      "AUPRC": 0.8114,
+      "Brier": 0.1534,
+      "Cutoff_tuned_cutoff": 0.5276,
+      "Accuracy_tuned_cutoff": 0.7743,
+      "Sensitivity_tuned_cutoff": 0.7531,
+      "Specificity_tuned_cutoff": 0.7926,
+      "PPV_tuned_cutoff": 0.7583,
+      "NPV_tuned_cutoff": 0.788,
+      "F1_tuned_cutoff": 0.7557,
+      "Kappa_tuned_cutoff": 0.546,
+      "Youden_tuned_cutoff": 0.5458,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7752,
+      "Sensitivity_at_0.5": 0.788,
+      "Specificity_at_0.5": 0.7642,
+      "PPV_at_0.5": 0.7427,
+      "NPV_at_0.5": 0.8067,
+      "F1_at_0.5": 0.7647,
+      "Kappa_at_0.5": 0.5499,
+      "Youden_at_0.5": 0.5522,
+      "statistically_indistinguishable_from_top": true
+    },
+    "LightGBM": {
+      "AUC": 0.8561,
+      "AUC_95CI_low": 0.84,
+      "AUC_95CI_high": 0.8708,
+      "AUPRC": 0.8145,
+      "Brier": 0.1541,
+      "Cutoff_tuned_cutoff": 0.5103,
+      "Accuracy_tuned_cutoff": 0.7703,
+      "Sensitivity_tuned_cutoff": 0.7764,
+      "Specificity_tuned_cutoff": 0.7651,
+      "PPV_tuned_cutoff": 0.7405,
+      "NPV_tuned_cutoff": 0.7984,
+      "F1_tuned_cutoff": 0.758,
+      "Kappa_tuned_cutoff": 0.5396,
+      "Youden_tuned_cutoff": 0.5414,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7685,
+      "Sensitivity_at_0.5": 0.7851,
+      "Specificity_at_0.5": 0.7542,
+      "PPV_at_0.5": 0.7339,
+      "NPV_at_0.5": 0.8025,
+      "F1_at_0.5": 0.7587,
+      "Kappa_at_0.5": 0.5367,
+      "Youden_at_0.5": 0.5393,
+      "statistically_indistinguishable_from_top": true
+    },
+    "XGBoost": {
+      "AUC": 0.8551,
+      "AUC_95CI_low": 0.8387,
+      "AUC_95CI_high": 0.8697,
+      "AUPRC": 0.8092,
+      "Brier": 0.1544,
+      "Cutoff_tuned_cutoff": 0.5064,
+      "Accuracy_tuned_cutoff": 0.773,
+      "Sensitivity_tuned_cutoff": 0.789,
+      "Specificity_tuned_cutoff": 0.7592,
+      "PPV_tuned_cutoff": 0.7389,
+      "NPV_tuned_cutoff": 0.8064,
+      "F1_tuned_cutoff": 0.7631,
+      "Kappa_tuned_cutoff": 0.5456,
+      "Youden_tuned_cutoff": 0.5482,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7716,
+      "Sensitivity_at_0.5": 0.7909,
+      "Specificity_at_0.5": 0.755,
+      "PPV_at_0.5": 0.736,
+      "NPV_at_0.5": 0.807,
+      "F1_at_0.5": 0.7625,
+      "Kappa_at_0.5": 0.5432,
+      "Youden_at_0.5": 0.5459,
+      "statistically_indistinguishable_from_top": true
+    },
+    "Gradient Boosting": {
+      "AUC": 0.8547,
+      "AUC_95CI_low": 0.8385,
+      "AUC_95CI_high": 0.8697,
+      "AUPRC": 0.8039,
+      "Brier": 0.1544,
+      "Cutoff_tuned_cutoff": 0.5179,
+      "Accuracy_tuned_cutoff": 0.7703,
+      "Sensitivity_tuned_cutoff": 0.7657,
+      "Specificity_tuned_cutoff": 0.7742,
+      "PPV_tuned_cutoff": 0.7455,
+      "NPV_tuned_cutoff": 0.7928,
+      "F1_tuned_cutoff": 0.7555,
+      "Kappa_tuned_cutoff": 0.539,
+      "Youden_tuned_cutoff": 0.54,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7694,
+      "Sensitivity_at_0.5": 0.7793,
+      "Specificity_at_0.5": 0.7609,
+      "PPV_at_0.5": 0.7379,
+      "NPV_at_0.5": 0.7996,
+      "F1_at_0.5": 0.758,
+      "Kappa_at_0.5": 0.5381,
+      "Youden_at_0.5": 0.5402,
+      "statistically_indistinguishable_from_top": true
+    },
+    "SVM": {
+      "AUC": 0.8463,
+      "AUC_95CI_low": 0.8289,
+      "AUC_95CI_high": 0.8622,
+      "AUPRC": 0.8055,
+      "Brier": 0.1594,
+      "Cutoff_tuned_cutoff": 0.4444,
+      "Accuracy_tuned_cutoff": 0.7573,
+      "Sensitivity_tuned_cutoff": 0.817,
+      "Specificity_tuned_cutoff": 0.7057,
+      "PPV_tuned_cutoff": 0.7057,
+      "NPV_tuned_cutoff": 0.817,
+      "F1_tuned_cutoff": 0.7573,
+      "Kappa_tuned_cutoff": 0.5172,
+      "Youden_tuned_cutoff": 0.5227,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.764,
+      "Sensitivity_at_0.5": 0.7851,
+      "Specificity_at_0.5": 0.7458,
+      "PPV_at_0.5": 0.7274,
+      "NPV_at_0.5": 0.8007,
+      "F1_at_0.5": 0.7551,
+      "Kappa_at_0.5": 0.5281,
+      "Youden_at_0.5": 0.5309,
+      "statistically_indistinguishable_from_top": false
+    },
+    "Logistic Regression": {
+      "AUC": 0.8448,
+      "AUC_95CI_low": 0.8276,
+      "AUC_95CI_high": 0.8606,
+      "AUPRC": 0.7882,
+      "Brier": 0.1609,
+      "Cutoff_tuned_cutoff": 0.4568,
+      "Accuracy_tuned_cutoff": 0.7672,
+      "Sensitivity_tuned_cutoff": 0.8199,
+      "Specificity_tuned_cutoff": 0.7216,
+      "PPV_tuned_cutoff": 0.7178,
+      "NPV_tuned_cutoff": 0.8227,
+      "F1_tuned_cutoff": 0.7655,
+      "Kappa_tuned_cutoff": 0.5363,
+      "Youden_tuned_cutoff": 0.5415,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7672,
+      "Sensitivity_at_0.5": 0.7735,
+      "Specificity_at_0.5": 0.7617,
+      "PPV_at_0.5": 0.7371,
+      "NPV_at_0.5": 0.7956,
+      "F1_at_0.5": 0.7548,
+      "Kappa_at_0.5": 0.5334,
+      "Youden_at_0.5": 0.5352,
+      "statistically_indistinguishable_from_top": false
+    },
+    "Random Forest": {
+      "AUC": 0.8447,
+      "AUC_95CI_low": 0.8268,
+      "AUC_95CI_high": 0.861,
+      "AUPRC": 0.7963,
+      "Brier": 0.1629,
+      "Cutoff_tuned_cutoff": 0.4994,
+      "Accuracy_tuned_cutoff": 0.7636,
+      "Sensitivity_tuned_cutoff": 0.7522,
+      "Specificity_tuned_cutoff": 0.7734,
+      "PPV_tuned_cutoff": 0.7414,
+      "NPV_tuned_cutoff": 0.7832,
+      "F1_tuned_cutoff": 0.7468,
+      "Kappa_tuned_cutoff": 0.5251,
+      "Youden_tuned_cutoff": 0.5256,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7636,
+      "Sensitivity_at_0.5": 0.7522,
+      "Specificity_at_0.5": 0.7734,
+      "PPV_at_0.5": 0.7414,
+      "NPV_at_0.5": 0.7832,
+      "F1_at_0.5": 0.7468,
+      "Kappa_at_0.5": 0.5251,
+      "Youden_at_0.5": 0.5256,
+      "statistically_indistinguishable_from_top": false
+    },
+    "Decision Tree": {
+      "AUC": 0.83,
+      "AUC_95CI_low": 0.8114,
+      "AUC_95CI_high": 0.8462,
+      "AUPRC": 0.7689,
+      "Brier": 0.1676,
+      "Cutoff_tuned_cutoff": 0.4932,
+      "Accuracy_tuned_cutoff": 0.7425,
+      "Sensitivity_tuned_cutoff": 0.8103,
+      "Specificity_tuned_cutoff": 0.6839,
+      "PPV_tuned_cutoff": 0.6889,
+      "NPV_tuned_cutoff": 0.8067,
+      "F1_tuned_cutoff": 0.7447,
+      "Kappa_tuned_cutoff": 0.4883,
+      "Youden_tuned_cutoff": 0.4942,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7425,
+      "Sensitivity_at_0.5": 0.8103,
+      "Specificity_at_0.5": 0.6839,
+      "PPV_at_0.5": 0.6889,
+      "NPV_at_0.5": 0.8067,
+      "F1_at_0.5": 0.7447,
+      "Kappa_at_0.5": 0.4883,
+      "Youden_at_0.5": 0.4942,
+      "statistically_indistinguishable_from_top": false
+    },
+    "MLP": {
+      "AUC": 0.8062,
+      "AUC_95CI_low": 0.7879,
+      "AUC_95CI_high": 0.823,
+      "AUPRC": 0.7608,
+      "Brier": 0.1957,
+      "Cutoff_tuned_cutoff": 0.4491,
+      "Accuracy_tuned_cutoff": 0.7241,
+      "Sensitivity_tuned_cutoff": 0.7686,
+      "Specificity_tuned_cutoff": 0.6856,
+      "PPV_tuned_cutoff": 0.6786,
+      "NPV_tuned_cutoff": 0.7743,
+      "F1_tuned_cutoff": 0.7208,
+      "Kappa_tuned_cutoff": 0.4502,
+      "Youden_tuned_cutoff": 0.4543,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7259,
+      "Sensitivity_at_0.5": 0.7473,
+      "Specificity_at_0.5": 0.7074,
+      "PPV_at_0.5": 0.6881,
+      "NPV_at_0.5": 0.7642,
+      "F1_at_0.5": 0.7165,
+      "Kappa_at_0.5": 0.452,
+      "Youden_at_0.5": 0.4547,
+      "statistically_indistinguishable_from_top": false
+    },
+    "KNN": {
+      "AUC": 0.802,
+      "AUC_95CI_low": 0.7823,
+      "AUC_95CI_high": 0.8205,
+      "AUPRC": 0.738,
+      "Brier": 0.1847,
+      "Cutoff_tuned_cutoff": 0.52,
+      "Accuracy_tuned_cutoff": 0.7277,
+      "Sensitivity_tuned_cutoff": 0.8093,
+      "Specificity_tuned_cutoff": 0.6572,
+      "PPV_tuned_cutoff": 0.6709,
+      "NPV_tuned_cutoff": 0.7996,
+      "F1_tuned_cutoff": 0.7337,
+      "Kappa_tuned_cutoff": 0.46,
+      "Youden_tuned_cutoff": 0.4665,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7277,
+      "Sensitivity_at_0.5": 0.8093,
+      "Specificity_at_0.5": 0.6572,
+      "PPV_at_0.5": 0.6709,
+      "NPV_at_0.5": 0.7996,
+      "F1_at_0.5": 0.7337,
+      "Kappa_at_0.5": 0.46,
+      "Youden_at_0.5": 0.4665,
+      "statistically_indistinguishable_from_top": false
+    },
+    "Naive Bayes": {
+      "AUC": 0.7301,
+      "AUC_95CI_low": 0.7088,
+      "AUC_95CI_high": 0.752,
+      "AUPRC": 0.669,
+      "Brier": 0.2651,
+      "Cutoff_tuned_cutoff": 0.6233,
+      "Accuracy_tuned_cutoff": 0.6635,
+      "Sensitivity_tuned_cutoff": 0.5682,
+      "Specificity_tuned_cutoff": 0.7458,
+      "PPV_tuned_cutoff": 0.6588,
+      "NPV_tuned_cutoff": 0.6667,
+      "F1_tuned_cutoff": 0.6102,
+      "Kappa_tuned_cutoff": 0.317,
+      "Youden_tuned_cutoff": 0.3141,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.6608,
+      "Sensitivity_at_0.5": 0.6176,
+      "Specificity_at_0.5": 0.6982,
+      "PPV_at_0.5": 0.6386,
+      "NPV_at_0.5": 0.6789,
+      "F1_at_0.5": 0.628,
+      "Kappa_at_0.5": 0.3165,
+      "Youden_at_0.5": 0.3158,
+      "statistically_indistinguishable_from_top": false
+    }
+  },
+  "tuning": {
+    "CatBoost": {
+      "cv_auc": 0.8463,
+      "seconds": 348.6,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__learning_rate\": 0.05, \"model__iterations\": 200, \"model__depth\": 6}"
+    },
+    "XGBoost": {
+      "cv_auc": 0.8446,
+      "seconds": 301.3,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__n_estimators\": 200, \"model__max_depth\": 3, \"model__learning_rate\": 0.05}"
+    },
+    "Gradient Boosting": {
+      "cv_auc": 0.8443,
+      "seconds": 392.4,
+      "cv_folds": 10.0,
+      "n_iter_actual": 8.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__n_estimators\": 200, \"model__max_depth\": 2, \"model__learning_rate\": 0.1}"
+    },
+    "LightGBM": {
+      "cv_auc": 0.8438,
+      "seconds": 321.4,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__num_leaves\": 15, \"model__n_estimators\": 500, \"model__learning_rate\": 0.01}"
+    },
+    "SVM": {
+      "cv_auc": 0.8398,
+      "seconds": 1593.3,
+      "cv_folds": 10.0,
+      "n_iter_actual": 6.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__kernel\": \"rbf\", \"model__C\": 1}"
+    },
+    "Logistic Regression": {
+      "cv_auc": 0.8396,
+      "seconds": 85.5,
+      "cv_folds": 10.0,
+      "n_iter_actual": 4.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__penalty\": \"l2\", \"model__C\": 0.01}"
+    },
+    "Random Forest": {
+      "cv_auc": 0.8377,
+      "seconds": 659.5,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__n_estimators\": 500, \"model__min_samples_leaf\": 5, \"model__max_depth\": null}"
+    },
+    "Decision Tree": {
+      "cv_auc": 0.8238,
+      "seconds": 258.3,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__min_samples_leaf\": 20, \"model__max_depth\": 5}"
+    },
+    "KNN": {
+      "cv_auc": 0.7991,
+      "seconds": 58.8,
+      "cv_folds": 10.0,
+      "n_iter_actual": 3.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__n_neighbors\": 25}"
+    },
+    "MLP": {
+      "cv_auc": 0.7943,
+      "seconds": 518.1,
+      "cv_folds": 10.0,
+      "n_iter_actual": 4.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__hidden_layer_sizes\": [64], \"model__alpha\": 0.001}"
+    },
+    "Naive Bayes": {
+      "cv_auc": 0.7472,
+      "seconds": 20.7,
+      "cv_folds": 10.0,
+      "n_iter_actual": NaN,
+      "search_method": "cross_val_score (no hyperparameters to search)",
+      "best_params": "{}"
+    }
+  },
+  "thresholds": {
+    "Logistic Regression": 0.4568305774599954,
+    "Decision Tree": 0.49321266968325794,
+    "Random Forest": 0.499399132656962,
+    "Gradient Boosting": 0.5179078157762977,
+    "LightGBM": 0.5103215611425922,
+    "XGBoost": 0.5064496397972107,
+    "SVM": 0.4443931056951595,
+    "Naive Bayes": 0.6232808862858226,
+    "MLP": 0.44911244930522587,
+    "KNN": 0.52,
+    "CatBoost": 0.5276437772060281
+  },
+  "outcome_definition": [
+    {
+      "definition": "lab_only (original pipeline)",
+      "n": 11144,
+      "n_positive": 3962,
+      "prevalence_pct": 35.55,
+      "n_reclassified_negative_to_positive": NaN,
+      "n_reclassified_positive_to_negative": NaN,
+      "n_on_any_relevant_medication": NaN
+    },
+    {
+      "definition": "harmonized (this fix: + drug-treatment clause)",
+      "n": 11144,
+      "n_positive": 5163,
+      "prevalence_pct": 46.33,
+      "n_reclassified_negative_to_positive": 1201.0,
+      "n_reclassified_positive_to_negative": 0.0,
+      "n_on_any_relevant_medication": 4032.0
+    }
+  ],
+  "sensitivity_diq010": [
+    {
+      "model": "CatBoost",
+      "cv_auc_primary": 0.8416,
+      "cv_auc_plus_diq010": 0.8515,
+      "delta": 0.0099
+    },
+    {
+      "model": "XGBoost",
+      "cv_auc_primary": 0.8186,
+      "cv_auc_plus_diq010": 0.8314,
+      "delta": 0.0128
+    },
+    {
+      "model": "Gradient Boosting",
+      "cv_auc_primary": 0.8442,
+      "cv_auc_plus_diq010": 0.8547,
+      "delta": 0.0105
+    }
+  ],
+  "sensitivity_metals_scope": [
+    {
+      "model": "CatBoost",
+      "cv_auc_all_5_metals": 0.8416,
+      "cv_auc_lead_only": 0.8427,
+      "delta": 0.0011
+    },
+    {
+      "model": "XGBoost",
+      "cv_auc_all_5_metals": 0.8186,
+      "cv_auc_lead_only": 0.8188,
+      "delta": 0.0002
+    },
+    {
+      "model": "Gradient Boosting",
+      "cv_auc_all_5_metals": 0.8442,
+      "cv_auc_lead_only": 0.8445,
+      "delta": 0.0003
+    }
+  ],
+  "sensitivity_smote_vs_classweight": [
+    {
+      "model": "CatBoost",
+      "cv_auc_smote": 0.8416,
+      "cv_auc_class_weight": 0.842,
+      "delta": 0.0005
+    },
+    {
+      "model": "XGBoost",
+      "cv_auc_smote": 0.8186,
+      "cv_auc_class_weight": 0.8196,
+      "delta": 0.001
+    },
+    {
+      "model": "Gradient Boosting",
+      "cv_auc_smote": 0.8442,
+      "cv_auc_class_weight": NaN,
+      "delta": NaN
+    }
+  ],
+  "sensitivity_outcome_definition": [
+    {
+      "model": "CatBoost",
+      "cv_auc_harmonized_label": 0.8416,
+      "cv_auc_labonly_label": 0.8097,
+      "delta": 0.0319,
+      "harmonized_prevalence_pct": 46.33,
+      "labonly_prevalence_pct": 35.57
+    },
+    {
+      "model": "XGBoost",
+      "cv_auc_harmonized_label": 0.8186,
+      "cv_auc_labonly_label": 0.7897,
+      "delta": 0.0289,
+      "harmonized_prevalence_pct": 46.33,
+      "labonly_prevalence_pct": 35.57
+    },
+    {
+      "model": "Gradient Boosting",
+      "cv_auc_harmonized_label": 0.8442,
+      "cv_auc_labonly_label": 0.8104,
+      "delta": 0.0338,
+      "harmonized_prevalence_pct": 46.33,
+      "labonly_prevalence_pct": 35.57
+    }
+  ],
+  "collinearity": [
+    {
+      "var_1": "BMXHIP",
+      "var_2": "BMXBMI",
+      "pearson_r": 0.9367,
+      "pct_missing_var_1_train": 81.97,
+      "decision": "excluded from predictor set (PREDICTOR_VARS in config.py): redundant with BMXBMI and majority-missing"
+    }
+  ],
+  "missingness": [
+    {
+      "variable": "DIQ070",
+      "pct_missing": 82.26
+    },
+    {
+      "variable": "BPQ100D",
+      "pct_missing": 75.16
+    },
+    {
+      "variable": "BPQ050A",
+      "pct_missing": 68.36
+    },
+    {
+      "variable": "SMQ040",
+      "pct_missing": 55.28
+    },
+    {
+      "variable": "LBXBMN",
+      "pct_missing": 43.31
+    },
+    {
+      "variable": "LBXBSE",
+      "pct_missing": 43.31
+    },
+    {
+      "variable": "ALQ130",
+      "pct_missing": 36.61
+    },
+    {
+      "variable": "INDFMPIR",
+      "pct_missing": 9.21
+    },
+    {
+      "variable": "ALQ_EVER",
+      "pct_missing": 6.25
+    },
+    {
+      "variable": "BMXBMI",
+      "pct_missing": 0.22
+    },
+    {
+      "variable": "DMDEDUC2",
+      "pct_missing": 0.09
+    },
+    {
+      "variable": "PAD645",
+      "pct_missing": 0.08
+    },
+    {
+      "variable": "SMQ020",
+      "pct_missing": 0.05
+    },
+    {
+      "variable": "DMDMARTL",
+      "pct_missing": 0.04
+    },
+    {
+      "variable": "PAQ605",
+      "pct_missing": 0.04
+    },
+    {
+      "variable": "DBQ700",
+      "pct_missing": 0.03
+    },
+    {
+      "variable": "DIQ050",
+      "pct_missing": 0.02
+    },
+    {
+      "variable": "PAQ665",
+      "pct_missing": 0.02
+    },
+    {
+      "variable": "BPXSY1",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "BMXWAIST",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "RIDRETH1",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "RIAGENDR",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBXBPB",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBXBCD",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBDHDD",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "BPXDI1",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBXTR",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBXGLU",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "RIDAGEYR",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "LBXTHG",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "RIDEXMON",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "DMDHHSIZ",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "PAQ650",
+      "pct_missing": 0.0
+    },
+    {
+      "variable": "BPXPLS",
+      "pct_missing": 0.0
+    }
+  ],
+  "n_predictors": 33,
+  "n_transformed_features": 46,
+  "train_prevalence_pct": 46.3264,
+  "test_prevalence_pct": 46.3437
+}

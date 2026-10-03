@@ -1,0 +1,3 @@
+Validation design,Train n,Test n,Test AUROC,Calibration slope,Calibration intercept,O:E ratio,Brier score
+Random SEQN split (original manuscript),8915,2229,0.8567,1.064,-0.099,0.97,0.1534
+"Temporal holdout (train 2007_2008-2013_2014, test 2015_2016-2017_2018)",8102,3042,0.8404,0.987,-0.042,0.986,0.1623

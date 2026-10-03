@@ -1,0 +1,93 @@
+path,size_bytes,md5,description
+01_Manuscript/01_Methods_AI.docx,406960,17706457eefcaaf99ff559b5c22630fe,"Methods section, AI/ML component (TRIPOD+AI structured, 21 verified references)"
+01_Manuscript/01_Methods_AI.pdf,688443,eb2af6c6b542b8e88c5bd60aad3ccb54,PDF rendering of the corresponding document
+01_Manuscript/02_Results_AI.docx,1923185,3b780b3239ce0a0201f394bf7c2065c1,"Results section, AI/ML component, with Tables 1-2 and Figures 2-5 embedded"
+01_Manuscript/02_Results_AI.pdf,2594805,6b23219cc5ec41d1545d0db471464a17,PDF rendering of the corresponding document
+01_Manuscript/03_Supplementary_Material.docx,1316236,0ce4c5344be187190639c17ee0ee89a1,Supplementary material: Tables S1-S7 and Figures S1-S5
+01_Manuscript/03_Supplementary_Material.pdf,987627,6e4ac9d9c70eaf39be8912c14fe99a4e,PDF rendering of the corresponding document
+02_Proposal/Research_Proposal.docx,1006140,f2b4f7a1cdcae76aaf01eb76338ef5cd,"Research proposal, revised: 99 PubMed-verified references in first-mention order"
+02_Proposal/Research_Proposal.pdf,1311119,5b005dd70e0742dab15bb85f710d5dfc,PDF rendering of the corresponding document
+03_Figures/Main/Figure_1_Participant_Flow.pdf,31145,310879510f5e0cb7d8aa987ee12c7d9c,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_1_Participant_Flow.png,417802,8d64541af941d0971dd5f5f810babcbf,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_2_ROC_Curves.pdf,68675,a0c2a17c06ac950ed4296564807a0b74,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_2_ROC_Curves.png,629439,ca298bffbc50927c426b057f4d089334,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_3_SHAP_Summary.pdf,215248,a6a69b104314aa31e55f77a541f2e321,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_3_SHAP_Summary.png,472684,de97a8b08d147c9a185acdc4d8b52e34,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_4_Importance_Concordance.pdf,53846,385397200c4896b6c6c3f1fea8615061,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_4_Importance_Concordance.png,613737,dcc451eda0a9663934d7add1d5429453,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_5_Metals_SHAP_Dependence.pdf,133370,c1aeb41c53476a9c47ea98d43558b6b9,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_5_Metals_SHAP_Dependence.png,417889,66069c1e06349e390208b85bfc62d6ce,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S1_Analysis_Pipeline.pdf,26935,79b9cb2be13eb1428bfad2a25327d50a,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S1_Analysis_Pipeline.png,331079,86237f53e83b8dd4581746b3c86893b0,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S2_AUROC_Forest.pdf,23105,1e9b8d259e778e5ec658ba0523abb05a,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S2_AUROC_Forest.png,314010,609f23510764db3ae8c8e4384512fd4c,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S3_Calibration.pdf,22441,d71a7b0394ae7be17b5434c0c4416793,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S3_Calibration.png,378204,6878f2982b0f9df25c70f3ba6da3512d,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S4_Decision_Curve.pdf,15112,6c94279b83bc51505c2217186e586ddb,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S4_Decision_Curve.png,236514,f7d8d419900835911935a1dfe0abfb0a,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S5_Subgroup_AUROC.pdf,21525,980522b15ac58f68f4fe5c563a56b1c1,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S5_Subgroup_AUROC.png,268353,26ad14e5e1a3d9e3bb6b6946e237b733,Publication figure (600 dpi PNG and vector PDF)
+04_Results_Tables/best_params.json,3456,576354459a7c9f1f6fc3b8fbd16479ac,Selected hyperparameters per model
+04_Results_Tables/calibration_metrics.csv,470,842b7e2f0f0cb1b6dc2395b842149cd7,"Calibration slope, intercept, observed-to-expected ratio and Brier score"
+04_Results_Tables/collinearity_flags.csv,184,5ce0e9377aaa3ad07121fb6dddeb731a,Predictor pairs flagged by the training-partition-only collinearity screen
+04_Results_Tables/decision_curve_data.csv,5819,aa19ad7d50696c0775d99ed1b97ec6d0,Net benefit across threshold probabilities for the decision-curve analysis
+04_Results_Tables/exclusion_flow.csv,288,5f4f29ab1d0182b8561410e5b6598a18,Counts excluded and remaining at each of the four exclusion steps
+04_Results_Tables/missingness_report.csv,441,4944366074db1680e84200b48e8f8668,Missingness per predictor in the analytic cohort
+04_Results_Tables/missingness_report_age_filtered_precohort.csv,461,c3498b6d7ad41e21a2a303c919650c56,Missingness before the metals-availability exclusion
+04_Results_Tables/model_comparison.csv,2277,70798179ee622fe6b77d28848c7fea8b,"Discrimination, calibration and classification metrics for all 11 models"
+04_Results_Tables/model_comparison_significance.csv,627,26e18a997bda4b761ebe6e274de058b6,Paired-bootstrap differences in AUROC against the leading model
+04_Results_Tables/outcome_definition_comparison.csv,271,643e63b804cc8982b625342d5d4cef3d,Harmonized versus measured-value-only MetS outcome definitions
+04_Results_Tables/permutation_importance.csv,2745,1a5acdea8e5e4554ce020dcf32fa02ff,"Permutation importance per predictor, leading model"
+04_Results_Tables/permutation_importance_by_model.csv,3033,33d5c7f5867cbfb5fa4f4db6e53b03ec,Permutation importance per predictor for each of the four leading models
+04_Results_Tables/predictors_used.csv,326,1e13071efbe0c7eff502ed1fdcf19514,"The 33 predictors carried into the models, with type and source module"
+04_Results_Tables/proposal_reference_verification.json,168446,db6bc1317040ce380e0d0df801b5ebae,PubMed audit record for the proposal reference bank
+04_Results_Tables/publication_numbers.json,38963,e8f20c0d58c3e7b11eee69fc8997f15d,"Every number quoted in the manuscripts, written at the moment each figure was drawn"
+04_Results_Tables/reference_verification.json,4948,d83b3d8ed89fd397dd8e44972c97a2af,PubMed audit record for the 21 Methods references
+04_Results_Tables/sensitivity_diq010.csv,144,092f0be701554bfd3fa44476b49c8c98,Sensitivity arm: adding physician-diagnosed diabetes as a predictor
+04_Results_Tables/sensitivity_metals_scope.csv,147,806992f588b2746d210efc7d6d037b9b,Sensitivity arm: restricting the metal panel to blood lead alone
+04_Results_Tables/sensitivity_outcome_definition.csv,240,acc50fc4717128d0bb52a6c1b579b7e9,Sensitivity arm: alternative outcome definition
+04_Results_Tables/sensitivity_smote_vs_classweight.csv,129,e386b9f7bebc463652eebace5707a9ed,Sensitivity arm: SMOTENC versus class weighting
+04_Results_Tables/shap_importance.csv,3086,3e2fd3c4147a8e879d2d2adf48eab20f,"Mean absolute SHAP value per transformed column, leading model"
+04_Results_Tables/strobe_flow.csv,508,43d69c171e1ce096b99baf855eaf0632,"STROBE participant-flow counts, including per-cycle contributions"
+04_Results_Tables/subgroup_auc.csv,1328,408a772d964f7b0e00f8edeb26e9f75e,"Discrimination and calibration within age, sex and race/ethnicity subgroups"
+04_Results_Tables/table1_by_mets_status.csv,3096,a3083f3525044901f410cac87deaf1a5,Table 1: cohort characteristics by metabolic-syndrome status
+04_Results_Tables/test_predictions.csv,427511,9ed04f947a36019cfc74d0979ac5d583,Cached predicted probabilities on the test set; every figure derives from this one file
+04_Results_Tables/thresholds.json,380,3e02386b7d08100d61434bd3917d66f5,Out-of-fold decision thresholds selected per model
+04_Results_Tables/tuning_summary.csv,1372,7f675161275c0757fc6390311d1fa578,"Cross-validated tuning result per model, with the selected hyperparameters"
+05_Data_Processed/model_ready.csv,2707290,7d0f73dc7adc91436036c742d84682b2,Analytic cohort with engineered predictors and the MetS outcome; input to modelling
+05_Data_Processed/nhanes_with_outcome.csv,13852190,5adc29765d002d2710c832401a472f47,"Cleaned pooled NHANES with the harmonized MetS outcome derived, before feature engineering"
+05_Data_Processed/test_seqn.csv,17961,ca15a2a96fadccc221d54c70c2829251,SEQN identifiers of the held-out test partition
+05_Data_Processed/train_seqn.csv,71863,fa9b812e18ac24ab2bf16653344eabcb,"SEQN identifiers of the training partition, so the split is exactly reproducible"
+06_Code/01_merge_data.py,4353,7afd401fd8335c6d08a9f93f72208a92,Pipeline step 01: merge raw NHANES modules into one pooled table
+06_Code/02_clean_and_outcome.py,16256,ce880fc47edb618400f3fa965eb27e50,Pipeline step 02: clean and derive the harmonized MetS outcome
+06_Code/03_feature_engineering.py,6872,f03e1a026e40a0efab4df5a7e783b811,Pipeline step 03: feature engineering
+06_Code/04_split.py,6607,c154437bb6fa1a306625057dde679852,Pipeline step 04: train/test split
+06_Code/06_cv_tuning.py,6539,11d5f9723ee1f81258efa5a4c6e5cd8f,Pipeline step 06: cross-validated hyperparameter tuning
+06_Code/07_train_models.py,4998,3e5cbf5c2032b41f7fd04dd5664acce6,Pipeline step 07: model training
+06_Code/08_evaluate.py,11016,1cf4be7e54667e805c791b2f87a01daa,Pipeline step 08: test-set evaluation with paired bootstrap
+06_Code/09_explain_shap.py,19511,ac65c743ee45d765a1b74d28066d4b08,Pipeline step 09: SHAP explanation
+06_Code/10_sensitivity.py,14473,b4f4b25f73465f65af8064e811925320,Pipeline step 10: sensitivity analyses
+06_Code/11_reporting.py,17912,c3d01d2ac8e50d1f182a25b4d70494a6,Pipeline step 11: survey-weighted reporting
+06_Code/12_visualize.py,17760,217d4e6245cae057fa454f6e70903aee,Pipeline step 12: exploratory visualisation
+06_Code/13_publication_extras.py,19640,6e34c6b5cb539f046cf0022f625b5709,Pipeline step 13: publication extras
+06_Code/14_generate_diagrams.py,26515,0fedb5820c93e118faabfc744a0a352b,Pipeline step 14: diagram generation
+06_Code/15_publication_figures.py,45924,102deb4102928ddcd29af916c0d3e200,Pipeline step 15: publication figure set and the numbers JSON
+06_Code/16_write_methods_docx.py,24137,33bd50973a4d33a54ae606b61cf88c42,Pipeline step 16: build the Methods document
+06_Code/17_write_results_docx.py,26660,fd0d05e74fc8d22b51271dc7ad4779f4,Pipeline step 17: build the Results document
+06_Code/18_verify_manuscript_numbers.py,7568,d0c32ef0789afbb6a98f397fa18e8d74,Pipeline step 18: verify every number in the manuscripts against pipeline output
+06_Code/20_verify_citations.py,7327,c19d3f0755817ebf282bae89afc300e6,Pipeline step 20: verify the Methods citations
+06_Code/21_write_supplement.py,24207,18f07d99bd59f80367f123af0a19ce6e,Pipeline step 21: build the Supplementary Material document
+06_Code/22_proposal_references.py,47608,b3134e8643328a41b46c03930d6b8181,Pipeline step 22: the proposal's verified reference bank
+06_Code/23_rewrite_proposal_citations.py,20764,61483f527fbb1542965b9ac2a9b21a9d,Pipeline step 23: renumber the proposal's citations and append its reference list
+06_Code/24_audit_proposal_references.py,7261,4d8e74c5b99cc9b12923f97fd9583108,Pipeline step 24: audit the proposal reference bank against PubMed
+06_Code/25_verify_proposal_citations.py,6790,8127842f904314387c18c6f5b8f1be1c,Pipeline step 25: verify the proposal's citations
+06_Code/26_build_submission.py,21272,95c163ed581b06e3e87b1e66ba0d8acf,Pipeline step 26: assemble this submission package
+06_Code/27_verify_submission.py,7330,9fbee7c8e952b8bfc5266a43207d3156,Pipeline step 27: verify the assembled package
+06_Code/config.py,20677,2eb3c13c6bd94c91559e490016d6dd2e,"Paths, variable definitions, clinical labels, MetS thresholds, random seed"
+06_Code/docx_style.py,12451,a1e3f1cd35e30a87ea60b16c8b4b3114,"Manuscript docx style: headings, three-line tables, captions, page-break handling"
+06_Code/feature_labels.py,7365,3b7292b5fff3c1e31c238a89bd526ecb,Short figure labels and the caption glossaries that define them
+06_Code/pipeline_utils.py,11754,bc323472250065dc9227f984db0ebe5a,"Shared pipeline helpers: split loading, preprocessing, SMOTENC, feature names"
+06_Code/pubstyle.py,5250,094fe25054700b5134c887bd7b00f524,"Figure style: Okabe-Ito palette, sizes, fonts, dual PNG/PDF export"
+06_Code/references.py,7995,22880fd83b74236cb6dcfefd5cc35b69,The 21 verified references cited in the Methods
+06_Code/requirements.txt,354,a50b6359d1adab2af3d028790f22bc9b,Pinned package versions for the analysis environment
+README.md,5347,28241abaf5cca92631f808af6158f27b,"What this package contains, how it is organised, and how to reproduce it"

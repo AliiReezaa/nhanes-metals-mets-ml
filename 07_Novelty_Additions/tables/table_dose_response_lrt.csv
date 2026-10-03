@@ -1,0 +1,4 @@
+Metal,N,LRT chi-square,df,P value,Nonlinear (P<0.05)
+Blood lead,10096,4.52,3,0.211,No
+Blood cadmium,10096,0.65,3,0.885,No
+Blood selenium,5715,3.02,3,0.389,No

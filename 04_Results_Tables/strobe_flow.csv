@@ -1,0 +1,13 @@
+stage,n
+"Cycle 2007_2008 (raw, all ages)",10149
+"Cycle 2009_2010 (raw, all ages)",10537
+"Cycle 2011_2012 (raw, all ages)",9756
+"Cycle 2013_2014 (raw, all ages)",10175
+"Cycle 2015_2016 (raw, all ages)",9971
+"Cycle 2017_2018 (raw, all ages)",9254
+"TOTAL pooled (all cycles, all ages)",59842
+"0. Pooled sample (all cycles, all ages)",59842
+1. Age >= 20,34770
+2. Complete data on all 5 MetS lab/exam components,13337
+3. At least 1 of 5 metals measured,11144
+4. Final analytic cohort (mets_status computed),11144
