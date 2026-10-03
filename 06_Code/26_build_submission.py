@@ -46,7 +46,7 @@ MET = ROOT / "outputs" / "metrics"
 
 # Folders that are regenerated on every run and never published.
 NOT_PUBLISHED = {".git", ".venv", "venv", "outputs", "data_processed", "NHANES_data",
-                 "manuscript", "__pycache__", ".pytest_cache"}
+                 "manuscript", "diagrams", "__pycache__", ".pytest_cache"}
 NOT_PUBLISHED_FILES = {".DS_Store", "00_MANIFEST.csv"}
 
 ADDITION_FOLDERS = ["07_Novelty_Additions", "08_Q1_Rigor_Additions"]

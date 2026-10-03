@@ -21,8 +21,10 @@ What it does, in order
    outputs/reproduction_report.txt.
 
 Everything the run creates goes into new folders (NHANES_data/,
-data_processed/, outputs/, manuscript/); the original package files are
-never modified. A full log is saved to outputs/run_log.txt.
+data_processed/, outputs/, manuscript/, diagrams/); the published package
+files are never modified (06_Code/26_build_submission.py does that, on
+request). Each run starts from empty output folders. A full log is saved to
+outputs/run_log.txt.
 
 How to start it
 ---------------
@@ -51,9 +53,8 @@ OUT = ROOT / "outputs"
 LOG = OUT / "run_log.txt"
 MIN_PY = (3, 11)
 
-# Packages: the pinned list in 06_Code/requirements.txt plus the few extra
-# libraries some scripts import but the original list left out.
-EXTRA_PACKAGES = ["seaborn", "patsy", "plotly", "python-docx"]
+# Packages: everything is pinned in 06_Code/requirements.txt (2026-10 audit, C10).
+EXTRA_PACKAGES: list[str] = []
 
 # (label, script, extra arguments per mode, required?)
 # Required steps stop the run when they fail; optional ones only warn.
@@ -69,7 +70,13 @@ CORE_STEPS = [
     ("Step 12 SHAP and permutation importance",     "09_explain_shap.py",           {},                              True,  {"full", "packaged", "quick"}),
     ("Step 13 sensitivity analyses",                "10_sensitivity.py",            {"quick": ["--cv", "3"]},        True,  {"full", "packaged", "quick"}),
     ("Step 14 STROBE flow and Table 1",             "11_reporting.py",              {},                              True,  {"full", "packaged", "quick"}),
+    ("Step 13b incremental value, repeated CV",     "13_incremental_value_and_repeated_cv.py", {"quick": ["--quick"]}, True,  {"full", "packaged", "quick"}),
     ("Extra   comparison charts and dashboard",     "12_visualize.py",              {},                              False, {"full", "packaged", "quick"}),
+]
+# Temporal validation is reported in the manuscript, so it always runs (before 15).
+TEMPORAL = ("08_Q1_Rigor_Additions", "06_temporal_validation.py")
+FINAL_STEPS = [
+    ("Diagrams proposal figures",                   "14_generate_diagrams.py",      {},                              False, {"full", "packaged", "quick"}),
     ("Step 15 publication figures and numbers",     "15_publication_figures.py",    {},                              True,  {"full", "packaged", "quick"}),
     ("Docs    write Methods .docx",                 "16_write_methods_docx.py",     {},                              False, {"full", "packaged", "quick"}),
     ("Docs    write Results .docx",                 "17_write_results_docx.py",     {},                              False, {"full", "packaged", "quick"}),
@@ -77,7 +84,7 @@ CORE_STEPS = [
 ]
 NOVELTY = ["01_dose_response.py", "02_shap_interactions.py",
            "03_component_level.py", "04_effect_modification.py"]
-RIGOR = ["06_temporal_validation.py", "07_pr_curve.py", "08_shap_waterfall.py",
+RIGOR = ["07_pr_curve.py", "08_shap_waterfall.py",
          "09_shap_stability.py", "10_correlation_heatmap.py", "11_wqs_mixture.py", "12_reporting_checklists.py"]
 
 
@@ -152,7 +159,9 @@ def choose_mode(argv) -> tuple[str, bool]:
 
 def prepare_packaged_inputs() -> None:
     """PACKAGED/QUICK: put the shipped cleaned data where the scripts expect it,
-    together with the three step-2 tables later steps read."""
+    together with the step-2 tables later steps read. Those step-2 tables are
+    copied, not re-derived, so 28_compare_to_reference.py does not count them
+    as a reproduction check in these modes."""
     dp = ROOT / "data_processed"
     met = OUT / "metrics"
     dp.mkdir(exist_ok=True)
@@ -206,6 +215,13 @@ def main() -> None:
         pause_and_exit(code)
 
     mode, extras = choose_mode(sys.argv)
+    # 2026-10 audit (C17): every run starts from empty output folders, so no table,
+    # model or figure from an earlier run can leak into this one.
+    for d in ["metrics", "models", "figures", "figures_pub", "07_Novelty_Additions", "08_Q1_Rigor_Additions"]:
+        shutil.rmtree(OUT / d, ignore_errors=True)
+    shutil.rmtree(ROOT / "manuscript", ignore_errors=True)
+    if mode == "full":
+        shutil.rmtree(ROOT / "data_processed", ignore_errors=True)
     OUT.mkdir(exist_ok=True)
     LOG.write_text("", encoding="utf-8")
     env = dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8", MPLBACKEND="Agg", RUN_ME_MODE=mode)
@@ -216,29 +232,35 @@ def main() -> None:
         prepare_packaged_inputs()
 
     t_all = time.time()
-    for label, script, margs, required, modes in CORE_STEPS:
-        if mode not in modes:
-            continue
-        path = CODE / script
-        if not path.exists():
-            log(f"[skip] {label}: {script} not found")
-            continue
-        log(f"\n=== {label}  ({script}) ===")
-        t0 = time.time()
-        ok = run_script(path, margs.get(mode, []), ROOT, env)
-        log(f"--- {'done' if ok else 'FAILED'} in {time.time() - t0:.0f} s")
-        if not ok and required:
-            log(f"\nThe required step '{label}' failed. The last lines above show why; "
-                f"the full log is in {LOG}.")
-            pause_and_exit(1)
-        if not ok:
-            log("    (optional step; continuing)")
 
+    def run_steps(steps):
+        for label, script, margs, required, modes in steps:
+            if mode not in modes:
+                continue
+            path = CODE / script
+            if not path.exists():
+                log(f"[skip] {label}: {script} not found")
+                continue
+            log(f"\n=== {label}  ({script}) ===")
+            t0 = time.time()
+            ok = run_script(path, margs.get(mode, []), ROOT, env)
+            log(f"--- {'done' if ok else 'FAILED'} in {time.time() - t0:.0f} s")
+            if not ok and required:
+                log(f"\nThe required step '{label}' failed. The last lines above show why; "
+                    f"the full log is in {LOG}.")
+                pause_and_exit(1)
+            if not ok:
+                log("    (optional step; continuing)")
+
+    run_steps(CORE_STEPS)
+    log("\n=== Temporal validation (reported in the manuscript) ===")
+    run_additions(TEMPORAL[0], [TEMPORAL[1]], env, {TEMPORAL[1]: ["--quick"]} if mode == "quick" else None)
     if extras:
         log("\n=== Exploratory additions: 07_Novelty_Additions ===")
         run_additions("07_Novelty_Additions", NOVELTY, env)
         log("\n=== Exploratory additions: 08_Q1_Rigor_Additions ===")
         run_additions("08_Q1_Rigor_Additions", RIGOR, env)
+    run_steps(FINAL_STEPS)
 
     log("\n=== Reproduction check ===")
     run_script(CODE / "28_compare_to_reference.py", [], ROOT, env)

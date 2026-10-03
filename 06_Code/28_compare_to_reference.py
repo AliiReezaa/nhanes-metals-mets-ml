@@ -54,14 +54,21 @@ def compare_numeric(name, key, cols, tol):
 
 
 def main():
-    # 1. identical cohort and split
+    import os
+    mode = os.environ.get("RUN_ME_MODE", "full")
+    # 1. identical cohort and split (the split is always re-derived by 04_split.py)
     for f in ["train_seqn.csv", "test_seqn.csv"]:
         a, b = REF_DATA / f, cfg.DATA_PROC_DIR / f
         if a.exists() and b.exists():
             same = set(pd.read_csv(a).SEQN) == set(pd.read_csv(b).SEQN)
             say("PASS" if same else "DIFF", f"{f}: same participants as the published split")
     a, b = REF / "exclusion_flow.csv", NEW / "exclusion_flow.csv"
-    if a.exists() and b.exists():
+    if mode in ("packaged", "quick"):
+        # 2026-10 audit (C23): in these modes the step-2 tables are copied from the
+        # package, so comparing them would be circular; say so instead of "PASS".
+        say("NOTE", "exclusion_flow.csv was copied from the package in this mode (not re-derived); "
+            "run FULL mode to re-derive the cohort from the raw files")
+    elif a.exists() and b.exists():
         same = pd.read_csv(a).n_remaining.tolist() == pd.read_csv(b).n_remaining.tolist()
         say("PASS" if same else "DIFF", "exclusion_flow.csv: same cohort counts")
 
@@ -85,8 +92,9 @@ def main():
         say("PASS" if top_a == top_b else "DIFF", "shap_importance.csv: same top-5 predictors",
             f"published {top_a} / rerun {top_b}")
 
-    import os
-    if os.environ.get("RUN_ME_MODE") == "quick":
+    compare_numeric("incremental_value.csv", "model", ["test_auc"], TOL_AUC)
+    compare_numeric("repeated_cv.csv", "model", ["mean_auc"], TOL_AUC)
+    if mode == "quick":
         say("NOTE", "QUICK mode uses 3-fold searches, so performance tables are expected to differ "
             "slightly from the published 10-fold results; run PACKAGED or FULL to reproduce them.")
     out = cfg.OUT_DIR / "reproduction_report.txt"

@@ -355,7 +355,13 @@ text{{font-family:'DejaVu Sans','Helvetica Neue',Arial,sans-serif;}}
 
 
 def render_html_to_png(html_path: Path, png_path: Path, width=960):
-    from playwright.sync_api import sync_playwright
+    # 2026-10 audit (C10): playwright is optional; without it the HTML version
+    # of the diagram is still written and only the PNG rendering is skipped.
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print(f"  [skip] playwright not installed: {png_path.name} not rendered (HTML kept)")
+        return
     # This project's venv installs its own playwright package, whose pinned
     # browser revision doesn't match the cloud sandbox's pre-installed
     # Chromium -- point at that pre-installed binary directly rather than
@@ -366,13 +372,14 @@ def render_html_to_png(html_path: Path, png_path: Path, width=960):
     with sync_playwright() as p:
         browser = p.chromium.launch(**launch_kwargs)
         page = browser.new_page(viewport={"width": width, "height": 1200})
-        page.goto(f"file://{html_path}")
+        page.goto(html_path.resolve().as_uri())
         page.wait_for_timeout(150)
         svg_box = page.eval_on_selector("svg", "el => { const r = el.getBoundingClientRect(); "
                                                 "return {width: r.width, height: r.height}; }")
         page.set_viewport_size({"width": width, "height": int(svg_box["height"]) + 48})
         page.screenshot(path=str(png_path), full_page=True)
         browser.close()
+    print(f"  saved: {png_path}")
 
 
 def build_ai_pipeline_diagram(n: dict):
@@ -382,7 +389,6 @@ def build_ai_pipeline_diagram(n: dict):
     print(f"  saved: {html_path}")
     png_path = DIAGRAMS_DIR / "ai_pipeline_steps_detailed.png"
     render_html_to_png(html_path, png_path)
-    print(f"  saved: {png_path}")
 
 
 # ============================================================
@@ -414,7 +420,6 @@ def build_study_workflow_diagram(n: dict):
     print(f"  saved: {html_path}")
     png_path = DIAGRAMS_DIR / "study_workflow_AI_to_MR.png"
     render_html_to_png(html_path, png_path)
-    print(f"  saved: {png_path}")
 
 
 def main():
