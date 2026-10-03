@@ -297,9 +297,8 @@ def main():
     # text cite for "the model-ready analytic dataset's worst-missing
     # predictor" -- but it is computed here on the age-filtered, PRE-exclusion
     # cohort (n=34,770), before the MetS-completeness and metals-availability
-    # filters run below. That is a real, if modest, population mismatch: for
-    # example SMQ040 (the actual worst-missing predictor) is 56.03% missing
-    # here vs. 55.28% missing in the true final n=11,144 analytic cohort.
+    # filters run below, so its percentages differ from those in the final
+    # analytic cohort (missingness_report.csv is the one to cite).
     # This age-filtered report is still useful in its own right (it is what
     # motivates/explains the exclusion filters below, which by definition
     # haven't run yet at this point in the script), so it is kept -- but

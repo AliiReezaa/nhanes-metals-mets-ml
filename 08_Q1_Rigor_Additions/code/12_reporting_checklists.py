@@ -165,7 +165,7 @@ probast_rows = [
      "Well-defined NHANES cross-sectional cohort with a fully enumerated eligibility/exclusion cascade "
      "(Methods Sec. 2, Figure 1). Appropriate source population for the prediction question. The one "
      "inherent constraint -- a cross-sectional design cannot support causal claims -- is explicitly "
-     "acknowledged (Methods Sec. 1, 10) rather than glossed over."),
+     "acknowledged (Methods Sec. 10) rather than glossed over."),
     ("Predictors", "Low",
      "All predictors pre-specified from the literature before model building; no data-driven selection "
      "(Methods Sec. 4, with an explicit methodological argument against stepwise/LASSO selection on a "

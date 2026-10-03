@@ -1,33 +1,33 @@
 path,size_bytes,md5,description
 .gitignore,235,881210960599dda3dfc5ab74fbda1c14,"Files and folders git does not track (regenerated outputs, OS clutter)"
-01_Manuscript/01_Methods_AI.docx,527287,fd2b6e61a1732b554a7640c274bae4d3,"Methods section, AI/ML component (TRIPOD+AI structured, 21 verified references)"
-01_Manuscript/01_Methods_AI.pdf,327175,c609ef9c2ce3339cdb62227ca0473e57,PDF rendering of the corresponding document
-01_Manuscript/02_Results_AI.docx,1950541,93bf398468352a4692398066bf2333c0,"Results section, AI/ML component, with Tables 1-2 and Figures 2-5 embedded"
-01_Manuscript/02_Results_AI.pdf,901879,a3fa4dd25b3888f29c01d5c23dcd8d83,PDF rendering of the corresponding document
-01_Manuscript/03_Supplementary_Material.docx,1346269,957c3d196ed3f9490946e600373551d9,Supplementary material: Tables S1-S7 and Figures S1-S5
-01_Manuscript/03_Supplementary_Material.pdf,1063933,ee8567832e4cb864250e4230b2e586f3,PDF rendering of the corresponding document
-02_Proposal/Humanized Proposal.docx,19827,333ec9c79863bbb5920beedf97c612c2,Partial plain-language rewrite of the proposal's first sections (draft)
-02_Proposal/Research_Proposal.docx,629285,122845412a3e028fd92d5624ae1c4520,"Research proposal for the two-phase study (ML phase done, MR phase planned)"
-02_Proposal/Research_Proposal.pdf,738387,4d12f8d8106b8b2fe0a4a28dc404d055,PDF rendering of the corresponding document
-03_Figures/Main/Figure_1_Participant_Flow.pdf,32045,04f9b525746ab39929e85482768dcbe5,Publication figure (600 dpi PNG and vector PDF)
+01_Manuscript/01_Methods_AI.docx,527492,d49fa6d9ec1d78311bf43b2d59091f36,"Methods section, AI/ML component (TRIPOD+AI structured, 21 verified references)"
+01_Manuscript/01_Methods_AI.pdf,327875,f4143517033770d7cf1ba5d8092e62f1,PDF rendering of the corresponding document
+01_Manuscript/02_Results_AI.docx,1949947,99945721e40c19d00d6e65aa37b81fef,"Results section, AI/ML component, with Tables 1-2 and Figures 2-5 embedded"
+01_Manuscript/02_Results_AI.pdf,901757,f5d6777a62f651b4288a989ab0eec25f,PDF rendering of the corresponding document
+01_Manuscript/03_Supplementary_Material.docx,1346558,0386677b2e7cf4b869e9fbc05f0c5c65,Supplementary material: Tables S1-S7 and Figures S1-S5
+01_Manuscript/03_Supplementary_Material.pdf,1065298,5b9fc85f8b7a7b9c93d2cf52d3c39d25,PDF rendering of the corresponding document
+02_Proposal/Humanized Proposal.docx,19834,b3b6a55cc45c9bc174fd85b321cbffc3,Partial plain-language rewrite of the proposal's first sections (draft)
+02_Proposal/Research_Proposal.docx,630501,0bdac7d6615c55f87399e36e79d6cba1,"Research proposal for the two-phase study (ML phase done, MR phase planned)"
+02_Proposal/Research_Proposal.pdf,738850,b9a0907cca9dacac4e43ea3d1deede08,PDF rendering of the corresponding document
+03_Figures/Main/Figure_1_Participant_Flow.pdf,32045,62c8fb209426559219455cf4f79a2c74,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Main/Figure_1_Participant_Flow.png,543788,d0a3ac5fd3691a0b5283ebbef804f315,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Main/Figure_2_ROC_Curves.pdf,66035,a89ddbadfffe557635808a00848e45a3,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_2_ROC_Curves.pdf,66035,02c362ef696b297042c318ce80b5b21c,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Main/Figure_2_ROC_Curves.png,609396,0ecc8db41a9b95cea4c87a10cf9efb65,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Main/Figure_3_SHAP_Summary.pdf,213839,5877ad1fb2d053643b316ca6e0e799cf,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Main/Figure_3_SHAP_Summary.png,475090,257f40fb40fc0938c9341787e8f8f63b,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Main/Figure_4_Importance_Concordance.pdf,53047,76cb42023e008655c16d0110a99f80dd,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_3_SHAP_Summary.pdf,212949,b51ef8d29f2c6a8fa35be87a39ff593e,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_3_SHAP_Summary.png,474201,88b4b3021e4eb681a50203d63ee8ee12,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_4_Importance_Concordance.pdf,53047,1ca220de9ecb0c99cc983c12f11e0777,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Main/Figure_4_Importance_Concordance.png,617612,c3289a937056b985f25f09382cbf6b61,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Main/Figure_5_Metals_SHAP_Dependence.pdf,131296,7ca42812ace79338731796d3eba9f90d,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Main/Figure_5_Metals_SHAP_Dependence.pdf,131296,d6d8db65f93cbbbf46a0ebad71849940,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Main/Figure_5_Metals_SHAP_Dependence.png,441728,e84b821584eb1724a8eabd287a7755e8,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Supplementary/Figure_S1_Analysis_Pipeline.pdf,26514,530e5c7635de8b564fa2f0866d691dbc,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S1_Analysis_Pipeline.pdf,26514,3dc9df5bfed4c9e9bd02d7305b0ef2fc,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Supplementary/Figure_S1_Analysis_Pipeline.png,328342,ad2b40907f76f5e955fc059fbd19345b,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Supplementary/Figure_S2_AUROC_Forest.pdf,23165,4c85d50085aa28befd4b71239db4e4ed,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S2_AUROC_Forest.pdf,23165,1f1b588a3a869f078df583babd217c6c,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Supplementary/Figure_S2_AUROC_Forest.png,301000,ff093174ad297d19e971a8b2cb010fcb,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Supplementary/Figure_S3_Calibration.pdf,22441,92b445524281bbc9cc2f33cfb63c9114,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S3_Calibration.pdf,22441,6e44fde2b771594aed6b5504faa20cf9,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Supplementary/Figure_S3_Calibration.png,374251,8e10786ae277ab147df51bc2b5d034f7,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Supplementary/Figure_S4_Decision_Curve.pdf,16630,808724a1d82cba3382af7d0d48ed10f8,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S4_Decision_Curve.pdf,16630,72b17e5bb6ee57bef4327962855393b2,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Supplementary/Figure_S4_Decision_Curve.png,250904,3d2dfa29907c3237ba3eafef27e452c3,Publication figure (600 dpi PNG and vector PDF)
-03_Figures/Supplementary/Figure_S5_Subgroup_AUROC.pdf,21488,27afb2ad20814ed86b1bcb7101e6c4d9,Publication figure (600 dpi PNG and vector PDF)
+03_Figures/Supplementary/Figure_S5_Subgroup_AUROC.pdf,21488,4830d07bc4a4aa117abaf4e0cca393b7,Publication figure (600 dpi PNG and vector PDF)
 03_Figures/Supplementary/Figure_S5_Subgroup_AUROC.png,260476,fe15e33df449b3210f0c2f1816173f78,Publication figure (600 dpi PNG and vector PDF)
 04_Results_Tables/best_params.json,3455,621e8804ef821a151a3749870c78c884,Selected hyperparameters per model
 04_Results_Tables/calibration_metrics.csv,472,7262f78580c540766d8496a5415da393,"Calibration slope, intercept, observed-to-expected ratio and Brier score"
@@ -41,21 +41,21 @@ path,size_bytes,md5,description
 04_Results_Tables/model_comparison.csv,4340,fd0eb703a96e82963f639cb126608232,"Discrimination, calibration and classification metrics for all 11 models"
 04_Results_Tables/model_comparison_significance.csv,741,b0ed0260a4bc670ee68cf9aa4f303bcd,AUROC differences against the leading model: paired-bootstrap 95% CI and DeLong p-value
 04_Results_Tables/outcome_definition_comparison.csv,451,5783db8f14905e60baa171342e17f27f,Harmonized versus measured-value-only MetS outcome definitions
-04_Results_Tables/permutation_importance.csv,2697,ef3bc6be540ee514351360c25ebbac35,"Permutation importance per predictor, leading model"
+04_Results_Tables/permutation_importance.csv,2702,06c6bf5788858aa59ab8a1fd56f47697,"Permutation importance per predictor, leading model"
 04_Results_Tables/permutation_importance_by_model.csv,3053,f7ee9e337d5689aa6202ffa68a7bb2a7,Permutation importance per predictor for each of the four leading models
 04_Results_Tables/predictors_used.csv,315,51d691bfd03bcf1fbcaa3c7ab130b074,The predictor columns carried into the models
 04_Results_Tables/proposal_reference_verification.json,168446,3daf112cd13394c720ea493695f83d65,PubMed audit record for the proposal reference bank
-04_Results_Tables/publication_numbers.json,56623,dfbd90dcf8253d93d6f1f0efe2cdac90,"Every number quoted in the manuscripts, written at the moment each figure was drawn"
+04_Results_Tables/publication_numbers.json,56638,e28e54da6ff559b8bd3d479c4fecba86,"Every number quoted in the manuscripts, written at the moment each figure was drawn"
 04_Results_Tables/reference_verification.json,5903,a466104df0b3098782151078bf0199ef,PubMed audit record for the 21 Methods references
 04_Results_Tables/repeated_cv.csv,763,e58f4ff26324345e709962a61b3531e3,Repeated stratified 10-fold cross-validation (5 repeats) for all models: mean and spread of AUROC
 04_Results_Tables/sensitivity_diq010.csv,133,2b46dd84931c0ae7854d964727f60130,Sensitivity arm: adding physician-diagnosed diabetes as a predictor
 04_Results_Tables/sensitivity_metals_scope.csv,134,21d2bae2d3f1164e64628d340f8cceab,Sensitivity arm: restricting the metal panel to blood lead alone
 04_Results_Tables/sensitivity_outcome_definition.csv,398,ca3a422c97f3f3fe7993f0a24fb6ae1f,"Sensitivity arm: alternative outcome definitions (lab-only, no lipid-medication clause, first BP reading)"
 04_Results_Tables/sensitivity_smote_vs_classweight.csv,134,e320abe5d58a6254d37c76e10913ab4f,Sensitivity arm: SMOTENC versus class weighting
-04_Results_Tables/shap_importance.csv,2431,ce57a863d72a8ee0e60a5cea1da8d68d,"Mean absolute SHAP value per transformed column, leading model"
+04_Results_Tables/shap_importance.csv,2441,35daf8a5b705637634bfab44da0bfb0a,"Mean absolute SHAP value per transformed column, leading model"
 04_Results_Tables/strobe_flow.csv,598,eb73059fd354ff00945b9c7223677943,"STROBE participant-flow counts, including per-cycle contributions"
 04_Results_Tables/subgroup_auc.csv,1330,c049d45d547b40c0f6ce75ab52e7b97c,"Discrimination and calibration within age, sex and race/ethnicity subgroups"
-04_Results_Tables/table1_by_mets_status.csv,3843,780cdcaab45585bce415976fb704863d,Table 1: cohort characteristics by metabolic-syndrome status
+04_Results_Tables/table1_by_mets_status.csv,3908,366542e12ed9a80380bca46ceec1d546,Table 1: cohort characteristics by metabolic-syndrome status
 04_Results_Tables/test_predictions.csv,415795,dad1d2c990c836a73387b4716a3f18c4,Predicted probabilities on the test set; every figure derives from this one file
 04_Results_Tables/thresholds.json,380,7152a5d54bbfc61f4d3e4bef7247d5f0,Out-of-fold decision thresholds selected per model
 04_Results_Tables/tuning_summary.csv,1370,2b445c65465705ea8dcb54dcbf9985e4,"Cross-validated tuning result per model, with the selected hyperparameters"
@@ -65,24 +65,24 @@ path,size_bytes,md5,description
 05_Data_Processed/train_seqn.csv,70142,136296088b4a4a880df19cc38f8c5332,"SEQN identifiers of the training partition, so the split is exactly reproducible"
 06_Code/00_download_nhanes.py,3711,b3740563179b270bdc7381f279499e85,Pipeline step 00: download the raw NHANES files from the CDC
 06_Code/01_merge_data.py,4806,18fd37bee92ef7fb7bb1355d8a35bdcf,Pipeline step 01: merge raw NHANES modules into one pooled table
-06_Code/02_clean_and_outcome.py,19963,acc65201d43665fd244d40c049c89ee5,Pipeline step 02: clean and derive the harmonized MetS outcome
+06_Code/02_clean_and_outcome.py,19878,bf4c4eea37feb1c988258b05e7398bd0,Pipeline step 02: clean and derive the harmonized MetS outcome
 06_Code/03_feature_engineering.py,8348,bff10b937e30aacb02d2141a7d0f0471,Pipeline step 03: feature engineering
 06_Code/04_split.py,6607,7451b8dfd0fd7d207a553c20f4914968,Pipeline step 04: train/test split
 06_Code/06_cv_tuning.py,6829,35db75e5b29b58fac01a247a9046f74d,Pipeline step 06: cross-validated hyperparameter tuning
 06_Code/07_train_models.py,5280,cf5dcb4e7aeeb9378d4ac54126e789ea,Pipeline step 07: model training
-06_Code/08_evaluate.py,12332,c36092fe8443918cdcfc42fe05b309b5,Pipeline step 08: test-set evaluation with DeLong comparisons and bootstrap intervals
-06_Code/09_explain_shap.py,19526,d7fca8130f4cc17a31e504802669a64b,Pipeline step 09: SHAP explanation
+06_Code/08_evaluate.py,12568,a4c1fe7afa42c1e6a1d6c5636a289682,Pipeline step 08: test-set evaluation with DeLong comparisons and bootstrap intervals
+06_Code/09_explain_shap.py,19531,c8ab1ec27cffcc402e10ac557abf24e9,Pipeline step 09: SHAP explanation
 06_Code/10_sensitivity.py,16153,dc07b9f05bea5ee6c9dbc2d11dfa37e7,Pipeline step 10: sensitivity analyses
-06_Code/11_reporting.py,11358,f4bb1503174dea4285f61be7640fa6a4,Pipeline step 11: survey-weighted reporting
-06_Code/12_visualize.py,17760,c59ae7d7fb7e1348fe4e65f0dd45cfbd,Pipeline step 12: exploratory visualisation and interactive dashboard
+06_Code/11_reporting.py,11649,89a78af045b7692602e9b2fbf34cba45,Pipeline step 11: survey-weighted reporting
+06_Code/12_visualize.py,17778,3db531c81e66e82a4de8526f4d3b5b77,Pipeline step 12: exploratory visualisation and interactive dashboard
 06_Code/13_incremental_value_and_repeated_cv.py,8161,85f8c04e0c646735f2d2c7b662f03715,"Pipeline step 13: incremental value of the metals, simple baselines and repeated cross-validation"
-06_Code/14_generate_diagrams.py,32153,9aeae17fbe8a91ef14c70b50c675e31e,Pipeline step 14: diagram generation
+06_Code/14_generate_diagrams.py,32153,b94a768c7ff4fe4aafb3feea21c6412f,Pipeline step 14: diagram generation
 06_Code/15_publication_figures.py,47299,6b72d0243831e35a31afec5586bfad9f,Pipeline step 15: publication figure set and the numbers JSON
-06_Code/16_write_methods_docx.py,28284,96d5d5c855f869a9fef52f0ca314e8df,Pipeline step 16: build the Methods document
-06_Code/17_write_results_docx.py,34374,9556dba12d12e491026a9e5364d6f6ff,Pipeline step 17: build the Results document
+06_Code/16_write_methods_docx.py,29097,2d870d834218eddee7abd6c0e57576bb,Pipeline step 16: build the Methods document
+06_Code/17_write_results_docx.py,34065,85d8571d904e0aee0ad68dd271678013,Pipeline step 17: build the Results document
 06_Code/18_verify_manuscript_numbers.py,9091,94e3e2b31f005b2bf80265ea5d560b9d,Pipeline step 18: verify every number in the manuscripts against pipeline output
 06_Code/20_verify_citations.py,7391,c0463d1466e8cae6cc8a876f1673d11e,Pipeline step 20: verify the Methods citations
-06_Code/21_write_supplement.py,29466,5a2637d5aab455bd56ae675017ee3c5d,Pipeline step 21: build the Supplementary Material document
+06_Code/21_write_supplement.py,30523,26acdcae7100bc6cb0025b89dd77adf1,Pipeline step 21: build the Supplementary Material document
 06_Code/22_proposal_references.py,47608,b3134e8643328a41b46c03930d6b8181,Pipeline step 22: the proposal's verified reference bank
 06_Code/23_rewrite_proposal_citations.py,21567,8865ce1b3d079e302301feb2ccd40d07,Pipeline step 23: renumber the proposal's citations and append its reference list
 06_Code/24_audit_proposal_references.py,7421,8411c726612a7bf06fd2205842276094,Pipeline step 24: audit the proposal reference bank against PubMed
@@ -90,9 +90,9 @@ path,size_bytes,md5,description
 06_Code/26_build_submission.py,20323,4e63ecabc8c377d3b96c5b2d91de2d5b,"Pipeline step 26: refresh the published folders, README and manifest from a finished run"
 06_Code/27_verify_submission.py,9424,93bc2eb41e2bf6faf3051c6407b36fdd,Pipeline step 27: verify the published package
 06_Code/28_compare_to_reference.py,4887,6cadb5aacdc396dabfa3467140445c95,Pipeline step 28: compare a fresh run with the published results
-06_Code/29_update_proposal.py,40287,bbb04bdb13bd2cffce580f0768f52334,"Pipeline step 29: update the research proposal text, tables and figures from the final results"
+06_Code/29_update_proposal.py,42919,f596529b5a29c4a45cc992d1b6078aa7,"Pipeline step 29: update the research proposal text, tables and figures from the final results"
 06_Code/additions_common.py,5794,2a562f5c022af83f5a8bd4051c1d7c30,"Shared setup for the 07/08 exploratory analyses (paths, fitted model, covariates)"
-06_Code/config.py,22367,132dd644a019f08debff51d6b081c44e,"Paths, variable definitions, clinical labels, MetS thresholds, random seed"
+06_Code/config.py,22370,5416a2292586dea6348a6a63fa257d69,"Paths, variable definitions, clinical labels, MetS thresholds, random seed"
 06_Code/docx_style.py,12451,a1e3f1cd35e30a87ea60b16c8b4b3114,"Manuscript docx style: headings, three-line tables, captions, page-break handling"
 06_Code/feature_labels.py,7582,40a2a64f93df6c12212e2fabaa87359a,Short figure labels and the caption glossaries that define them
 06_Code/pipeline_utils.py,12232,a6a19e9b262d4d2014d6e0c9be1c68cd,"Shared pipeline helpers: split loading, preprocessing, SMOTENC, feature names"
@@ -100,8 +100,8 @@ path,size_bytes,md5,description
 06_Code/readme_template.md,5045,d2ffddba3ca12e04dd4f51e917430573,"Text of README.md, filled in by 26_build_submission.py"
 06_Code/references.py,8688,565558c33e2beb77a73681d98d3909b2,The 21 verified references cited in the Methods
 06_Code/requirements.txt,782,8aabe39aef2725d3d054527c0c92e5a0,Pinned package versions for the analysis environment
-06_Code/stats_utils.py,4091,8adfcf775448ee8b2e3ebfbd394cbb45,"Shared statistics helpers: DeLong test, bootstrap intervals, p-value formatting"
-07_Novelty_Additions/README.md,6099,0d1e12f282e7a1bb58d68e0afe6b9ad3,Guide to the files in this folder
+06_Code/stats_utils.py,5545,9570204d3498ddbd87e0824f15893c39,"Shared statistics helpers: DeLong test, bootstrap intervals, p-value formatting"
+07_Novelty_Additions/README.md,6435,9ce6a08f6c87418f9f64212a1c422d65,Guide to the files in this folder
 07_Novelty_Additions/code/01_dose_response.py,10808,dd1330f299a87ee9f31735ad33b7906e,Exploratory analysis script (07): see 07_Novelty_Additions/README.md
 07_Novelty_Additions/code/02_shap_interactions.py,7435,409555da40a9fcf7464f0f96f71c28e6,Exploratory analysis script (07): see 07_Novelty_Additions/README.md
 07_Novelty_Additions/code/03_component_level.py,4496,d8c35c13e95861ce9731c7917b26c8fd,Exploratory analysis script (07): see 07_Novelty_Additions/README.md
@@ -127,14 +127,14 @@ path,size_bytes,md5,description
 07_Novelty_Additions/tables/table_metal_demographic_interaction.csv,1020,6ee6d7c8080722a8a998b15f24e9cf8c,Exploratory result table (07): see 07_Novelty_Additions/README.md
 07_Novelty_Additions/tables/table_metal_interaction_ranking.csv,796,629fcd7fba180ff3e0b391e531f1a546,Exploratory result table (07): see 07_Novelty_Additions/README.md
 07_Novelty_Additions/tables/table_selenium_antagonism_test.csv,310,b303910f5b2b840e7f90fb9a5e2e732a,Exploratory result table (07): see 07_Novelty_Additions/README.md
-08_Q1_Rigor_Additions/README.md,5011,2cc80b182409870da1d9b035da21d0e2,Guide to the files in this folder
+08_Q1_Rigor_Additions/README.md,5096,00e4b762bfcc4634190afb3b38764c9c,Guide to the files in this folder
 08_Q1_Rigor_Additions/code/06_temporal_validation.py,5959,24189b3610c1e2d2a7a4926fd7f147c1,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/code/07_pr_curve.py,2381,436649f9663c681da70e4ed3ec60aea2,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/code/08_shap_waterfall.py,3584,22e6ae732597b2298e2aa5b11841510a,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/code/09_shap_stability.py,3888,c3a1f447a187111f74fe3c9a251dabd4,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/code/10_correlation_heatmap.py,4709,15c71e366422096f77ccd0d012a89b22,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/code/11_wqs_mixture.py,11446,335c8f13219f040e2666b1a135f6f888,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
-08_Q1_Rigor_Additions/code/12_reporting_checklists.py,17592,19020055a7f0e22054cb235cd044e3cd,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
+08_Q1_Rigor_Additions/code/12_reporting_checklists.py,17589,a9e9a6ad7a1f7323861e70e1ee8f6d38,Exploratory analysis script (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/figures/fig_precision_recall_curve.pdf,17806,9e052d4cbbe320528cf669d1d845b73f,Exploratory figure (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/figures/fig_precision_recall_curve.png,203085,c1aee39a0a5d2cfb56e4dff70ace3b09,Exploratory figure (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/figures/fig_predictor_correlation_heatmap.pdf,89732,c0f90c8a466046b5bb5106a03eeef4f9,Exploratory figure (08): see 08_Q1_Rigor_Additions/README.md
@@ -154,15 +154,15 @@ path,size_bytes,md5,description
 08_Q1_Rigor_Additions/tables/table_precision_recall_summary.csv,86,c3777cc9548545821edede397036cc6b,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_predictor_correlation_flags.csv,147,129bd36bc3fda2f6f6ceb12d5d1f37e2,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_predictor_correlation_matrix.csv,8079,9d38fdc601dabe2df25a4ef7c38f275e,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
-08_Q1_Rigor_Additions/tables/table_probast_ai_risk_of_bias.csv,2068,a58544820b8f9a2d9344b345814b3101,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
+08_Q1_Rigor_Additions/tables/table_probast_ai_risk_of_bias.csv,2065,2be283dd1e83e7a670cd89ea1815befe,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_shap_importance_stability.csv,1662,15a1b65b110b60bfb39fa0a45c49c22d,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_shap_waterfall_examples.csv,245,872bfd11ed74276ec8e500b7a6c21b30,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_temporal_validation.csv,574,0522e7a771d397c7a07a74a5fb16f982,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_tripod_ai_checklist.csv,10123,1814ab8bca9b17f076d6a18e01fa4dc0,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_wqs_component_weights.csv,175,25224e146ffce3562eee39acbdb2100b,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
 08_Q1_Rigor_Additions/tables/table_wqs_validation_test.csv,331,a850c5367d240d2b6335e0d83eb16621,Exploratory result table (08): see 08_Q1_Rigor_Additions/README.md
-FIX_CHECKLIST.md,10256,e0d0b54b77679f9b20932d3b2fe9b6a9,Checklist of every issue found in the October 2026 audit and how each was fixed
-README.md,5086,06bb21bad486740e6870b021140c9b24,"What this package contains, how it is organised, and how to reproduce it"
+FIX_CHECKLIST.md,10728,a126dbc7d68d1b4f5a8671dc17461775,Checklist of every issue found in the October 2026 audit and how each was fixed
+README.md,5086,8a3443a0ac4c9c937acbe13048e38949,"What this package contains, how it is organised, and how to reproduce it"
 RUN_ME.py,13810,11f05c82f7673f182681fc377f838df5,One-click launcher: installs packages in a private environment and runs the whole pipeline
 RUN_ME_Linux.sh,331,dabf1d32be00367189af4969f07403d9,Launcher for Linux (calls RUN_ME.py)
 RUN_ME_Windows.bat,483,09e5568f0eb53b5f3c7790e7bb16fad6,Double-click launcher for Windows (calls RUN_ME.py)

@@ -74,7 +74,7 @@ SEQN in `05_Data_Processed/train_seqn.csv` and `test_seqn.csv`.
 ## What has been checked, and how
 
 - `06_Code/18_verify_manuscript_numbers.py` traces every numeric token in the three
-  manuscript documents back to a value in the pipeline's output. Current result: 1,301 tokens checked, 0 requiring adjudication.
+  manuscript documents back to a value in the pipeline's output. Current result: 1,320 tokens checked, 0 requiring adjudication.
 - `06_Code/20_verify_citations.py` checks the Methods references against the PubMed
   records captured in `04_Results_Tables/reference_verification.json`.
 - `06_Code/24_audit_proposal_references.py` and `25_verify_proposal_citations.py` audit

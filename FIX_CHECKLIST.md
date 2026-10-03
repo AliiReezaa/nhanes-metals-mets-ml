@@ -7,6 +7,7 @@ Decisions confirmed with the study owner on 2026-10-03:
 - Lipid-medication clause: keep it in the primary outcome, state it as a choice, add a sensitivity arm without it.
 - Blood pressure: primary outcome uses the mean of all available readings; first-reading-only becomes a sensitivity arm.
 - MR proposal: lead and selenium become primary exposures, cadmium secondary; the relaxed P < 5e-6 rule applies to every metal with an F > 10 check, and mercury is kept as exploratory.
+- Revised after the final run showed selenium and cadmium close (study owner, 2026-10-03): lead primary; selenium and cadmium co-secondary.
 
 ## 28.1 Coding and data-handling issues
 

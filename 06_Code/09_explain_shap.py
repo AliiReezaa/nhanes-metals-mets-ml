@@ -33,7 +33,7 @@ REBUILD NOTE / FIX (two changes from the original 09_explain_shap.py):
 
 2. "Best model" overclaiming. 08_evaluate.py's paired bootstrap test
    frequently finds several models statistically indistinguishable from
-   the top point-estimate AUC (a 2,229-row test set has real sampling
+   the top point-estimate AUC (a test set of about 2,200 has real sampling
    noise). This script now reads
    outputs/metrics/model_comparison_significance.csv (if present) and
    prints, alongside the chosen model's SHAP results, how many other

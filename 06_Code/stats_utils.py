@@ -108,3 +108,36 @@ def calibration_slope_intercept(y, p):
 
     intercept = float(minimize_scalar(nll, bounds=(-5, 5), method="bounded").x)
     return slope, intercept
+
+
+def describe_shape(values) -> str:
+    """Plain-language shape of a binned SHAP dependence curve (equal-count bins,
+    lowest exposure first). Shared by the Results and proposal generators so the
+    two documents cannot describe the same curve differently.
+
+    A curve that is flat apart from one extreme bin is named as such rather than
+    as rising or falling, because one bin of ~100 participants carries little
+    weight (2026-10 review, M3)."""
+    import numpy as np
+    import pandas as pd
+    v = np.asarray(values, float)
+    rng = v.max() - v.min()
+    if rng < 0.03:
+        return "flat"
+    imin, imax, last = int(v.argmin()), int(v.argmax()), len(v) - 1
+    if imax == last and v[-1] - v[:-1].max() > 0.5 * rng:
+        return "flat apart from a rise in the highest bin"
+    if imin == last and v[:-1].min() - v[-1] > 0.5 * rng:
+        return "flat apart from a drop in the highest bin"
+    if imax == 0 and v[0] - v[1:].max() > 0.5 * rng:
+        return "flat apart from a higher lowest bin"
+    rho = pd.Series(v).corr(pd.Series(np.arange(len(v))), method="spearman")
+    if rho >= 0.8:
+        return "rising"
+    if rho <= -0.8:
+        return "falling"
+    if 0 < imin < last and min(v[0], v[-1]) - v[imin] > 0.4 * rng:
+        return "U-shaped"
+    if 0 < imax < last and v[imax] - max(v[0], v[-1]) > 0.4 * rng:
+        return "inverted U-shaped"
+    return "rising" if rho > 0.3 else "falling" if rho < -0.3 else "irregular"

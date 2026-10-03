@@ -21,7 +21,7 @@ by point-estimate test AUC, which on its own invites a reader to treat the
 #1 model as unambiguously "the best" -- 08_evaluate.py's paired bootstrap
 test (model_comparison_significance.csv) frequently finds several
 top-ranked models statistically indistinguishable from each other on a
-2,229-row test set. This script now reads that column (merged into
+test set of about 2,200 participants. This script now reads that column (merged into
 model_comparison.csv by 08_evaluate.py) where available and marks tied
 models with a "*" in every chart/table that ranks models, plus a caption
 on the dashboard -- so the same "don't overclaim a single best model"

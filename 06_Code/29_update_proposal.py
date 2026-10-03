@@ -14,8 +14,9 @@ What it changes, and why:
     added analyses) is updated to match the code.
   * The outcome-definition rationale is corrected: the 2005 AHA/NHLBI criteria already
     include drug treatment; the harmonized definition keeps those clauses (P10).
-  * MR design: lead and selenium become primary exposures and cadmium secondary,
-    following the ML evidence (decision confirmed with the study owner, P5); one
+  * MR design: lead is the primary metal exposure and selenium and cadmium are
+    co-secondary, following the final ML evidence (decision confirmed with the study
+    owner on 2026-10-03 after the final run, P5); one
     instrument rule for every exposure, with mercury exploratory (P6); MR methods tiered
     by the number of SNPs, betas instead of odds ratios, components instead of
     composite MetS (P7); the removed 13-SNP lead instrument is gone everywhere (P2);
@@ -45,6 +46,7 @@ from docx.shared import Inches
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import config as cfg
+import stats_utils as su
 
 ROOT = Path(__file__).resolve().parents[1]
 DOC = ROOT / "02_Proposal" / "Research_Proposal.docx"
@@ -88,22 +90,7 @@ def shap_rank(code):
 
 
 def shape_of(values):
-    """Plain-language shape of a binned SHAP dependence curve (same rule as 17)."""
-    v = np.asarray(values, float)
-    rng = v.max() - v.min()
-    if rng < 0.03:
-        return "flat"
-    rho = pd.Series(v).corr(pd.Series(np.arange(len(v))), method="spearman")
-    imin, imax = int(v.argmin()), int(v.argmax())
-    if rho >= 0.8:
-        return "rising"
-    if rho <= -0.8:
-        return "falling"
-    if 0 < imin < len(v) - 1 and min(v[0], v[-1]) - v[imin] > 0.4 * rng:
-        return "U-shaped"
-    if 0 < imax < len(v) - 1 and v[imax] - max(v[0], v[-1]) > 0.4 * rng:
-        return "inverted U-shaped"
-    return "rising" if rho > 0.3 else "falling" if rho < -0.3 else "irregular"
+    return su.describe_shape(values)
 
 
 def shape_txt(code):
@@ -113,7 +100,10 @@ def shape_txt(code):
             "falling": "SHAP contribution falls with concentration",
             "U-shaped": "U-shaped SHAP contribution",
             "inverted U-shaped": "inverted-U SHAP contribution",
-            "irregular": "no consistent SHAP direction"}[sh]
+            "irregular": "no consistent SHAP direction",
+            "flat apart from a rise in the highest bin": "SHAP contribution flat except in the highest bin",
+            "flat apart from a drop in the highest bin": "SHAP contribution flat except in the highest bin",
+            "flat apart from a higher lowest bin": "SHAP contribution flat except in the lowest bin"}[sh]
 
 
 perm["rank"] = perm["perm_importance_mean"].rank(ascending=False, method="min").astype(int)
@@ -167,6 +157,35 @@ def sub(p, old, new):
     set_text(p, t.replace(old, new))
 
 
+WORDING = [
+    ("As lead levels increase MetS risk increases and its individual components (blood pressure, "
+     "triglycerides, fasting glucose and HDL cholesterol) all go in the predicted way.",
+     "In several studies higher blood lead has gone with higher MetS risk and with adverse levels of "
+     "its individual components (blood pressure, triglycerides, fasting glucose and HDL cholesterol)."),
+    ("Lead also interferes with lipid metabolism and causes insulin resistance, the two pathways",
+     "Experimental work suggests that lead also interferes with lipid metabolism and promotes insulin "
+     "resistance, the two pathways"),
+    ("by how much each actually contributes to MetS risk once the others are accounted for, rather than "
+     "assuming in advance which one matters most",
+     "by how much each contributes to predicting MetS alongside the others, rather than assuming in "
+     "advance which one matters most; this is a predictive ranking, not a causal one"),
+    ("means the resulting AUC, calibration, and error metrics reflect genuine generalization rather than "
+     "an artifact of any one algorithm's fit to this particular sample.",
+     "gives a fair internal comparison on participants none of the models was trained on. Because the "
+     "leading model is the one with the highest test-set AUROC, its estimate is slightly optimistic, and "
+     "external validation in an independent cohort remains outstanding."),
+    ("The Steiger directionality test confirms which way the causal arrow points for each "
+     "exposure–outcome pair",
+     "The Steiger directionality test checks whether the assumed direction, from exposure to outcome, is "
+     "better supported than the reverse for each exposure–outcome pair"),
+    ("associations with p < 0.05 are treated as statistically significant, with the number of "
+     "exposure–outcome pairs reported alongside so that multiplicity can be judged (Figure 2).",
+     "associations are judged against a Benjamini-Hochberg false discovery rate of 5% across all "
+     "exposure–outcome pairs tested, with unadjusted p-values and the number of pairs also reported "
+     "(Figure 2)."),
+]
+
+
 def set_cell(cell, text):
     ps = cell.paragraphs
     if ps[0].runs:
@@ -204,8 +223,8 @@ def main():
     sub(para(doc, sp, 12), "to predict pressure injuries in ICU patients",
         "to predict mortality in ICU patients with pressure ulcers")
     sub(para(doc, sp, 14), "(lead foremost among them, but cadmium, mercury, selenium, and manganese "
-        "close behind)", "(lead the best documented among them, alongside cadmium, mercury, selenium, "
-        "and manganese)")
+        "close behind)", "(lead, cadmium, mercury, selenium and manganese, with evidence of differing "
+        "strength and consistency for each)")
     lr = "2. Literature Review"
     sub(para(doc, lr, 21), "Cadmium, mercury, and selenium carry the most consistent evidence for "
         "increased MetS risk; lead and manganese remain mixed",
@@ -370,9 +389,9 @@ def main():
              "LBXBMN": "manganese"}
     xmean = {m: float(np.mean(list(mr[m]["per_model_perm_rank"].values()))) for m in METALS}
     by_cross = sorted(METALS, key=xmean.get)
-    if by_cross[:2] != ["LBXBPB", "LBXBSE"]:
-        print(f"[WARNING] by mean permutation rank across the four leading models the two highest metals "
-              f"are {by_cross[:2]}, not lead then selenium; revisit the exposure tiers before submission.")
+    if by_cross[0] != "LBXBPB" or set(by_cross[1:3]) != {"LBXBSE", "LBXBCD"}:
+        print(f"[WARNING] the cross-model metal order is {by_cross}; the tiers in the text assume lead "
+              f"first and selenium and cadmium next. Revisit them before submission.")
 
     def metal_ev(m):
         return (f"{MNAME[m]} (permutation rank {prank(m)} of {n_pred} in {top}, "
@@ -393,10 +412,13 @@ def main():
              f"{sgn(no_met['delta_vs_full'], 4)} AUROC units (DeLong p = {no_met['delong_p']:.3g}). "
              f"The metal evidence, from strongest to weakest by mean rank across the four leading "
              f"models, was: " + "; ".join(metal_ev(m) for m in by_cross) + ". "
-             f"Lead, the most stable metal across models, and selenium, the next most stable, are the "
-             f"primary metal exposures. Cadmium is secondary: its signal was distinguishable from "
-             f"noise in {top} but less stable across models, and it has the strongest prior "
-             f"literature and a published never-smoker instrument. The "
+             f"Lead is the primary metal exposure: it ranked highest on average across the four "
+             f"models and its permutation signal in {top} exceeded the run-to-run noise. Selenium "
+             f"and cadmium are co-secondary, because neither clearly outranks the other: selenium "
+             f"ranked higher on average across models but its signal in {top} was within noise, "
+             f"whereas cadmium's signal in {top} exceeded the noise and its rank varied least across "
+             f"models but sat lower on average; cadmium also has the strongest prior literature and "
+             f"a published never-smoker instrument. The "
              f"second criterion is a usable genetic instrument under the rule in section 3.2.3, applied "
              f"identically to every exposure. An associational ranking and a causal test answer "
              f"different questions: a factor can be predictive without being causal, or causal without "
@@ -502,7 +524,7 @@ def main():
          f"Permutation rank {prank('LBXBSE')} ({'above' if above_noise('LBXBSE') else 'not above'} its "
          f"permutation SD), ranks {span('LBXBSE')} across models; SHAP rank {se['shap_rank']}; "
          f"{shape_txt('LBXBSE')}",
-         "GWAS of blood selenium concentrations, loci at 5q14 and 21q22.3 [76]", "Primary exposure"),
+         "GWAS of blood selenium concentrations, loci at 5q14 and 21q22.3 [76]", "Secondary exposure"),
         ("Cadmium",
          f"Permutation rank {prank('LBXBCD')} "
          f"({'above' if above_noise('LBXBCD') else 'within'} its permutation SD), SHAP rank "
@@ -549,7 +571,7 @@ def main():
     # ---- Table 3: MR design summary
     t3 = doc.tables[2]
     set_cell(t3.rows[1].cells[1],
-             "Blood lead, selenium and body mass index (primary); cadmium (secondary); manganese, mercury "
+             "Blood lead and body mass index (primary); selenium and cadmium (secondary); manganese, mercury "
              "(suggestive instruments), alcohol consumption, physical activity (exploratory)")
     set_cell(t3.rows[1].cells[2],
              "Metabolic syndrome components, analysed separately: waist circumference, triglycerides, "
@@ -564,9 +586,9 @@ def main():
                    "both will be prioritized for the MR phase.")
     h2 = nonempty_after(doc, "4.2.1. Hypotheses")
     set_text(h2[0], "H5: Publicly available GWAS will yield valid instruments (F > 10) for blood lead, "
-                    "selenium and body mass index; instruments for cadmium, manganese, alcohol consumption "
+                    "selenium, cadmium and body mass index; instruments for manganese, alcohol consumption "
                     "and physical activity may be fewer or weaker, and mercury has suggestive loci only.")
-    set_text(h2[1], "H6: The instruments for the primary exposures (lead, selenium, body mass index) will "
+    set_text(h2[1], "H6: The instruments for the primary exposures (lead, body mass index) will "
                     "show sufficient strength (F > 10) for reliable causal inference, while instrument "
                     "strength for the secondary and exploratory exposures is expected to vary.")
     set_text(h2[2], "H7: Where an exposure has enough SNPs, heterogeneity and pleiotropy will be detectable "
@@ -577,12 +599,12 @@ def main():
     lead_why = ("showed an inverse cross-sectional association that may reflect confounding"
                 if lead_sh == "falling" else
                 "showed no consistent direction for lead once the other predictors were accounted for"
-                if lead_sh in ("flat", "irregular") else
+                if lead_sh == "flat" or lead_sh.startswith("flat apart") or lead_sh == "irregular" else
                 f"showed a {lead_sh} pattern for lead that a cross-sectional model cannot interpret causally")
-    set_text(h2[3], "H8: Genetically predicted blood selenium and lead will be associated with one or more "
-                    "MetS components (blood pressure, fasting glucose, triglycerides, HDL-C). The effect of "
-                    f"lead is tested two-sided, because the machine-learning phase {lead_why}; cadmium is "
-                    "tested as a secondary exposure.")
+    set_text(h2[3], "H8: Genetically predicted blood lead will be associated with one or more MetS "
+                    "components (blood pressure, fasting glucose, triglycerides, HDL-C). The effect of lead "
+                    f"is tested two-sided, because the machine-learning phase {lead_why}; selenium and "
+                    "cadmium are tested as secondary exposures.")
     set_text(h2[4], "H9: Exposures ranked highest by the machine-learning phase (body mass index in "
                     "particular) will show the strongest and most consistent causal estimates, while any "
                     "exposure with a weak machine-learning signal but an adequate instrument will help "
@@ -603,6 +625,14 @@ def main():
     # ---- Figures 1 and 2
     replace_image(doc, 0, DIAG / "figure1_data_cleaning_pipeline.png")
     replace_image(doc, 1, DIAG / "figure2_mr_study_design.png")
+
+    # ---- wording that overstated causation or generalization (2026-10 review, M4/M6)
+    for old, new in WORDING:
+        hits = [p for p in doc.paragraphs if old in p.text or new in p.text]
+        if not hits:
+            raise SystemExit(f"text not found: {old[:70]!r}")
+        for p in hits:
+            sub(p, old, new)
 
     doc.save(DOC)
     print(f"updated {DOC.relative_to(ROOT)}")

@@ -1,8 +1,7 @@
 # Exploratory additions: dose-response, metal interactions, component-level models, effect modification
 
 These analyses sit on top of the main pipeline. They use the same cohort
-(10,879 adults), the same train/test split, the same predictors and the same
-leading model (CatBoost, with the hyperparameters chosen in
+(10,879 adults), the same predictors and the same leading model (CatBoost, with the hyperparameters chosen in
 `06_Code/06_cv_tuning.py`). They are exploratory: none was prespecified, and
 none is reported in the manuscript Results. Treat every p-value here as
 hypothesis-generating.
@@ -14,7 +13,11 @@ Run them after the main pipeline (the launcher does this):
 Tables and figures are written to `outputs/07_Novelty_Additions/` and copied
 into `tables/` and `figures/` here by `06_Code/26_build_submission.py`.
 
-All regression models below adjust for the same set: age, BMI, sex,
+The SHAP summaries use the model fitted on the training partition and the
+held-out test participants. The regression models use every participant in
+the cohort with the relevant metals observed (test participants included),
+because they estimate associations rather than predictive performance. All
+regression models below adjust for the same set: age, BMI, sex,
 income-to-poverty ratio, race/ethnicity, education, smoking (ever and
 current intensity), any alcohol in the past 12 months, and survey cycle.
 Metals enter on the log scale. They are fitted on participants with the
@@ -37,7 +40,8 @@ compared with the same model using a linear term, by likelihood-ratio test
 Lead and cadmium depart from linearity on the log scale (both remain below
 0.05 after Benjamini-Hochberg correction across the five tests: q = 0.043 and
 0.030). A segmented model for lead places a breakpoint at 2.39 µg/dL, but its
-bootstrap 95% interval (0.74 to 2.75 µg/dL) spans most of the searched range,
+bootstrap 95% interval (0.74 to 2.75 µg/dL, from only 80 bootstrap
+replicates, so the interval itself is rough) spans most of the searched range,
 so the location is poorly identified (`tables/table_lead_breakpoint.csv`,
 `figures/fig_lead_breakpoint.png`). Read the curves in the figure for the
 shape; the test only says that a straight line on the log scale does not fit

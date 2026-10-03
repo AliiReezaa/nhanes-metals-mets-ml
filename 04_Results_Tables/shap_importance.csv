@@ -6,7 +6,7 @@ BPXPLS,0.15158713234360516,Resting pulse (60 sec)
 DBQ700,0.10157703174197102,Self-rated diet quality (1=excellent...5=poor)
 DMDEDUC2,0.07734354241970143,Education level
 RIDRETH1_4.0,0.06287418061090333,Race/ethnicity: Non-Hispanic Black
-ALQ130,0.05615270501520769,Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)
+ALQ130,0.05615270501520769,"Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers)"
 DMDMARTL_5.0,0.05612468869599375,Marital status: Never married
 sex_female,0.04456755567406331,Sex: Female
 SMQ040,0.044512794478181614,"Current smoking intensity (0=none, 1=some days, 2=every day)"
@@ -27,7 +27,7 @@ SMQ020,0.012186927307766163,Smoked ≥100 cigarettes in life
 PAQ665,0.011660908891436051,Moderate recreational activity
 PAQ605,0.01060883456422237,Vigorous work activity
 RIDRETH1_2.0,0.010467176688889602,Race/ethnicity: Other Hispanic
-missingindicator_ALQ130,0.00897549151375649,Avg. drinks per drinking day (past 12 mo; 0 = non-drinker): missing (imputed)
+missingindicator_ALQ130,0.00897549151375649,"Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers): missing (imputed)"
 DMDMARTL_3.0,0.005964236772917398,Marital status: Divorced
 RIDRETH1_3.0,0.005739703497565825,Race/ethnicity: Non-Hispanic White
 DMDMARTL_2.0,0.004226977086947969,Marital status: Widowed

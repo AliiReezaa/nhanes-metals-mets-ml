@@ -353,7 +353,7 @@ CLINICAL_NAMES = {
     "SMQ020": "Smoked ≥100 cigarettes in life",
     "SMQ040": "Current smoking intensity (0=none, 1=some days, 2=every day)",
     "ALQ_PAST12": "Drank alcohol in past 12 months",
-    "ALQ130": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
+    "ALQ130": "Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers)",
     "DBQ700": "Self-rated diet quality (1=excellent...5=poor)",
     "PAQ605": "Vigorous work activity",
     "PAQ650": "Vigorous recreational activity",

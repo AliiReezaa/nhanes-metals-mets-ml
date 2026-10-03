@@ -18,7 +18,7 @@ For every fitted model in outputs/models/*.joblib:
 REBUILD NOTE / FIX: the original pipeline picked a single "best" model by the
 top test-AUC point estimate and treated the resulting 1-through-11 ranking as
 reliable, even though the top handful of models sat within about 0.005 AUC of
-each other -- well inside plausible sampling noise for a 2,229-row test set.
+each other -- well inside plausible sampling noise for a test set of about 2,200 participants.
 This script compares the top-ranked model with every other model on the
 same test participants: the p-value comes from DeLong's test for correlated
 AUROCs (2026-10 audit, C8: the earlier bootstrap p-value could not resolve
@@ -225,7 +225,10 @@ def main():
                               "statistically_indistinguishable_from_top": True})
             continue
         diff, lo, hi, p = paired_bootstrap_auc_diff(y_test, prob_top, prob_by_model[name])
-        indistinguishable = (lo <= 0 <= hi)
+        # 2026-10 review: one tie rule everywhere. A model is "indistinguishable"
+        # from the top model when DeLong's test does not reject at 0.05; the
+        # paired-bootstrap interval is reported alongside.
+        indistinguishable = bool(p >= 0.05)
         sig_rows.append({"model": name, "is_top_model": False, "auc_diff_vs_top": round(diff, 4),
                           "diff_95ci_low": round(lo, 4), "diff_95ci_high": round(hi, 4),
                           "p_value": float(f"{p:.3g}"), "p_method": "DeLong",

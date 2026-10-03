@@ -205,11 +205,15 @@ def build_table1():
             continue
         is_metal = var in METALS_VARS
         y = np.log(df[var].where(df[var] > 0)) if is_metal else df[var]
-        (m0, se0, n0), (m1, se1, n1), p = domain_difference(df, y, w, d0, d1, ddf)
+        # 2026-10 review: degrees of freedom from the strata and PSUs that hold
+        # data on this variable (selenium and manganese exist only in 2011-2018,
+        # so their df is smaller than the whole-design 94).
+        vdf = design_df(df[y.notna()])
+        (m0, se0, n0), (m1, se1, n1), p = domain_difference(df, y, w, d0, d1, vdf)
         row = {"variable": var, "clinical_name": cfg.label_feature(var), "type": "continuous",
                "summary": "geometric mean" if is_metal else "mean", "weight_used": weight_note}
         if is_metal:
-            tq = stats.t.ppf(0.975, ddf)
+            tq = stats.t.ppf(0.975, vdf)
             row.update({
                 "no_mets_mean": round(float(np.exp(m0)), 3), "no_mets_se": round(float(np.exp(m0) * se0), 4),
                 "no_mets_ci_low": round(float(np.exp(m0 - tq * se0)), 3),
@@ -222,8 +226,9 @@ def build_table1():
             row.update({"no_mets_mean": round(m0, 3), "no_mets_se": round(se0, 4), "no_mets_n": n0,
                         "mets_mean": round(m1, 3), "mets_se": round(se1, 4), "mets_n": n1})
         row["p_value"] = float(f"{p:.3g}")
+        row["design_df"] = vdf
         row["p_value_note"] = ("design-based t test on the log scale" if is_metal
-                               else "design-based t test") + f", df = {ddf}"
+                               else "design-based t test") + f", df = {vdf}"
         rows.append(row)
 
     for var in TABLE1_CATEGORICAL:

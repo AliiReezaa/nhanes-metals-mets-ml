@@ -426,8 +426,8 @@ def build_study_workflow_diagram(n: dict):
 # Figure 2 of the proposal: MR study design (2026-10 audit, P2/P5/P6)
 # ============================================================
 MR_EXPOSURE_TIERS = {
-    "Primary": "lead, selenium, body mass index",
-    "Secondary": "cadmium",
+    "Primary": "lead, body mass index",
+    "Secondary": "selenium, cadmium",
     "Exploratory": "manganese, mercury\n(suggestive loci), alcohol,\nphysical activity",
 }
 

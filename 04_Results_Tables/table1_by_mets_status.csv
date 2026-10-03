@@ -1,23 +1,23 @@
-variable,clinical_name,type,summary,weight_used,no_mets_mean,no_mets_se,no_mets_n,mets_mean,mets_se,mets_n,p_value,p_value_note,no_mets_ci_low,no_mets_ci_high,mets_ci_low,mets_ci_high
-RIDAGEYR,Age (years),continuous,mean,WTSAF2YR/6,41.643,0.3254,5800.0,55.144,0.3325,5079.0,1.5e-48,"design-based t test, df = 94",,,,
-BMXBMI,Body mass index (kg/m²),continuous,mean,WTSAF2YR/6,26.585,0.1322,5791.0,32.099,0.1834,5066.0,2.47e-43,"design-based t test, df = 94",,,,
-LBXBPB,Blood lead (µg/dL),continuous,geometric mean,WTSAF2YR/6,1.028,0.0153,5800.0,1.173,0.0208,5079.0,6.5e-09,"design-based t test on the log scale, df = 94",0.998,1.059,1.133,1.215
-LBXBCD,Blood cadmium (µg/L),continuous,geometric mean,WTSAF2YR/6,0.32,0.0054,5800.0,0.342,0.0054,5079.0,0.00246,"design-based t test on the log scale, df = 94",0.309,0.331,0.332,0.353
-LBXTHG,"Blood mercury, total (µg/L)",continuous,geometric mean,WTSAF2YR/6,0.913,0.0254,5800.0,0.837,0.023,5079.0,0.00126,"design-based t test on the log scale, df = 94",0.864,0.965,0.792,0.884
-LBXBSE,Blood selenium (µg/L),continuous,geometric mean,WTSAF2YR/6,193.074,0.7283,3347.0,195.1,1.2369,2961.0,0.0686,"design-based t test on the log scale, df = 94",191.633,194.525,192.659,197.571
-LBXBMN,Blood manganese (µg/L),continuous,geometric mean,WTSAF2YR/6,9.379,0.0682,3347.0,9.156,0.0727,2961.0,0.034,"design-based t test on the log scale, df = 94",9.244,9.515,9.013,9.301
-INDFMPIR,Income-to-poverty ratio,continuous,mean,WTSAF2YR/6,3.018,0.0418,5278.0,2.934,0.0507,4608.0,0.0784,"design-based t test, df = 94",,,,
-RIAGENDR = 1.0,Sex: Male,categorical,weighted %,WTSAF2YR/6,48.79,0.7946,,49.95,0.9543,,0.391,"design-based adjusted Wald F test, df = 94",,,,
-RIAGENDR = 2.0,Sex: Female,categorical,weighted %,WTSAF2YR/6,51.21,0.7946,,50.05,0.9543,,0.391,"design-based adjusted Wald F test, df = 94",,,,
-RIDRETH1 = 1.0,Race/ethnicity: Mexican American,categorical,weighted %,WTSAF2YR/6,8.95,0.7931,,8.2,0.8458,,3.4e-06,"design-based adjusted Wald F test, df = 94",,,,
-RIDRETH1 = 2.0,Race/ethnicity: Other Hispanic,categorical,weighted %,WTSAF2YR/6,6.55,0.6116,,5.06,0.5231,,3.4e-06,"design-based adjusted Wald F test, df = 94",,,,
-RIDRETH1 = 3.0,Race/ethnicity: Non-Hispanic White,categorical,weighted %,WTSAF2YR/6,64.36,1.4446,,69.96,1.5547,,3.4e-06,"design-based adjusted Wald F test, df = 94",,,,
-RIDRETH1 = 4.0,Race/ethnicity: Non-Hispanic Black,categorical,weighted %,WTSAF2YR/6,11.37,0.7911,,10.28,0.8074,,3.4e-06,"design-based adjusted Wald F test, df = 94",,,,
-RIDRETH1 = 5.0,Race/ethnicity: Other/Multi-Racial,categorical,weighted %,WTSAF2YR/6,8.77,0.6406,,6.5,0.5428,,3.4e-06,"design-based adjusted Wald F test, df = 94",,,,
-DMDEDUC2 = 1.0,Education level: <9th grade,categorical,weighted %,WTSAF2YR/6,4.46,0.3282,,7.03,0.4737,,5.64e-14,"design-based adjusted Wald F test, df = 94",,,,
-DMDEDUC2 = 2.0,Education level: 9-11th grade,categorical,weighted %,WTSAF2YR/6,9.57,0.5762,,12.02,0.7171,,5.64e-14,"design-based adjusted Wald F test, df = 94",,,,
-DMDEDUC2 = 3.0,Education level: HS grad/GED,categorical,weighted %,WTSAF2YR/6,21.14,0.9431,,26.14,1.0005,,5.64e-14,"design-based adjusted Wald F test, df = 94",,,,
-DMDEDUC2 = 4.0,Education level: Some college/AA degree,categorical,weighted %,WTSAF2YR/6,30.16,0.9695,,30.92,1.1106,,5.64e-14,"design-based adjusted Wald F test, df = 94",,,,
-DMDEDUC2 = 5.0,Education level: College grad or above,categorical,weighted %,WTSAF2YR/6,34.66,1.4001,,23.89,1.1858,,5.64e-14,"design-based adjusted Wald F test, df = 94",,,,
-SMQ020 = 1.0,Smoked ≥100 cigarettes in life: Yes,categorical,weighted %,WTSAF2YR/6,41.46,1.027,,48.86,0.9983,,5.39e-08,"design-based adjusted Wald F test, df = 94",,,,
-SMQ020 = 2.0,Smoked ≥100 cigarettes in life: No,categorical,weighted %,WTSAF2YR/6,58.54,1.027,,51.14,0.9983,,5.39e-08,"design-based adjusted Wald F test, df = 94",,,,
+variable,clinical_name,type,summary,weight_used,no_mets_mean,no_mets_se,no_mets_n,mets_mean,mets_se,mets_n,p_value,design_df,p_value_note,no_mets_ci_low,no_mets_ci_high,mets_ci_low,mets_ci_high
+RIDAGEYR,Age (years),continuous,mean,WTSAF2YR/6,41.643,0.3254,5800.0,55.144,0.3325,5079.0,1.5e-48,94.0,"design-based t test, df = 94",,,,
+BMXBMI,Body mass index (kg/m²),continuous,mean,WTSAF2YR/6,26.585,0.1322,5791.0,32.099,0.1834,5066.0,2.47e-43,94.0,"design-based t test, df = 94",,,,
+LBXBPB,Blood lead (µg/dL),continuous,geometric mean,WTSAF2YR/6,1.028,0.0153,5800.0,1.173,0.0208,5079.0,6.5e-09,94.0,"design-based t test on the log scale, df = 94",0.998,1.059,1.133,1.215
+LBXBCD,Blood cadmium (µg/L),continuous,geometric mean,WTSAF2YR/6,0.32,0.0054,5800.0,0.342,0.0054,5079.0,0.00246,94.0,"design-based t test on the log scale, df = 94",0.309,0.331,0.332,0.353
+LBXTHG,"Blood mercury, total (µg/L)",continuous,geometric mean,WTSAF2YR/6,0.913,0.0254,5800.0,0.837,0.023,5079.0,0.00126,94.0,"design-based t test on the log scale, df = 94",0.864,0.965,0.792,0.884
+LBXBSE,Blood selenium (µg/L),continuous,geometric mean,WTSAF2YR/6,193.074,0.7283,3347.0,195.1,1.2369,2961.0,0.0702,62.0,"design-based t test on the log scale, df = 62",191.623,194.535,192.643,197.588
+LBXBMN,Blood manganese (µg/L),continuous,geometric mean,WTSAF2YR/6,9.379,0.0682,3347.0,9.156,0.0727,2961.0,0.0354,62.0,"design-based t test on the log scale, df = 62",9.244,9.516,9.012,9.302
+INDFMPIR,Income-to-poverty ratio,continuous,mean,WTSAF2YR/6,3.018,0.0418,5278.0,2.934,0.0507,4608.0,0.0784,94.0,"design-based t test, df = 94",,,,
+RIAGENDR = 1.0,Sex: Male,categorical,weighted %,WTSAF2YR/6,48.79,0.7946,,49.95,0.9543,,0.391,,"design-based adjusted Wald F test, df = 94",,,,
+RIAGENDR = 2.0,Sex: Female,categorical,weighted %,WTSAF2YR/6,51.21,0.7946,,50.05,0.9543,,0.391,,"design-based adjusted Wald F test, df = 94",,,,
+RIDRETH1 = 1.0,Race/ethnicity: Mexican American,categorical,weighted %,WTSAF2YR/6,8.95,0.7931,,8.2,0.8458,,3.4e-06,,"design-based adjusted Wald F test, df = 94",,,,
+RIDRETH1 = 2.0,Race/ethnicity: Other Hispanic,categorical,weighted %,WTSAF2YR/6,6.55,0.6116,,5.06,0.5231,,3.4e-06,,"design-based adjusted Wald F test, df = 94",,,,
+RIDRETH1 = 3.0,Race/ethnicity: Non-Hispanic White,categorical,weighted %,WTSAF2YR/6,64.36,1.4446,,69.96,1.5547,,3.4e-06,,"design-based adjusted Wald F test, df = 94",,,,
+RIDRETH1 = 4.0,Race/ethnicity: Non-Hispanic Black,categorical,weighted %,WTSAF2YR/6,11.37,0.7911,,10.28,0.8074,,3.4e-06,,"design-based adjusted Wald F test, df = 94",,,,
+RIDRETH1 = 5.0,Race/ethnicity: Other/Multi-Racial,categorical,weighted %,WTSAF2YR/6,8.77,0.6406,,6.5,0.5428,,3.4e-06,,"design-based adjusted Wald F test, df = 94",,,,
+DMDEDUC2 = 1.0,Education level: <9th grade,categorical,weighted %,WTSAF2YR/6,4.46,0.3282,,7.03,0.4737,,5.64e-14,,"design-based adjusted Wald F test, df = 94",,,,
+DMDEDUC2 = 2.0,Education level: 9-11th grade,categorical,weighted %,WTSAF2YR/6,9.57,0.5762,,12.02,0.7171,,5.64e-14,,"design-based adjusted Wald F test, df = 94",,,,
+DMDEDUC2 = 3.0,Education level: HS grad/GED,categorical,weighted %,WTSAF2YR/6,21.14,0.9431,,26.14,1.0005,,5.64e-14,,"design-based adjusted Wald F test, df = 94",,,,
+DMDEDUC2 = 4.0,Education level: Some college/AA degree,categorical,weighted %,WTSAF2YR/6,30.16,0.9695,,30.92,1.1106,,5.64e-14,,"design-based adjusted Wald F test, df = 94",,,,
+DMDEDUC2 = 5.0,Education level: College grad or above,categorical,weighted %,WTSAF2YR/6,34.66,1.4001,,23.89,1.1858,,5.64e-14,,"design-based adjusted Wald F test, df = 94",,,,
+SMQ020 = 1.0,Smoked ≥100 cigarettes in life: Yes,categorical,weighted %,WTSAF2YR/6,41.46,1.027,,48.86,0.9983,,5.39e-08,,"design-based adjusted Wald F test, df = 94",,,,
+SMQ020 = 2.0,Smoked ≥100 cigarettes in life: No,categorical,weighted %,WTSAF2YR/6,58.54,1.027,,51.14,0.9983,,5.39e-08,,"design-based adjusted Wald F test, df = 94",,,,

@@ -79,8 +79,9 @@ Spearman correlations among the predictors on the training partition (after impu
 |rho| = 0.5 (`tables/table_predictor_correlation_flags.csv`): any alcohol and
 drinks per drinking day (0.81, by construction, since non-drinkers have 0
 drinks), smoking intensity and blood cadmium (0.55), and ever smoked and
-smoking intensity (0.55). Smoking and cadmium sharing signal is one reason
-the cadmium importance varies between methods.
+smoking intensity (0.55). Because smoking is the main source of cadmium,
+part of any cadmium association can reflect smoking; both smoking items are
+in the model and in every adjustment set for that reason.
 
 ## 7. TRIPOD+AI and PROBAST-AI (`code/12_reporting_checklists.py`)
 

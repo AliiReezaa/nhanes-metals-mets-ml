@@ -32,6 +32,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import docx_style as ds
+import pipeline_utils as pu
 from references import cite
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -83,10 +84,10 @@ PREDICTORS = [
     ("Demographic and socioeconomic", [
         ("RIDAGEYR", "Age at screening", "Continuous, years", "1"),
         ("RIAGENDR", "Sex", "Binary (female = 1)", "1"),
-        ("RIDRETH1", "Race/Hispanic origin", "One-hot; Mexican American = reference", "5"),
+        ("RIDRETH1", "Race/Hispanic origin", "One-hot; Mexican American = reference", "4"),
         ("DMDEDUC2", "Highest education level completed (adults)",
          "Ordinal 1–5 (<9th grade → college graduate)", "1"),
-        ("DMDMARTL", "Marital status", "One-hot; married = reference", "6"),
+        ("DMDMARTL", "Marital status", "One-hot; married = reference, plus a column for a missing answer", "6"),
         ("DMDHHSIZ", "Total number of people in the household", "Continuous, count", "1"),
         ("INDFMPIR", "Ratio of family income to the federal poverty threshold",
          "Continuous, 0–5", "1"),
@@ -205,9 +206,16 @@ def main():
                   "the predictor set.")
 
     # ================= Table S3 =================
-    rows3 = []
+    rows3, edge = [], []
+    registry = pu.get_model_registry()
     for _, t in tune.sort_values("cv_auc", ascending=False).iterrows():
         bp = json.loads(t["best_params"]) if isinstance(t["best_params"], str) else {}
+        # selections on the boundary of a numeric grid (2026-10 review)
+        grid = registry.get(t["model"], {}).get("param_grid") or {}
+        for k, v in bp.items():
+            vals = [x for x in grid.get(k, []) if isinstance(x, (int, float)) and not isinstance(x, bool)]
+            if len(vals) > 1 and isinstance(v, (int, float)) and v in (min(vals), max(vals)):
+                edge.append(f"{t['model']} ({k.replace('model__', '')} = {v})")
 
         def _fmt(v):
             return "(" + ", ".join(str(x) for x in v) + ")" if isinstance(v, list) else str(v)
@@ -223,6 +231,10 @@ def main():
     ds.add_table(doc, ["Algorithm", "Search space", "Selected configuration", "CV AUROC"],
                  rows3, col_widths_in=[1.12, 2.05, 2.05, 0.68],
                  align_right_from=3, font_size=ds.Pt(7.5))
+    if edge:
+        ds.table_note(doc,
+                      "Selections at the edge of their search range, where a wider grid might have "
+                      "chosen a more extreme value: " + "; ".join(edge) + ".")
     ds.page_break(doc)
 
     # ================= Table S4 =================
@@ -266,7 +278,7 @@ def main():
     n_zero = int((perm["perm_importance_mean"] == 0).sum())
     for _, r in merged.nsmallest(15, "rank_shap").iterrows():
         pv, sd = r["perm_importance_mean"], r["perm_importance_std"]
-        resolved = abs(pv) > sd
+        resolved = pv > sd
         n_resolved += int(resolved)
         rows5.append([SHORT.get(r["clinical_name"], r["clinical_name"]),
                       f"{r['mean_abs_shap']:.4f}", f"{int(r['rank_shap'])}",
@@ -346,10 +358,11 @@ def main():
             rows7.append([label, r["model"], f"{base:.4f}", f"{r[col]:.4f}", f"{r[col] - base:+.4f}"])
     ds.caption(doc, "Table S7.",
                "Sensitivity analyses. Each entry is the mean AUROC from 10-fold stratified "
-               "cross-validation on the training partition, using the three leading algorithms at "
-               "their tuned hyperparameters (Table S3), holding everything except the stated change "
-               "fixed. The outcome-definition arms change the label, and therefore its prevalence, "
-               "as well as the difficulty of the task.", above=True)
+               "cross-validation on the training partition, using the three algorithms with the "
+               "highest cross-validated AUROC in Table S3 at their tuned hyperparameters, holding "
+               "everything except the stated change fixed. The outcome-definition arms change the "
+               "label, and therefore its prevalence, as well as the difficulty of the task; "
+               "prevalences quoted for these arms refer to the training partition.", above=True)
     ds.add_table(doc, ["Analysis", "Model", "Primary", "Alternative", "Δ AUROC"],
                  rows7, col_widths_in=[2.30, 1.25, 0.80, 1.05, 0.80],
                  align_right_from=2, font_size=ds.Pt(8.5))
@@ -397,8 +410,10 @@ def main():
     ds.caption(doc, "Table S9.",
                f"Repeated stratified cross-validation on the training partition "
                f"({int(rcv.iloc[0]['folds'])} folds × {int(rcv.iloc[0]['repeats'])} repeats, "
-               f"{int(rcv.iloc[0]['n_fits'])} fits per model, tuned hyperparameters), showing how much "
-               f"discrimination varies between data partitions.", above=True)
+               f"{int(rcv.iloc[0]['n_fits'])} fits per model), showing how much discrimination varies "
+               f"between data partitions. The hyperparameters tuned on the same training partition "
+               f"were reused rather than re-tuned inside each fold, so the means are mildly "
+               f"optimistic.", above=True)
     ds.add_table(doc, ["Model", "Mean AUROC", "SD across folds", "2.5th–97.5th percentile",
                        "Range of repeat means"],
                  rows9, col_widths_in=[1.45, 0.95, 1.05, 1.55, 1.40],

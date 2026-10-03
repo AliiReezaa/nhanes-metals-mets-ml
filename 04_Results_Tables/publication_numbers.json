@@ -325,8 +325,8 @@
   },
   "shap_model": "CatBoost",
   "figure_abbreviations": {
-    "fig6_shap_beeswarm": "Abbreviations: BMI, body mass index (kg/m\u00b2); Vigorous rec. PA, vigorous recreational activity; Resting pulse, resting pulse (60 sec); Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Drinks/drinking day, avg. drinks per drinking day (past 12 mo; 0 = non-drinker); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Active transport, minutes walking/biking for transportation; Blood Cd, blood cadmium (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Exam season, exam month: May-Oct (vs. Nov-Apr); Blood Pb, blood lead (\u00b5g/dL).",
-    "fig7_importance_concordance": "Abbreviations: Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Mn, blood manganese (\u00b5g/L); BMI, body mass index (kg/m\u00b2); Resting pulse, resting pulse (60 sec); Vigorous rec. PA, vigorous recreational activity; Eth: NH Black, race/ethnicity: Non-Hispanic Black; Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Drinks/drinking day, avg. drinks per drinking day (past 12 mo; 0 = non-drinker); Diet quality, self-rated diet quality (1=excellent...5=poor); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Drank past 12 mo, drank alcohol in past 12 months.",
+    "fig6_shap_beeswarm": "Abbreviations: BMI, body mass index (kg/m\u00b2); Vigorous rec. PA, vigorous recreational activity; Resting pulse, resting pulse (60 sec); Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Drinks/drinking day, avg. drinks per drinking day (past 12 mo, 0 for non-drinkers); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Active transport, minutes walking/biking for transportation; Blood Cd, blood cadmium (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Exam season, exam month: May-Oct (vs. Nov-Apr); Blood Pb, blood lead (\u00b5g/dL).",
+    "fig7_importance_concordance": "Abbreviations: Blood Se, blood selenium (\u00b5g/L); Blood Pb, blood lead (\u00b5g/dL); Blood Mn, blood manganese (\u00b5g/L); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); BMI, body mass index (kg/m\u00b2); Resting pulse, resting pulse (60 sec); Vigorous rec. PA, vigorous recreational activity; Eth: NH Black, race/ethnicity: Non-Hispanic Black; Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Drinks/drinking day, avg. drinks per drinking day (past 12 mo, 0 for non-drinkers); Diet quality, self-rated diet quality (1=excellent...5=poor); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Drank past 12 mo, drank alcohol in past 12 months.",
     "fig8_metals_shap_dependence": "Abbreviations: Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Mn, blood manganese (\u00b5g/L)."
   },
   "metal_ranks": {
@@ -438,7 +438,7 @@
     },
     {
       "feature": "ALQ130",
-      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
+      "name": "Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers)",
       "mean_abs_shap": 0.0561527050152076,
       "rank": 8
     },
@@ -500,7 +500,7 @@
     },
     {
       "feature": "ALQ130",
-      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
+      "name": "Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers)",
       "perm_importance": 0.0017786960358401,
       "rank": 6
     },
@@ -549,7 +549,7 @@
     },
     {
       "feature": "missingindicator_ALQ130",
-      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker): missing (imputed)",
+      "name": "Avg. drinks per drinking day (past 12 mo, 0 for non-drinkers): missing (imputed)",
       "mean_abs_shap": 0.00898
     },
     {

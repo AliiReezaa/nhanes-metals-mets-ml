@@ -31,6 +31,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import docx_style as ds
+import stats_utils as su
 
 ROOT = Path(__file__).resolve().parents[1]
 MET = ROOT / "outputs" / "metrics"
@@ -126,22 +127,7 @@ def sg_name(label):
 
 
 def shape_of(centers, values):
-    """Plain-language description of a binned SHAP dependence curve."""
-    v = np.asarray(values, float)
-    rng = v.max() - v.min()
-    if rng < 0.03:
-        return "flat"
-    rho = pd.Series(v).corr(pd.Series(np.arange(len(v))), method="spearman")
-    imin, imax = int(v.argmin()), int(v.argmax())
-    if rho >= 0.8:
-        return "rising"
-    if rho <= -0.8:
-        return "falling"
-    if 0 < imin < len(v) - 1 and min(v[0], v[-1]) - v[imin] > 0.4 * rng:
-        return "U-shaped"
-    if 0 < imax < len(v) - 1 and v[imax] - max(v[0], v[-1]) > 0.4 * rng:
-        return "inverted U-shaped"
-    return "rising" if rho > 0.3 else "falling" if rho < -0.3 else "irregular"
+    return su.describe_shape(values)
 
 
 def main():
@@ -219,8 +205,10 @@ def main():
                   f"are based on n = {int(se_row['no_mets_n']):,} without and "
                   f"n = {int(se_row['mets_n']):,} with metabolic syndrome. p-values for continuous "
                   f"variables are design-based t tests of the domain difference (on the log scale for "
-                  f"the metals; 94 degrees of freedom, 184 primary sampling units minus 90 strata); "
-                  f"for categorical variables they are design-adjusted Wald F tests.")
+                  f"the metals), with degrees of freedom equal to primary sampling units minus strata "
+                  f"among participants measured: {int(age['design_df'])} for most rows and "
+                  f"{int(se_row['design_df'])} for selenium and manganese; for categorical variables "
+                  f"they are design-adjusted Wald F tests.")
 
     # ==================================================================
     ds.heading(doc, "2. Model performance", 1)
@@ -364,7 +352,8 @@ def main():
             f"whole.")
 
     mi = N["missingness_indicator_shap"]
-    mi_named = [x["name"].replace(" missing (imputed)", "").replace(" (missing)", "").lower()
+    mi_named = [x["name"].replace(": missing (imputed)", "").replace(" missing (imputed)", "")
+                .replace(" (missing)", "").split(" (")[0].lower()
                 for x in mi if x["mean_abs_shap"] >= 0.01]
     ds.para(doc,
             f"The two methods agreed only moderately below the top of the ranking (Spearman "
@@ -374,8 +363,8 @@ def main():
             f"much ranking performance degrades when that predictor is scrambled, so a predictor "
             f"that correlated predictors can substitute for scores well on the first and poorly on "
             f"the second."
-            + (f" Missing-value indicators for {join(mi_named)} also carried SHAP weight of at "
-               f"least 0.01; these describe questionnaire structure rather than biology and are "
+            + (f" The missing-value indicator{'s' if len(mi_named) > 1 else ''} for {join(mi_named)} also carried SHAP weight of at "
+               f"least 0.01; such indicators describe questionnaire structure rather than biology and are "
                f"kept out of the predictor ranking." if mi_named else ""))
 
     ds.figure(doc, FIGP / "fig6_shap_beeswarm.png", width_in=5.9)
@@ -560,7 +549,7 @@ def main():
             f"units, as expected for a variable partly downstream of the glucose component. "
             f"Replacing SMOTENC with class weighting changed it by {rng(s_smo['delta'])}. The "
             f"measured-value-only outcome changed it by {rng(d_lab)}, dropping the lipid-medication "
-            f"clause by {rng(d_nol)} (prevalence {so['nolipidmed_prevalence_pct'].iloc[0]:.1f}% "
+            f"clause by {rng(d_nol)} (training-partition prevalence {so['nolipidmed_prevalence_pct'].iloc[0]:.1f}% "
             f"instead of {so['harmonized_prevalence_pct'].iloc[0]:.1f}%), and using only the first "
             f"blood-pressure reading by {rng(d_bpf)}. Restricting the metal panel to lead changed "
             f"it by {rng(s_met['delta'])}. Differences of a few thousandths sit within the "

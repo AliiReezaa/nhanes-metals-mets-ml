@@ -36,6 +36,8 @@ tune = pd.read_csv(MET / "tuning_summary.csv")
 miss = pd.read_csv(MET / "missingness_report.csv")
 coll = pd.read_csv(MET / "collinearity_flags.csv")
 outdef = pd.read_csv(MET / "outcome_definition_comparison.csv")
+_sm = pd.read_csv(MET / "sensitivity_diq010.csv")["model"].tolist()
+sens_models = ", ".join(_sm[:-1]) + " and " + _sm[-1]
 
 f = N["flow"]
 n_train, n_test = f["train_n"], f["test_n"]
@@ -163,10 +165,13 @@ def main():
             f"only in sensitivity analysis. Three items needed harmonization or skip-pattern "
             f"handling. The alcohol questionnaire was redesigned in 2017–2018, and its gatekeeper "
             f"questions differ between periods (\"at least 12 drinks in any one year\" before, "
-            f"\"ever had a drink\" after), so alcohol use was represented by a construct asked the "
-            f"same way in every cycle: any alcohol in the past 12 months (from the past-year drinking "
-            f"frequency), with average drinks per drinking day set to zero for past-year "
-            f"non-drinkers, who are never asked that question. Current smoking intensity is asked "
+            f"\"ever had a drink\" after), so alcohol use was represented by the construct closest "
+            f"to identical across cycles: any alcohol in the past 12 months, from the past-year "
+            f"drinking frequency, with average drinks per drinking day set to zero for past-year "
+            f"non-drinkers, who are never asked that question. The two versions route people "
+            f"differently around the frequency item (before 2017 those with fewer than 12 lifetime "
+            f"drinks skip it; from 2017 only lifelong abstainers do), so a few very light drinkers "
+            f"may be coded differently between periods. Current smoking intensity is asked "
             f"only of people who have smoked at least 100 cigarettes, so never-smokers were coded as "
             f"not smoking now. PAD645 (minutes walking or bicycling for transportation) is asked "
             f"only of those answering yes to PAQ635, so a blank after a *no* denotes zero minutes and "
@@ -319,14 +324,17 @@ def main():
             f"the panel to blood lead alone; and three alternative outcome definitions "
             f"(measured values only; no cholesterol-medication clause for the lipid components; "
             f"blood pressure from the first reading only). Each used 10-fold cross-validation on the "
-            f"training partition with the three leading algorithms at their tuned hyperparameters, "
+            f"training partition with the three algorithms with the highest cross-validated AUROC "
+            f"({sens_models}) at their tuned hyperparameters, "
             f"holding everything else fixed. The incremental value of the metals was assessed by "
             f"refitting the leading model without the five metals, with lead as the only metal and "
             f"without body mass index, and by a logistic regression on age and body mass index "
             f"alone; each was scored on the same test participants and compared with the full model "
             f"by DeLong's test. Because a single random partition leaves split-to-split variability "
             f"uncaptured, all eleven models were also evaluated by repeated stratified 10-fold "
-            f"cross-validation (five repeats) on the training partition. Discrimination and "
+            f"cross-validation (five repeats) on the training partition, reusing the tuned "
+            f"hyperparameters, so these estimates share the mild optimism of tuning on the same "
+            f"data. Discrimination and "
             f"calibration were "
             f"also recomputed within strata of sex, age tertile and race/ethnicity, with bootstrap "
             f"intervals and the calibration model refitted in every resample. Subgroup analyses are "
@@ -343,7 +351,9 @@ def main():
             f"2007–2014 cycles and tested on the 2015–2018 cycles. No external cohort was available "
             f"{cite('tripod')}. The models are a "
             f"research instrument for prioritizing exposures for the Mendelian randomization phase, "
-            f"not a clinical screening tool, and have not been evaluated prospectively. Four further "
+            f"not a clinical screening tool, and have not been evaluated prospectively. The design is "
+            f"cross-sectional, so no association reported here can establish causation or temporal "
+            f"order; that question is left to the Mendelian randomization phase. Four further "
             f"limitations follow from the design. Each metal was measured once in whole blood, which "
             f"reflects recent exposure for lead and mercury and only partly reflects the long-term "
             f"body burden of cadmium. The waist cut-points of 102 and 88 cm were applied to every "
