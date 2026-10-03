@@ -55,14 +55,14 @@ Decisions confirmed with the study owner on 2026-10-03:
 
 | ID | Issue | Fix | Status |
 |---|---|---|---|
-| P1 | Proposal Table 1 citation numbers wrong (9 of 9) and wrong citations in 3.2.4 | Correct every number against the reference list || [>] code in f6cf853 (29_update_proposal.py), applied after the final run |
+| P1 | Proposal Table 1 citation numbers wrong (9 of 9) and wrong citations in 3.2.4 | Correct every number against the reference list || [x] f6cf853 (code), 8c07187 (applied to the final results) |
 | P2 | Removed 13-SNP lead claim still in Table 1, H6, H8 and Figure 2 | Remove everywhere; redraw Figure 2 || [x] 6706bd4 (figure); text in 29_update_proposal.py |
-| P3 | Proposal Figure 1 shows old numbers and the old definition | Redraw from the final numbers || [>] redrawn by 14 in the final run |
-| P4 | Table 1 contradictions (cadmium "lowest", selenium ~230, draft wording) | Correct to the final numbers; remove draft wording || [>] same as P1 |
-| P5 | Exposure selection logic (decision above) | Lead and selenium primary, cadmium secondary, manganese and mercury exploratory || [>] same as P1 |
-| P6 | Instrument rule contradicts the mercury exclusion (decision above) | One rule for every exposure || [>] same as P1 |
-| P7 | MR sensitivity methods infeasible with few SNPs; "odds ratios" for continuous outcomes; composite-MetS promises | Tiered methods by SNP count; betas; component-level wording || [>] same as P1 |
-| P8 | H4 (and H3) written after the results; Q3 had no analysis | Reframe as ML-phase findings; Q3 answered by A1 || [>] same as P1 |
+| P3 | Proposal Figure 1 shows old numbers and the old definition | Redraw from the final numbers || [x] 8c07187 |
+| P4 | Table 1 contradictions (cadmium "lowest", selenium ~230, draft wording) | Correct to the final numbers; remove draft wording || [x] f6cf853 (code), 8c07187 (applied to the final results) |
+| P5 | Exposure selection logic (decision above) | Lead and selenium primary, cadmium secondary, manganese and mercury exploratory || [x] f6cf853 (code), 8c07187 (applied to the final results) |
+| P6 | Instrument rule contradicts the mercury exclusion (decision above) | One rule for every exposure || [x] f6cf853 (code), 8c07187 (applied to the final results) |
+| P7 | MR sensitivity methods infeasible with few SNPs; "odds ratios" for continuous outcomes; composite-MetS promises | Tiered methods by SNP count; betas; component-level wording || [x] f6cf853 (code), 8c07187 (applied to the final results) |
+| P8 | H4 (and H3) written after the results; Q3 had no analysis | Reframe as ML-phase findings; Q3 answered by A1 || [x] f6cf853 (code), 8c07187 (applied to the final results) |
 | P9 | Humanized proposal: listed errors plus further typos and causal overstatements | Correct every error; mark it as a partial draft || [x] d972124 |
 | P10 | Outcome rationale wrong: the 2005 AHA/NHLBI criteria already include treatment (Methods and proposal) | Correct wording in Methods, Supplement and proposal || [x] f6cf853 |
 | P11 | Decision-curve result misinterpreted (47 "additional true cases") | Express as net reduction in unnecessary interventions; fix publication_numbers || [x] 7250dcf, d781cff |
@@ -70,16 +70,16 @@ Decisions confirmed with the study owner on 2026-10-03:
 | P13 | Methods says no temporal validation, but 08 did one | Report it (re-tuned, A7) || [x] f6cf853 |
 | P14 | Methods claims bootstrap intervals for threshold metrics that were not computed | Compute them || [x] af27205 |
 | P15 | Methods missingness sentence miscounts; Figure 4B cited for metals it does not show; Table S3 caption; Figure 4 caption | Correct each || [x] f6cf853 |
-| P16 | 07 dossier says selenium "protective"; READMEs overstate 07/08 findings; Claude outputs folder stale | Correct after re-run; remove the stale folder || [>] folder removed in d781cff; READMEs after the final run |
-| P17 | Proposal internal contradictions (literature review on which metal is most consistent; ref [46] description; PhenoScanner; window units; sample overlap; Table 1 variables vs Results Table 1) | Correct each || [>] same as P1 |
+| P16 | 07 dossier says selenium "protective"; READMEs overstate 07/08 findings; Claude outputs folder stale | Correct after re-run; remove the stale folder || [x] d781cff, 8c07187 |
+| P17 | Proposal internal contradictions (literature review on which metal is most consistent; ref [46] description; PhenoScanner; window units; sample overlap; Table 1 variables vs Results Table 1) | Correct each || [x] f6cf853 (code), 8c07187 (applied to the final results) |
 | P18 | Limitations to add: waist cut-offs for Asian participants, single-measure metals, BMI and waist overlap, lipid clause | Add to Methods/Results limitations || [x] 6e9f296 |
 
 ## Final steps
 
 | ID | Step | Status |
 |---|---|---|
-| R1 | Full re-run from the raw NHANES files with all fixes; regenerate tables, figures, manuscript and supplement | [ ] |
-| R2 | Verification scripts (18, 20, 27, 28) all pass | [ ] |
+| R1 | Full re-run from the raw NHANES files with all fixes; regenerate tables, figures, manuscript and supplement | [x] 8c07187 (full run from the raw files, 28 steps, all passed) |
+| R2 | Verification scripts (18, 20, 27, 28) all pass | [x] 8c07187 (18: 0 unexplained numbers; 20, 24, 25, 27 pass; 28: 13 checks, 0 flagged) |
 | R3 | Independent review of the final package | [ ] |
 | R4 | Update the beginner's manual to the final version | [ ] |
 | R5 | Copy the final package back to the study folder | [ ] |
