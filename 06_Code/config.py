@@ -60,11 +60,33 @@ MIN_AGE = 20  # adults only
 # ----------------------------------------------------------------------
 METS_COMPONENT_VARS = [
     "BMXWAIST",  # waist circumference (BMX)
-    "BPXSY1", "BPXDI1",  # systolic / diastolic BP (BPX)
+    "SBP_MEAN", "DBP_MEAN",  # mean of all valid BP readings (built in 02 from BPX)
     "LBDHDD",  # HDL cholesterol (HDL)
     "LBXTR",  # triglycerides (TRIGLY)
     "LBXGLU",  # fasting glucose (GLU)
 ]
+
+# FIX (2026-10 audit, C16): blood pressure is the mean of all valid readings,
+# not the first reading only. NHANES takes up to four auscultatory readings;
+# averaging them is the standard way to reduce white-coat and measurement
+# noise. A diastolic reading of 0 mmHg (sounds heard to zero) is not a valid
+# value and is treated as missing. The first-reading version is kept for a
+# sensitivity arm (mets_status_bpfirst).
+BP_SYS_READINGS = ["BPXSY1", "BPXSY2", "BPXSY3", "BPXSY4"]
+BP_DIA_READINGS = ["BPXDI1", "BPXDI2", "BPXDI3", "BPXDI4"]
+
+# FIX (2026-10 audit, C5): fasting check. Triglycerides and glucose are only
+# valid after an 8- to 24-hour fast. NCHS assigns a fasting-subsample weight
+# (WTSAF2YR) of zero to every participant who did not meet that criterion, in
+# every cycle; that is the only fasting indicator available for 2015-2018
+# (the separate FASTQX file is not part of this download). Participants with
+# WTSAF2YR == 0 are excluded.
+FASTING_WEIGHT_VAR = "WTSAF2YR"
+
+# FIX (2026-10 audit, C13): pregnant participants are excluded (RIDEXPRG == 1,
+# "Yes, positive lab pregnancy test or self-reported pregnant"); pregnancy
+# changes waist, blood pressure, lipids and glucose.
+PREGNANCY_VAR = "RIDEXPRG"
 
 # FIX: medication/treatment variables used to complete the AHA/NHLBI "harmonized"
 # 2009 definition (Alberti et al., Circulation 2009;120:1640-1645, building on
@@ -111,39 +133,48 @@ METS_POSITIVE_COUNT = 3  # >= this many components positive => MetS = 1
 # use different, mostly-unambiguous missing conventions and are handled
 # separately in 02_clean_and_outcome.py).
 # ----------------------------------------------------------------------
-SENTINEL_RECODE_VARS = [
-    "SMQ020", "SMQ040", "ALQ111", "ALQ101", "ALQ130", "DBQ700",
-    "PAQ605", "PAQ650", "PAQ665", "PAQ635", "DIQ010",
-    "DMDMARTL", "DMDEDUC2",  # confirmed present in data: DMDMARTL has 77 (Refused);
-                              # DMDEDUC2 has 7 (Refused) and 9 (Don't know)
-    # FIX: medication variables also carry 7 (Refused) / 9 (Don't know) NHANES
-    # sentinel codes and must be cleaned the same way before they're used to
-    # build the outcome label.
-    "BPQ050A", "BPQ100D", "DIQ050", "DIQ070",
-]
-SENTINEL_CODES = {7, 9, 77, 99, 777, 999, 7777, 9999}
+# FIX (2026-10 audit, C1/C14): refusal and don't-know codes are recoded PER
+# VARIABLE, using the code width each NHANES codebook actually uses. The old
+# version applied one shared set {7, 9, 77, 99, 777, 999, 7777, 9999} to every
+# listed variable, which silently erased genuine answers of 7 and 9 drinks per
+# day in ALQ130 (184 and 44 adults), and it left PAD645's 9999 ("Don't know")
+# in the data as 9,999 minutes because PAD645 was not listed at all.
+_YES_NO = (7, 9)        # 1-digit items: 7 = Refused, 9 = Don't know
+_TWO_DIGIT = (77, 99)
+_THREE_DIGIT = (777, 999)
+_FOUR_DIGIT = (7777, 9999)
+SENTINEL_MAP = {
+    "SMQ020": _YES_NO, "SMQ040": _YES_NO,
+    "ALQ101": _YES_NO, "ALQ110": _YES_NO, "ALQ111": _YES_NO,
+    "ALQ120Q": _THREE_DIGIT, "ALQ121": _TWO_DIGIT, "ALQ130": _THREE_DIGIT,
+    "DBQ700": _YES_NO,
+    "PAQ605": _YES_NO, "PAQ650": _YES_NO, "PAQ665": _YES_NO, "PAQ635": _YES_NO,
+    "PAD645": _FOUR_DIGIT,
+    "DIQ010": _YES_NO,
+    "DMDMARTL": _TWO_DIGIT, "DMDEDUC2": _YES_NO,
+    # medication items used to build the outcome label
+    "BPQ050A": _YES_NO, "BPQ100D": _YES_NO, "DIQ050": _YES_NO, "DIQ070": _YES_NO,
+}
+SENTINEL_RECODE_VARS = list(SENTINEL_MAP)  # kept for backward compatibility
 
 # ----------------------------------------------------------------------
-# FIX: alcohol-ever variable harmonization.
-# The original pipeline used ALQ111 ("Ever had a drink of any kind of
-# alcohol") as a predictor. Verified directly against nhanes_merged_raw.csv:
-# ALQ111 has ZERO non-null values in 2007-2008, 2009-2010, 2011-2012,
-# 2013-2014, and 2015-2016 -- it was only added to the NHANES alcohol
-# questionnaire in 2017-2018. Its ~86% "missingness" in the original pipeline
-# was therefore not random: it was structural absence from 5 of 6 pooled
-# cycles, harmonized by mode-imputing a near-constant value into 83% of the
-# cohort and reporting whatever fell out of that as "signal." The equivalent
-# gatekeeper question in the five earlier cycles was ALQ101 ("Had at least 12
-# alcohol drinks/1 yr"), confirmed present in exactly those five cycles and
-# absent from 2017-2018 (a clean 1-for-1 questionnaire-redesign swap, verified
-# by non-null counts per cycle). The two questions are not word-for-word
-# identical, but both function as the survey's alcohol-use gatekeeper item in
-# their respective cycles and are harmonized here into a single "ever drank
-# alcohol" indicator, which is standard practice for pooling redesigned NHANES
-# questionnaire items across cycles (e.g. NHANES's own guidance on combining
-# ALQ101/ALQ111 for trend analyses).
-ALQ_EVER_SOURCES = {"ALQ111": ["2017_2018"], "ALQ101": ["2007_2008", "2009_2010", "2011_2012", "2013_2014", "2015_2016"]}
-ALQ_EVER_VAR = "ALQ_EVER"
+# FIX (2026-10 audit, C15): alcohol variables.
+# ALQ111 ("ever had a drink") exists only in 2017-2018, and the earlier
+# version combined it with ALQ101 ("at least 12 drinks in any one year",
+# 2007-2016) into one "ever drank" variable. Those are different questions
+# (26.9% "no" in 2007-2016 vs 9.0% in 2017-2018), so the combined variable
+# measured different things in different cycles. It is replaced by a
+# construct that every cycle measures the same way: ANY ALCOHOL IN THE PAST
+# 12 MONTHS.
+#   2007-2016: ALQ120Q (how often drank in the past 12 months; 0 = never).
+#              People who never had 12 drinks in their life (ALQ101 = 2 and
+#              ALQ110 = 2) skip ALQ120Q and are coded as non-drinkers.
+#   2017-2018: ALQ121 (past-12-month frequency; 0 = never), and ALQ111 = 2
+#              (never had a drink) skips ALQ121 and is coded as non-drinker.
+# FIX (C2): ALQ130 (average drinks on a drinking day) is only asked of
+# past-year drinkers; for everyone else it is a structural zero, not an
+# unknown value, and is set to 0 before imputation.
+ALQ_CURRENT_VAR = "ALQ_PAST12"
 
 # FIX: PAD645 skip-pattern recode. Verified against the NHANES 2007-2008 PAQ
 # codebook: PAD645 ("minutes walking/bicycling for transportation") is only
@@ -177,8 +208,9 @@ PREDICTOR_VARS = {
     # PAD590 (youth sedentary-time item) were dropped after 02_clean_and_outcome.py
     # showed them 100% missing in the adults-only cohort -- both are pediatric/youth
     # NHANES items, not applicable to this population.
-    # FIX: ALQ111 replaced by the harmonized ALQ_EVER (see ALQ_EVER_SOURCES above).
-    "lifestyle": ["SMQ020", "SMQ040", "ALQ_EVER", "ALQ130", "DBQ700",
+    # FIX (C15): ALQ_PAST12 (any alcohol in the past 12 months) replaces the
+    # earlier ALQ_EVER, which mixed two different questions across cycles.
+    "lifestyle": ["SMQ020", "SMQ040", "ALQ_PAST12", "ALQ130", "DBQ700",
                    "PAQ605", "PAQ650", "PAD645", "PAQ665", "BPXPLS"],
 }
 # DIQ010 (diagnosed diabetes) is intentionally NOT in the primary predictor set --
@@ -194,10 +226,13 @@ DIQ_SENSITIVITY_VAR = "DIQ010"
 # ----------------------------------------------------------------------
 
 # 1=Yes, 2=No in the raw NHANES coding -> recoded to 1/0 (1=Yes)
-# FIX: ALQ111 -> ALQ_EVER (already built as clean 1/0 upstream in
-# 02_clean_and_outcome.py, so it is carried through as continuous-style 0/1
-# here rather than re-mapped from a raw 1/2 code -- see CONTINUOUS_AS_IS).
 BINARY_YESNO_1_2 = ["SMQ020", "PAQ605", "PAQ650", "PAQ665"]
+
+# FIX (C19): binary variables already built as clean 0/1 in
+# 02_clean_and_outcome.py. They go through the categorical (mode-impute,
+# unscaled) path, not the continuous one, so SMOTENC never creates
+# fractional values for them.
+BINARY_01_AS_IS = ["ALQ_PAST12"]
 
 # Ordinal, already in a sensible increasing direction as coded -- kept as-is
 # DBQ700: 1=excellent ... 5=poor (higher = worse diet)
@@ -226,18 +261,16 @@ BINARY_RENAME = {
 
 # Left as numeric, imputed + scaled later inside the modeling pipeline (Step 6) --
 # NOT touched in 03_feature_engineering.py beyond being carried through as-is.
-# FIX: ALQ_EVER added here -- it is built as a clean 0/1 column directly in
-# 02_clean_and_outcome.py (harmonized from ALQ101/ALQ111), so there is no raw
-# 1/2 NHANES code left to remap; treating it as a pass-through 0/1 numeric
-# column is equivalent to BINARY_YESNO_1_2 treatment downstream (imputed via
-# the continuous pipeline's median imputer, which for a clean 0/1 column with
-# low missingness is effectively the same as mode imputation) while keeping
-# the encode() function's bucket logic simple and auditable.
 CONTINUOUS_AS_IS = [
     "RIDAGEYR", "INDFMPIR", "DMDHHSIZ", "BMXBMI",
-    "ALQ130", "PAD645", "BPXPLS", "ALQ_EVER",
+    "ALQ130", "PAD645", "BPXPLS",
     "LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN",
 ]
+
+# FIX (C18): selenium and manganese were not assayed in 2007-2010, so their
+# missingness is identical and is a period marker, not informative
+# non-response. The two flags are merged into one column with an honest name.
+SE_MN_FLAG_NAME = "missingindicator_LBXBSE"
 
 ID_VAR = "SEQN"
 OUTCOME_VAR = "mets_status"
@@ -319,8 +352,8 @@ CLINICAL_NAMES = {
     # lifestyle
     "SMQ020": "Smoked ≥100 cigarettes in life",
     "SMQ040": "Current smoking intensity (0=none, 1=some days, 2=every day)",
-    "ALQ_EVER": "Ever consumed alcohol (harmonized ALQ101/ALQ111)",
-    "ALQ130": "Avg. alcoholic drinks/day (past 12 mo)",
+    "ALQ_PAST12": "Drank alcohol in past 12 months",
+    "ALQ130": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
     "DBQ700": "Self-rated diet quality (1=excellent...5=poor)",
     "PAQ605": "Vigorous work activity",
     "PAQ650": "Vigorous recreational activity",
@@ -333,8 +366,10 @@ CLINICAL_NAMES = {
     "diq010_borderline": "Diagnosed diabetes: Borderline",
     # MetS components (for Table 1 / context, never predictors)
     "BMXWAIST": "Waist circumference (cm)",
-    "BPXSY1": "Systolic blood pressure (mmHg)",
-    "BPXDI1": "Diastolic blood pressure (mmHg)",
+    "SBP_MEAN": "Systolic blood pressure, mean of readings (mmHg)",
+    "DBP_MEAN": "Diastolic blood pressure, mean of readings (mmHg)",
+    "BPXSY1": "Systolic blood pressure, first reading (mmHg)",
+    "BPXDI1": "Diastolic blood pressure, first reading (mmHg)",
     "LBDHDD": "HDL cholesterol (mg/dL)",
     "LBXTR": "Triglycerides (mg/dL)",
     "LBXGLU": "Fasting glucose (mg/dL)",
@@ -368,13 +403,16 @@ def label_feature(col_name: str) -> str:
     MissingIndicator output, prefixed "missingindicator_"), or its "_nan"
     missing-indicator variant from the pre-split one-hot step. Falls back to
     the raw column name if nothing matches, so this never raises."""
-    # FIX: handle sklearn's MissingIndicator-style output name so the new
-    # "was this value actually observed?" flags (see pipeline_utils.py) get a
-    # readable label in SHAP plots / importance tables instead of a raw code.
+    # FIX (2026-10 audit, C4): sklearn's MissingIndicator outputs 1 when the
+    # value is MISSING (and was therefore imputed). The earlier label said
+    # "was measured/observed", which inverted the meaning of every SHAP colour
+    # for these flags.
+    if col_name == SE_MN_FLAG_NAME:
+        return "Selenium & manganese not measured (2007-2010 cycles)"
     if col_name.startswith("missingindicator_"):
         base = col_name[len("missingindicator_"):]
         base_label = CLINICAL_NAMES.get(base, base)
-        return f"{base_label}: was measured/observed"
+        return f"{base_label}: missing (imputed)"
 
     if col_name in CLINICAL_NAMES:
         return CLINICAL_NAMES[col_name]

@@ -6,16 +6,17 @@ Reads data_processed/nhanes_merged_raw.csv (from 01_merge_data.py) and:
   1. Filters to adults (RIDAGEYR >= config.MIN_AGE)
   2. Recodes NHANES refusal/don't-know sentinel codes to missing in the
      questionnaire variables listed in config.SENTINEL_RECODE_VARS
-  3. FIX: builds the harmonized ALQ_EVER alcohol variable from ALQ101 (2007-2016)
-     / ALQ111 (2017-2018) -- see config.py ALQ_EVER_SOURCES for the full
-     rationale. Structural, not random, missingness; verified against real
-     per-cycle non-null counts before this fix was written.
-  4. FIX: recodes PAD645 to 0 minutes wherever the PAQ635 skip gate says the
-     respondent doesn't walk/bike for transportation (see config.py).
+  3. Excludes pregnant participants (2026-10 audit, C13)
+  4. Builds ALQ_PAST12 (any alcohol in the past 12 months, same construct in
+     every cycle), sets ALQ130 = 0 for non-drinkers, sets SMQ040 = 'not at
+     all' for never-smokers, and recodes PAD645 to 0 minutes wherever the
+     PAQ635 skip gate says the respondent doesn't walk/bike for transportation
+  5. Builds mean systolic/diastolic blood pressure from all valid readings
   5. Reports missingness (saved to outputs/metrics/missingness_report.csv)
   6. Drops rows missing any of the 5 MetS-defining lab/exam components (label
-     can't be computed otherwise), or missing ALL 5 metals (no exposure signal
-     at all). Medication variables are NOT part of this drop -- a missing
+     can't be computed otherwise), rows that did not meet the NCHS fasting
+     criterion (2026-10 audit, C5), or rows missing ALL 5 metals (no exposure
+     signal at all). Medication variables are NOT part of this drop -- a missing
      medication-use item is treated as "not on treatment" (see build_mets_status
      docstring), consistent with NHANES's own skip-pattern logic, so it never
      removes anyone from the cohort.
@@ -34,7 +35,7 @@ Output: data_processed/nhanes_with_outcome.csv
         outputs/metrics/outcome_definition_comparison.csv
 
 Run:
-    python scripts/02_clean_and_outcome.py
+    python 06_Code/02_clean_and_outcome.py
 """
 import sys
 from pathlib import Path
@@ -52,46 +53,55 @@ def record(flow, label, df):
 
 
 def recode_sentinels(df: pd.DataFrame) -> pd.DataFrame:
+    """FIX (2026-10 audit, C1/C14): per-variable refusal / don't-know codes
+    (config.SENTINEL_MAP), so a genuine answer that happens to equal a code
+    used elsewhere (7 or 9 drinks per day) is never erased."""
     df = df.copy()
-    for col in cfg.SENTINEL_RECODE_VARS:
+    for col, codes in cfg.SENTINEL_MAP.items():
         if col not in df.columns:
             continue
-        n_flagged = df[col].isin(cfg.SENTINEL_CODES).sum()
-        if n_flagged:
-            print(f"  {col}: recoding {n_flagged} sentinel values to NaN")
-            df.loc[df[col].isin(cfg.SENTINEL_CODES), col] = np.nan
+        hit = df[col].isin(codes)
+        if hit.any():
+            print(f"  {col}: recoding {int(hit.sum())} values coded {codes} to NaN")
+            df.loc[hit, col] = np.nan
     return df
 
 
-def build_alq_ever(df: pd.DataFrame) -> pd.DataFrame:
-    """FIX: harmonize the alcohol-ever gatekeeper question across the NHANES
-    2013-2014 questionnaire redesign. ALQ111 exists only in 2017-2018; ALQ101
-    exists only in 2007-2016. Take whichever is non-null for a given row (by
-    construction, at most one of the two is ever populated for any single
-    respondent, since they come from mutually exclusive cycles) and recode
-    from the raw NHANES 1=Yes/2=No coding to a clean 1/0."""
+def build_alcohol_vars(df: pd.DataFrame) -> pd.DataFrame:
+    """FIX (2026-10 audit, C2/C15): ALQ_PAST12 = any alcohol in the past 12
+    months, built the same way in every cycle (see config.ALQ_CURRENT_VAR),
+    and ALQ130 = 0 for everyone who did not drink in the past 12 months
+    (they were never asked ALQ130, so their blank is a structural zero)."""
     df = df.copy()
-    has_111 = "ALQ111" in df.columns
-    has_101 = "ALQ101" in df.columns
-    if not (has_111 or has_101):
-        raise SystemExit("Neither ALQ111 nor ALQ101 present -- cannot build ALQ_EVER.")
-    if has_111 and has_101:
-        raw = df["ALQ111"].where(df["ALQ111"].notna(), df["ALQ101"])
-        overlap = (df["ALQ111"].notna() & df["ALQ101"].notna()).sum()
-        if overlap:
-            print(f"  [WARNING] {overlap} rows have BOTH ALQ111 and ALQ101 non-null "
-                  f"(expected 0 given the cycles are mutually exclusive) -- ALQ111 takes priority")
-    elif has_111:
-        raw = df["ALQ111"]
-    else:
-        raw = df["ALQ101"]
-    df[cfg.ALQ_EVER_VAR] = raw.map({1: 1, 2: 0})
-    n_by_source = {
-        "from_ALQ111_2017_2018": int((df["ALQ111"].notna()).sum()) if has_111 else 0,
-        "from_ALQ101_2007_2016": int((df["ALQ101"].notna()).sum()) if has_101 else 0,
-    }
-    print(f"  ALQ_EVER built: {n_by_source}, "
-          f"{df[cfg.ALQ_EVER_VAR].notna().sum()} non-null of {len(df)} total")
+    get = lambda c: df[c] if c in df.columns else pd.Series(np.nan, index=df.index)
+    q120, q121 = get("ALQ120Q"), get("ALQ121")
+    q101, q110, q111 = get("ALQ101"), get("ALQ110"), get("ALQ111")
+
+    drinker = (q120 > 0) | (q121 > 0)
+    non_drinker = (q120 == 0) | (q121 == 0) | (q111 == 2) | ((q101 == 2) & (q110 == 2))
+    past12 = pd.Series(np.nan, index=df.index)
+    past12[non_drinker] = 0
+    past12[drinker] = 1
+    df[cfg.ALQ_CURRENT_VAR] = past12
+    print(f"  ALQ_PAST12 built: {int((past12 == 1).sum())} drinkers, "
+          f"{int((past12 == 0).sum())} non-drinkers, {int(past12.isna().sum())} unknown")
+
+    before = int(df["ALQ130"].isna().sum())
+    df.loc[past12 == 0, "ALQ130"] = 0
+    print(f"  ALQ130: set to 0 for {before - int(df['ALQ130'].isna().sum())} past-year non-drinkers")
+    return df
+
+
+def recode_smq040_skip_pattern(df: pd.DataFrame) -> pd.DataFrame:
+    """FIX (2026-10 audit, C3): SMQ040 (do you now smoke?) is only asked of
+    people who smoked at least 100 cigarettes (SMQ020 = 1). Never-smokers
+    (SMQ020 = 2) do not smoke now: raw code 3 ('Not at all'). Before this fix
+    their blank was left to mode imputation, which only gave the right answer
+    because the mode happened to be 'not at all'."""
+    df = df.copy()
+    n = int(((df["SMQ020"] == 2) & df["SMQ040"].isna()).sum())
+    df.loc[df["SMQ020"] == 2, "SMQ040"] = 3
+    print(f"  SMQ040: set to 'not at all' for {n} never-smokers")
     return df
 
 
@@ -110,6 +120,21 @@ def recode_pad645_skip_pattern(df: pd.DataFrame) -> pd.DataFrame:
     n_recoded = (df[gate] == 2).sum()
     df.loc[df[gate] == 2, var] = 0
     print(f"  PAD645: recoded {n_recoded} rows to 0 minutes based on PAQ635=='No' skip pattern")
+    return df
+
+
+def build_mean_bp(df: pd.DataFrame) -> pd.DataFrame:
+    """FIX (2026-10 audit, C16): mean of all valid readings. Diastolic 0 is
+    not a valid reading and is treated as missing."""
+    df = df.copy()
+    sys_cols = [c for c in cfg.BP_SYS_READINGS if c in df.columns]
+    dia = df[[c for c in cfg.BP_DIA_READINGS if c in df.columns]].copy()
+    n_zero = int((dia == 0).sum().sum())
+    dia = dia.mask(dia == 0)
+    df["SBP_MEAN"] = df[sys_cols].mean(axis=1)
+    df["DBP_MEAN"] = dia.mean(axis=1)
+    df["BP_N_READINGS"] = df[sys_cols].notna().sum(axis=1)
+    print(f"  BP: mean of up to {len(sys_cols)} readings; {n_zero} diastolic readings of 0 set to missing")
     return df
 
 
@@ -144,7 +169,10 @@ def build_mets_status(df: pd.DataFrame) -> pd.DataFrame:
 
     trigly_lab = df["LBXTR"] >= t["triglycerides"]
     hdl_lab = (male & (df["LBDHDD"] < t["hdl_men"])) | (female & (df["LBDHDD"] < t["hdl_women"]))
-    bp_lab = (df["BPXSY1"] >= t["sbp"]) | (df["BPXDI1"] >= t["dbp"])
+    bp_lab = (df["SBP_MEAN"] >= t["sbp"]) | (df["DBP_MEAN"] >= t["dbp"])
+    # first-reading-only version, kept for the sensitivity arm (decision C16)
+    dia1 = df["BPXDI1"].mask(df["BPXDI1"] == 0)
+    bp_first_lab = (df["BPXSY1"] >= t["sbp"]) | (dia1 >= t["dbp"])
     glu_lab = df["LBXGLU"] >= t["glucose"]
 
     df["mets_trigly_labonly"] = trigly_lab.astype(int)
@@ -174,6 +202,18 @@ def build_mets_status(df: pd.DataFrame) -> pd.DataFrame:
 
     df["mets_score"] = df[["mets_waist", "mets_trigly", "mets_hdl", "mets_bp", "mets_glu"]].sum(axis=1)
     df[cfg.OUTCOME_VAR] = (df["mets_score"] >= cfg.METS_POSITIVE_COUNT).astype(int)
+
+    # Sensitivity arms for the two outcome-definition decisions (A8):
+    # (a) cholesterol-medication clause NOT applied to TG/HDL (BP and glucose
+    #     treatment clauses kept), because NHANES cannot tell statins from
+    #     fibrates or niacin;
+    # (b) harmonized definition but with the first BP reading only.
+    score_nolipid = (df["mets_waist"] + trigly_lab.astype(int) + hdl_lab.astype(int)
+                     + df["mets_bp"] + df["mets_glu"])
+    df["mets_status_nolipidmed"] = (score_nolipid >= cfg.METS_POSITIVE_COUNT).astype(int)
+    bp_first = (bp_first_lab.fillna(False) | on_bp_med).astype(int)
+    score_bpfirst = (df["mets_waist"] + df["mets_trigly"] + df["mets_hdl"] + bp_first + df["mets_glu"])
+    df["mets_status_bpfirst"] = (score_bpfirst >= cfg.METS_POSITIVE_COUNT).astype(int)
 
     return df
 
@@ -224,15 +264,25 @@ def main():
     flow.append({"step": f"1. Age >= {cfg.MIN_AGE}", "n_remaining": len(df)})
     print(f"After age filter (>= {cfg.MIN_AGE}): {len(df)} rows")
 
-    # 2. Sentinel recoding
-    print("\nRecoding sentinel/refusal codes to missing:")
+    # 1b. FIX (C13): exclude pregnant participants
+    preg = df[cfg.PREGNANCY_VAR] == 1
+    df = df[~preg].copy()
+    flow.append({"step": "2. Not pregnant", "n_remaining": len(df)})
+    print(f"After excluding {int(preg.sum())} pregnant participants: {len(df)} rows")
+
+    # 2. Sentinel recoding (per-variable codes)
+    print("\nRecoding refusal/don't-know codes to missing:")
     df = recode_sentinels(df)
 
-    # 3. FIX: harmonized alcohol variable + PAD645 skip-pattern recode
-    print("\nBuilding harmonized ALQ_EVER variable:")
-    df = build_alq_ever(df)
+    # 3. Skip patterns and derived variables
+    print("\nAlcohol variables:")
+    df = build_alcohol_vars(df)
+    print("\nSmoking skip pattern:")
+    df = recode_smq040_skip_pattern(df)
     print("\nApplying PAD645 skip-pattern recode:")
     df = recode_pad645_skip_pattern(df)
+    print("\nBlood pressure:")
+    df = build_mean_bp(df)
 
     # 4. Missingness report (on the age-filtered cohort, before dropping anything).
     # FIX (found during the "check every step" precision review): this report
@@ -273,14 +323,23 @@ def main():
     # 5a. Drop rows missing any of the 5 MetS-defining LAB components
     #     (medication variables are NOT part of this filter -- see _med_flag)
     df = df.dropna(subset=cfg.METS_COMPONENT_VARS)
-    flow.append({"step": "2. Complete data on all 5 MetS lab/exam components", "n_remaining": len(df)})
+    flow.append({"step": "3. Complete data on all 5 MetS lab/exam components", "n_remaining": len(df)})
     print(f"\nAfter requiring complete MetS lab components: {len(df)} rows")
 
-    # 5b. Drop rows missing ALL 5 metals (no exposure signal at all)
+    # 5b. FIX (C5): met the NCHS fasting criterion (8 to <24 h). NCHS gives a
+    #     zero fasting-subsample weight to everyone who did not; values that
+    #     the SAS transport reader returns as ~1e-79 are true zeros.
+    fasted = df[cfg.FASTING_WEIGHT_VAR].fillna(0) > 0
+    n_not_fasted = int((~fasted).sum())
+    df = df[fasted].copy()
+    flow.append({"step": "4. Met fasting criterion (8 to 24 h; non-zero fasting weight)", "n_remaining": len(df)})
+    print(f"After excluding {n_not_fasted} participants who did not meet the fasting criterion: {len(df)} rows")
+
+    # 5c. Drop rows missing ALL 5 metals (no exposure signal at all)
     metal_cols = cfg.PREDICTOR_VARS["metals"]
     n_metals_present = df[metal_cols].notna().sum(axis=1)
     df = df[n_metals_present > 0].copy()
-    flow.append({"step": "3. At least 1 of 5 metals measured", "n_remaining": len(df)})
+    flow.append({"step": "5. At least 1 of 5 metals measured", "n_remaining": len(df)})
     print(f"After requiring >=1 metal measured: {len(df)} rows")
 
     # 6. Build outcome (both label-only and harmonized versions)
@@ -309,7 +368,7 @@ def main():
     print(f"\nTop 20 variables by % missing (TRUE final analytic cohort, n={len(df)}):")
     print(missing_report_final.head(20).to_string(index=False))
 
-    flow.append({"step": "4. Final analytic cohort (mets_status computed)", "n_remaining": len(df)})
+    flow.append({"step": "6. Final analytic cohort (mets_status computed)", "n_remaining": len(df)})
     flow_df = pd.DataFrame(flow)
     flow_df["n_excluded_this_step"] = flow_df["n_remaining"].shift(1) - flow_df["n_remaining"]
     flow_df.loc[0, "n_excluded_this_step"] = 0

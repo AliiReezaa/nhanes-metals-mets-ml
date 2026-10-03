@@ -13,7 +13,7 @@ the new module; it "just worked" once BPQ was added to config.
 Output: data_processed/nhanes_merged_raw.csv
 
 Run from anywhere:
-    python scripts/01_merge_data.py
+    python 06_Code/01_merge_data.py
 """
 import sys
 from pathlib import Path
@@ -29,10 +29,19 @@ def read_xpt(path: Path) -> pd.DataFrame | None:
         print(f"  [MISSING] {path.name} not found -- skipping this module for this cycle")
         return None
     try:
-        return pd.read_sas(path, format="xport")
+        df = pd.read_sas(path, format="xport")
     except Exception as e:
         print(f"  [ERROR] failed to read {path.name}: {e}")
         return None
+    # FIX (2026-10 audit, C26): the SAS transport reader returns a stored
+    # value of 0 as 5.4e-79 (an IBM floating-point artefact). Left alone, any
+    # "== 0" test fails silently (e.g. a fasting weight of zero, or "never
+    # drank in the past 12 months"). Snap these to exactly 0.
+    num = df.select_dtypes("number")
+    tiny = num.abs().lt(1e-30) & num.ne(0)
+    if tiny.values.any():
+        df[num.columns] = num.mask(tiny, 0.0)
+    return df
 
 
 def merge_one_cycle(letter: str, years: str) -> pd.DataFrame | None:
