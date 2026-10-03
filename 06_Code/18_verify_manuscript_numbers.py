@@ -110,24 +110,43 @@ def collect_allowed() -> set:
     add(events)
     add(events / n_pred)
 
-    # structural constants: section/figure/table numbering, cycle years,
-    # diagnostic thresholds, design constants, and small integers used in prose
+    # derived quantities the Results text computes (2026-10 audit: derived here
+    # from the same files rather than typed in as constants)
+    for _, r in tab1.iterrows():
+        if r["no_mets_mean"]:
+            add((r["mets_mean"] / r["no_mets_mean"] - 1) * 100)
+    so = pd.read_csv(MET / "sensitivity_outcome_definition.csv")
+    for c in ("cv_auc_labonly_label", "cv_auc_nolipidmed_label", "cv_auc_bpfirst_label"):
+        for v in so[c] - so["cv_auc_harmonized_label"]:
+            add(v)
+    rcv = pd.read_csv(MET / "repeated_cv.csv").sort_values("mean_auc", ascending=False)
+    for k in range(len(rcv)):
+        add(rcv["mean_auc"].iloc[0] - rcv["mean_auc"].iloc[k])
+    shp = pd.read_csv(MET / "shap_importance.csv")
+    shp = shp[~shp["feature_code"].str.startswith("missingindicator")]["mean_abs_shap"].sort_values(
+        ascending=False).values
+    add(shp[1] / shp[2])
+    tv = ROOT / "outputs" / "08_Q1_Rigor_Additions" / "tables" / "table_temporal_validation.csv"
+    if tv.exists():
+        for col in pd.read_csv(tv).select_dtypes("number").columns:
+            for v in pd.read_csv(tv)[col]:
+                add(v)
+    for v in cal.select_dtypes("number").values.ravel():
+        add(v)
+
+    # structural constants: numbering, cycle years, diagnostic thresholds and
+    # design constants. Cohort sizes and column counts are NOT listed: they come
+    # from the flow table and publication_numbers.json above.
     structural = [
-        # numbering and small counts
         *range(0, 51),
-        # NHANES cycle years
         *range(2007, 2019),
         # diagnostic thresholds (config.METS_THRESHOLDS)
         102, 88, 150, 40, 50, 130, 85, 100,
-        # design constants
-        1000, 10, 80, 20, 0.5, 0.02, 0.50, 0.001, 0.05, 5e-6, 1e-5, 0.00001,
-        # partition and cohort sizes
-        59842, 34770, 13337, 11144, 8915, 2229, 25072, 21433, 2193,
-        1201, 5163, 3962, 4032,
-        # transformed-column counts
-        33, 46, 13, 24, 18, 15, 11, 12,
-        # percentages stated to one decimal in prose
-        1.5, 3.1,
+        # design constants: bootstrap resamples, CV folds, split, DCA range,
+        # significance levels, MR thresholds, survey design (184 PSUs, 90 strata,
+        # 94 df), fasting window, calibration-slope screen
+        1000, 10, 80, 20, 0.5, 0.02, 0.80, 0.20, 0.2, 0.4, 0.001, 0.05, 5e-6, 1e-5, 5e-8,
+        184, 90, 94, 8, 24, 0.8, 1.2, 0.01, 0.03,
         # hyperparameter grid values quoted verbatim in Table S3
         0.0001, 0.001, 0.01, 0.1, 1, 10, 15, 25, 31, 64, 32, 200, 500, 100,
     ]

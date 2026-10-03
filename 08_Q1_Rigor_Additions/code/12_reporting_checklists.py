@@ -9,9 +9,10 @@ venues now do) routinely ask for the completed checklist as a supplementary
 file, so this substantiates the claim already being made rather than
 introducing a new one.
 
-Built by reading the actual Methods_AI.pdf and Results_AI.pdf text
-section-by-section (not inferred from the README) and citing exactly where,
-if anywhere, each of TRIPOD+AI's 27 items is addressed. This package is
+Built by reading the Methods and Results text section by section and citing
+where, if anywhere, each of TRIPOD+AI's 27 items is addressed. 2026-10 audit
+(P13): every number quoted below is read from the pipeline outputs when the
+script runs, so the checklist cannot drift from the results. This package is
 explicitly a Methods+Results draft with no Title page, Abstract,
 Introduction or Discussion yet (per the user's own framing: these are drafts
 for a professor, not a submission-ready manuscript, and the Mendelian
@@ -30,7 +31,31 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "06_Code"))
 import additions_common as ac  # noqa: E402
 import pandas as pd
 
+import config as cfg
+import pipeline_utils as pu
+
 TABLES, _ = ac.out_dirs("08_Q1_Rigor_Additions")
+MET = cfg.OUT_METRICS
+
+train_df, test_df = pu.load_model_ready_split()
+n_train, n_test = len(train_df), len(test_df)
+events = int(train_df[cfg.OUTCOME_VAR].sum())
+n_pred = len(pd.read_csv(MET / "predictors_used.csv"))
+miss = pd.read_csv(MET / "missingness_report.csv").set_index("variable")["pct_missing"]
+pred_codes = pd.read_csv(MET / "predictors_used.csv").iloc[:, 0].tolist()
+miss_pred = miss[miss.index.isin(pred_codes)].sort_values(ascending=False)
+worst_var, worst_pct = miss_pred.index[0], float(miss_pred.iloc[0])
+so = pd.read_csv(MET / "sensitivity_outcome_definition.csv")
+d_out = so["cv_auc_harmonized_label"] - so["cv_auc_labonly_label"]
+d_nol = so["cv_auc_harmonized_label"] - so["cv_auc_nolipidmed_label"]
+tv_path = TABLES / "table_temporal_validation.csv"
+if tv_path.exists():
+    tv = pd.read_csv(tv_path)
+    tv_txt = (f"AUROC {tv['Test AUROC'].iloc[0]:.3f} on the random split and "
+              f"{tv['Test AUROC'].iloc[1]:.3f} on the temporal holdout, calibration slope "
+              f"{tv['Calibration slope'].iloc[0]:.2f} and {tv['Calibration slope'].iloc[1]:.2f}")
+else:
+    tv_txt = "see table_temporal_validation.csv"
 
 rows = [
     # (item, section, requirement, status, evidence, note)
@@ -65,20 +90,20 @@ rows = [
     ("9b", "Methods: Predictors", "Definitions, timing, blinding of predictors", "Satisfied", "Methods Sec. 4, Table S1 (referenced)", "--"),
     ("9c", "Methods: Predictors", "Qualifications of predictor assessors, if subjective", "Not applicable", "--", "Predictors are lab values or structured survey items"),
     ("10", "Methods: Sample size", "Explain and justify study size", "Partial", "Methods Sec. 6",
-     "Reports ~125 events/predictor and explicitly flags that this benchmark 'does not translate directly' to a boosted ensemble -- an honest partial justification, not a formal sample-size calculation"),
+     f"Reports about {events / n_pred:.0f} events per predictor ({events:,} events, {n_pred} predictors) and explicitly flags that this benchmark 'does not translate directly' to a boosted ensemble -- an honest partial justification, not a formal sample-size calculation"),
     ("11", "Methods: Missing data", "How missing data were handled, reasons for omissions", "Satisfied", "Methods Sec. 5",
      "Per-variable missingness rates, imputation strategy, and missing-indicator rationale all given"),
     ("12a", "Methods: Analysis", "How data were partitioned", "Satisfied", "Methods Sec. 6", "80/20 stratified split, pinned by SEQN"),
     ("12b", "Methods: Analysis", "Predictor handling (scaling/transformation)", "Satisfied", "Methods Sec. 7", "--"),
-    ("12c", "Methods: Analysis", "Model type, rationale, tuning, internal validation", "Satisfied", "Methods Sec. 7", "11 models, randomized search, 10-fold stratified CV, all justified"),
-    ("12d", "Methods: Analysis", "Heterogeneity across clusters", "Not addressed at this draft stage", "--",
-     "NHANES cycles are a natural clustering structure not analyzed as such in the original pipeline -- 08_Q1_Rigor_Additions/code/06_temporal_validation.py now partially fills this gap"),
-    ("12e", "Methods: Analysis", "Performance measures and plots, rationale", "Satisfied", "Methods Sec. 8", "AUROC, AUPRC, Brier, calibration slope/O:E, DCA -- all justified with citations"),
+    ("12c", "Methods: Analysis", "Model type, rationale, tuning, internal validation", "Satisfied", "Methods Sec. 7", "11 models, exhaustive grid search with 10-fold stratified CV, repeated CV (10 x 5) for split-to-split variability"),
+    ("12d", "Methods: Analysis", "Heterogeneity across clusters", "Partial", "Methods Sec. 10; Table S10",
+     "NHANES cycles are not modelled as clusters; the temporal validation (develop 2007-2014, test 2015-2018, re-tuned) checks transport across cycles"),
+    ("12e", "Methods: Analysis", "Performance measures and plots, rationale", "Satisfied", "Methods Sec. 8", "AUROC, AUPRC, Brier, calibration slope and intercept, O:E, DCA, DeLong tests, bootstrap CIs for every metric"),
     ("12f", "Methods: Analysis", "Model updating/recalibration", "Not applicable", "--", "Development-only study; no updating was performed or claimed"),
     ("12g", "Methods: Analysis", "How predictions are calculated for evaluation (formula/code/API)", "Partial",
-     "README states code will be deposited publicly on publication", "No formula, serialized object, or API is referenced in the Methods/Results text itself yet"),
+     "Fitted pipelines are saved in outputs/models and the code is under version control", "No formula, serialized object or API is referenced in the Methods/Results text itself yet"),
     ("13", "Methods: Class imbalance", "Class imbalance methods used, why, recalibration", "Satisfied", "Methods Sec. 7",
-     "SMOTENC justified over SMOTE; tested against class-weighting in a prespecified sensitivity analysis; calibration reported for every model"),
+     "SMOTENC justified over SMOTE; tested against class weighting in a sensitivity analysis; calibration reported for every model"),
     ("14", "Methods: Fairness", "Approaches used to address model fairness", "Partial",
      "Results Sec. 5 subgroup discrimination/calibration by sex, age, race", "Functions as a de facto fairness check but is not framed or named as one"),
     ("15", "Methods: Model output", "Output type (probabilities/classification), rationale", "Satisfied", "Methods Sec. 7",
@@ -93,34 +118,34 @@ rows = [
     ("18d", "Open Science: Registration", "Registration name and number", "Not addressed at this draft stage", "--", "--"),
     ("18e", "Open Science: Data sharing", "Availability of study data", "Satisfied", "Methods Sec. 10; README",
      "NHANES is public data at a stated URL"),
-    ("18f", "Open Science: Code sharing", "Availability of analytical code", "Partial", "README: \"code, derived metrics and model artifacts will be deposited publicly on publication\"",
-     "Stated intent, not yet a live repository link"),
+    ("18f", "Open Science: Code sharing", "Availability of analytical code", "Partial", "Code is kept in a private Git repository",
+     "A public repository link is still to be added to the manuscript"),
     ("19", "Patient & public involvement", "PPI in design/conduct/reporting/dissemination", "Not addressed at this draft stage", "--",
      "Not applicable to most secondary NHANES analyses, but TRIPOD+AI still asks for an explicit statement, even if it is 'none'"),
     ("20a", "Results: Participants", "Flow of participants through the study", "Satisfied", "Results Sec. 1, Figure 1", "--"),
     ("20b", "Results: Participants", "Characteristics overall and by data source", "Satisfied", "Results Sec. 1, Table 1",
      "Survey-weighted, with design-based standard errors"),
-    ("20c", "Results: Participants", "Comparison of development vs. evaluation predictor distributions", "Partial",
-     "08_Q1_Rigor_Additions/tables/table_temporal_validation.csv now reports this across the temporal train/test split", "Not present for the original random split, since there is no separate external evaluation dataset"),
+    ("20c", "Results: Participants", "Comparison of development vs. evaluation predictor distributions", "Not addressed at this draft stage",
+     "--", "Neither the random split nor the temporal split has a table comparing predictor distributions between development and evaluation data; table_temporal_validation.csv reports sizes and performance only"),
     ("21", "Results: Model development", "N participants/events at each analysis stage", "Satisfied",
-     "Results Sec. 1 (8,915/2,229), Methods Sec. 6 (4,130 events)", "--"),
+     f"Results Sec. 1 ({n_train:,}/{n_test:,}), Methods Sec. 6 ({events:,} training events)", "--"),
     ("22", "Results: Model specification", "Full model detail for reuse/third-party evaluation", "Partial",
      "best_params.json and the full pipeline code exist in 06_Code/, but are not referenced or summarized in the manuscript text itself",
      "An explicit pointer from the Methods/Results text to the artifact would close this"),
     ("23a", "Results: Performance", "Performance estimates with CIs, incl. subgroups", "Satisfied",
      "Table 2, Results Sec. 5, Table S6", "Bootstrap CIs reported throughout, including per-subgroup calibration"),
-    ("23b", "Results: Performance", "Heterogeneity across clusters", "Not addressed at this draft stage", "--",
-     "Same gap as item 12d; NHANES-cycle heterogeneity is not analyzed as a clustering structure in the original results"),
+    ("23b", "Results: Performance", "Heterogeneity across clusters", "Partial", "Results Sec. 5, Table S10",
+     f"Temporal validation reported ({tv_txt}); performance by individual cycle is not reported"),
     ("24", "Results: Model updating", "Results of any model updating", "Not applicable", "--", "No updating performed"),
     ("25", "Discussion: Interpretation", "Overall interpretation incl. fairness, vs. prior studies", "Not addressed at this draft stage",
      "--", "No Discussion section exists yet"),
     ("26", "Discussion: Limitations", "Limitations, effects on bias/uncertainty/generalizability", "Partial",
-     "Methods Sec. 10 pre-states several limitations (internal-validation-only, single seed, no temporal validation)",
+     "Methods Sec. 10 pre-states several limitations (internal validation only, cross-sectional design, single random split supplemented by repeated CV and a temporal holdout)",
      "Unusually, limitations are disclosed in Methods rather than a dedicated Discussion section, which does not yet exist"),
     ("27a", "Discussion: Usability", "Handling poor-quality/unavailable input data in deployment", "Not addressed at this draft stage", "--", "--"),
     ("27b", "Discussion: Usability", "User interaction/expertise required", "Not addressed at this draft stage", "--", "--"),
     ("27c", "Discussion: Usability", "Next steps for future research", "Partial",
-     "Methods Sec. 10 gestures at this (\"would permit holding out the most recent cycle\") and the MR arm is named as the next phase throughout",
+     "The MR arm is named as the next phase throughout",
      "Not a dedicated forward-looking Discussion paragraph"),
 ]
 
@@ -144,27 +169,24 @@ probast_rows = [
     ("Predictors", "Low",
      "All predictors pre-specified from the literature before model building; no data-driven selection "
      "(Methods Sec. 4, with an explicit methodological argument against stepwise/LASSO selection on a "
-     "fixed dataset). Consistently defined and measured across all participants. One moderate concern: "
-     "current-smoking-intensity has 55.3% missingness from a genuine skip pattern, handled with imputation "
-     "plus a missingness indicator and reported as such rather than hidden."),
+     "fixed dataset). Skip patterns are recoded to their logical values (never-smokers as not smoking now, "
+     "past-year non-drinkers as zero drinks) and refusal codes are set to missing per variable. The most "
+     f"incomplete predictor is {worst_var} ({worst_pct:.1f}% missing), handled with median imputation plus a "
+     "missing-value indicator."),
     ("Outcome", "Some concerns",
      "The outcome (harmonized MetS) is objectively built from lab values and treatment flags with an "
      "unusually thorough definition (Methods Sec. 3). The concern is not measurement quality but "
      "definitional sensitivity: the substituting-definition sensitivity analysis (Results Sec. 5, Table S7) "
-     "shows the outcome-definition choice moves discrimination by 0.029-0.034 AUROC units -- the largest "
-     "swing of the four sensitivity arms -- meaning a materially different, defensible outcome definition "
-     "would have produced a different headline number. This is disclosed, not hidden, which is itself "
-     "good practice, but it is a real source of between-definition variability."),
+     f"shows the measured-value-only definition lowers discrimination by {d_out.min():.3f} to {d_out.max():.3f} "
+     f"AUROC units, and dropping the lipid-medication clause by {d_nol.min():.3f} to {d_nol.max():.3f}, so a "
+     "different defensible definition would have produced a different headline number. This is disclosed, "
+     "but it is a real source of between-definition variability."),
     ("Analysis", "Some concerns",
      "Leakage-safe pipeline (single fitted-per-fold object, Methods Sec. 6), appropriate internal "
-     "cross-validation and a held-out test partition are all low-risk practices. The residual concern, "
-     "explicitly self-flagged in Methods Sec. 10, is that this is internal validation on a SINGLE random "
-     "split under ONE fixed seed, with no external or temporal validation -- split-to-split variability is "
-     "not captured by within-partition bootstrapping. 08_Q1_Rigor_Additions/code/06_temporal_validation.py "
-     "now provides a genuine forward-in-time check (AUROC 0.857 to 0.840 from random-split to temporal-"
-     "holdout, well-calibrated in both), which moves this domain from what would otherwise be a clean "
-     "'some concerns' toward the low end of it -- but a single temporal split is still not the same as "
-     "true external validation on an independent cohort."),
+     "cross-validation and a held-out test partition are all low-risk practices. Split-to-split variability "
+     "is shown by repeated cross-validation (Table S9), and a re-tuned forward-in-time check gives "
+     f"{tv_txt} (Table S10). The residual concern is that there is no external validation on an "
+     "independent cohort."),
 ]
 probast_df = pd.DataFrame(probast_rows, columns=["PROBAST-AI domain", "Risk of bias", "Rationale"])
 probast_df.to_csv(TABLES / "table_probast_ai_risk_of_bias.csv", index=False)

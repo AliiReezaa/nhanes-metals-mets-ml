@@ -256,7 +256,7 @@ def main():
             f"miscalibrated without improving discrimination, and shifting the decision threshold "
             f"achieves the same sensitivity–specificity trade-off without that cost "
             f"{cite('goorbergh')}. We therefore treated the choice as a parameter to test rather "
-            f"than assume, compared SMOTENC against class weighting in a prespecified sensitivity "
+            f"than assume, compared SMOTENC against class weighting in a sensitivity "
             f"analysis (Section 9), and report calibration alongside discrimination for every model.")
 
     ds.para(doc,

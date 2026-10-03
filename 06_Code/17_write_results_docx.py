@@ -119,6 +119,12 @@ def t1(var):
     return tab1[tab1["variable"] == var].iloc[0]
 
 
+def sg_name(label):
+    if label.startswith("Age"):
+        return "the age band " + label[4:]
+    return {"Male": "men", "Female": "women"}.get(label, label)
+
+
 def shape_of(centers, values):
     """Plain-language description of a binned SHAP dependence curve."""
     v = np.asarray(values, float)
@@ -437,13 +443,17 @@ def main():
                          f"{num(v[-1])} in the highest (range {num(min(v))} to {num(max(v))})")
     pb_v = md["LBXBPB"]["binned_mean_shap"]
     pb_shape = shape_of(md["LBXBPB"]["binned_centers"], pb_v)
+    biggest = max(abs(x) for m in METALS for x in md[m]["binned_mean_shap"])
+    top2 = shap_pred.nsmallest(2, "rank")
     ds.para(doc,
             f"The shape of each metal's contribution is shown in Figure 5, as the mean SHAP value "
             f"within twelve equal-count bins of the exposure: " + "; ".join(descr) + ". These are "
             f"contributions to the predicted log-odds within one fitted model, adjusted for "
-            f"everything else the model contains, and they are an order of magnitude smaller than "
-            f"those of body mass index and age.")
-    if pb_v[-1] < pb_v[0]:
+            f"everything else the model contains. No binned mean for any metal exceeded "
+            f"{biggest:.3f} in absolute value, against mean absolute contributions of "
+            f"{top2['mean_abs_shap'].iloc[0]:.3f} and {top2['mean_abs_shap'].iloc[1]:.3f} for the two "
+            f"leading predictors.")
+    if pb_shape in ("falling", "inverted U-shaped") and pb_v[-1] < 0:
         ds.para(doc,
                 "The lower predicted risk at the highest blood lead concentrations deserves "
                 "emphasis rather than quiet omission, because it runs against the hypothesis that "
@@ -509,17 +519,17 @@ def main():
     ds.para(doc,
             f"Against an overall test-set AUROC of {ov['auc']:.3f} "
             f"({ci(ov['ci_low'], ov['ci_high'])}), subgroup AUROC ranged from {worst_sg['auc']:.3f} "
-            f"in {worst_sg['subgroup'].lower().replace('age', 'the age band')} "
-            f"({ci(worst_sg['ci_low'], worst_sg['ci_high'])}) to {best_sg['auc']:.3f} in "
-            f"{best_sg['subgroup'].lower().replace('age', 'the age band')} (Table S6, Figure S5)"
-            + (f"; the interval for {join(b.lower() for b in below['subgroup'])} lay entirely below "
-               f"the overall interval" if len(below) else "")
+            f"in {sg_name(worst_sg['subgroup'])} ({ci(worst_sg['ci_low'], worst_sg['ci_high'])}) to "
+            f"{best_sg['auc']:.3f} in {sg_name(best_sg['subgroup'])} "
+            f"({ci(best_sg['ci_low'], best_sg['ci_high'])}; Table S6, Figure S5)"
+            + (f"; the interval for {join(sg_name(b) for b in below['subgroup'])} lay entirely "
+               f"below the overall interval" if len(below) else "")
             + ". Within an age band the range of age is compressed, so the model's second most "
             f"important predictor separates participants less well there; prevalence across the "
             f"age bands ran from {age_sg['prevalence_pct'].min():.1f}% to "
             f"{age_sg['prevalence_pct'].max():.1f}%. "
             + (f"Calibration departed detectably from ideal (slope or observed-to-expected ratio "
-               f"interval excluding 1) in {join(mis['subgroup'].str.lower())}. " if len(mis) else
+               f"interval excluding 1) in {join(sg_name(b) for b in mis['subgroup'])}. " if len(mis) else
                "No subgroup's calibration slope or observed-to-expected ratio interval excluded 1. ")
             + f"These are descriptive screens over {len(sg) * 2} intervals without multiplicity "
             f"adjustment.")
