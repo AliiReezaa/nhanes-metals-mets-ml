@@ -38,6 +38,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from docx import Document
 from docx.shared import Inches
@@ -71,11 +72,43 @@ top = N["top_model"]
 shap_model = N.get("shap_model", top)
 
 
+_shap = pd.read_csv(MET / "shap_importance.csv")
+_shap = _shap[~_shap["feature_code"].str.startswith("missingindicator")].copy()
+_shap["rank"] = _shap["mean_abs_shap"].rank(ascending=False, method="min").astype(int)
+SHAP_RANK = _shap.set_index("feature_code")["rank"]
+
+
 def shap_rank(code):
-    for r in N["shap_top"]:
-        if r["feature"] == code:
-            return r["rank"]
-    return mr.get(code, {}).get("shap_rank")
+    return int(SHAP_RANK[code])
+
+
+def shape_of(values):
+    """Plain-language shape of a binned SHAP dependence curve (same rule as 17)."""
+    v = np.asarray(values, float)
+    rng = v.max() - v.min()
+    if rng < 0.03:
+        return "flat"
+    rho = pd.Series(v).corr(pd.Series(np.arange(len(v))), method="spearman")
+    imin, imax = int(v.argmin()), int(v.argmax())
+    if rho >= 0.8:
+        return "rising"
+    if rho <= -0.8:
+        return "falling"
+    if 0 < imin < len(v) - 1 and min(v[0], v[-1]) - v[imin] > 0.4 * rng:
+        return "U-shaped"
+    if 0 < imax < len(v) - 1 and v[imax] - max(v[0], v[-1]) > 0.4 * rng:
+        return "inverted U-shaped"
+    return "rising" if rho > 0.3 else "falling" if rho < -0.3 else "irregular"
+
+
+def shape_txt(code):
+    sh = shape_of(N["metals_dependence"][code]["binned_mean_shap"])
+    return {"flat": "SHAP contribution essentially flat across the range",
+            "rising": "SHAP contribution rises with concentration",
+            "falling": "SHAP contribution falls with concentration",
+            "U-shaped": "U-shaped SHAP contribution",
+            "inverted U-shaped": "inverted-U SHAP contribution",
+            "irregular": "no consistent SHAP direction"}[sh]
 
 
 perm["rank"] = perm["perm_importance_mean"].rank(ascending=False, method="min").astype(int)
@@ -326,7 +359,7 @@ def main():
     pb, se, cd, hg, mn = (mr[k] for k in ["LBXBPB", "LBXBSE", "LBXBCD", "LBXTHG", "LBXBMN"])
     no_met = inc.loc["no_metals"]
     lead_rank_metals = sorted(cfg.PREDICTOR_VARS["metals"], key=prank)
-    if lead_rank_metals[:2] != ["LBXBPB", "LBXBSE"] and set(lead_rank_metals[:2]) != {"LBXBPB", "LBXBSE"}:
+    if set(lead_rank_metals[:2]) != {"LBXBPB", "LBXBSE"}:
         print(f"[WARNING] the two highest metals by permutation importance are {lead_rank_metals[:2]}, "
               f"not lead and selenium; revisit the exposure tiers before submission.")
     set_text(para(doc, "3.2.1. Study design", 0),
@@ -438,29 +471,29 @@ def main():
     pa_s, pa_p = shap_rank("PAQ650"), prank("PAQ650")
     rows = [
         ("Body mass index",
-         f"Strongest predictor (rank 1 of {n_pred} by SHAP and permutation importance); removing it "
+         f"SHAP rank {shap_rank('BMXBMI')} and permutation rank {prank('BMXBMI')} of {n_pred}; removing it "
          f"changed test AUROC by {inc.loc['no_bmi', 'delta_vs_full']:+.4f}. Part of its weight is "
          f"definitional, because waist circumference defines one MetS component",
          "GIANT consortium meta-analyses, ~700,000 participants [78,79]", "Primary exposure"),
         ("Lead",
          f"Most consistent metal: permutation rank {prank('LBXBPB')} of {n_pred} "
          f"({'above' if above_noise('LBXBPB') else 'not above'} its permutation SD), ranks "
-         f"{span('LBXBPB')} across the four leading models; SHAP rank {pb['shap_rank']}. Inverse "
-         f"cross-sectional association, possibly confounded",
+         f"{span('LBXBPB')} across the four leading models; SHAP rank {pb['shap_rank']}; "
+         f"{shape_txt('LBXBPB')}",
          "Loci for blood/erythrocyte lead in the toxic-metal and multi-element GWAS [73,74]; strength to "
          "be confirmed (F > 10)", "Primary exposure"),
         ("Selenium",
          f"Permutation rank {prank('LBXBSE')} ({'above' if above_noise('LBXBSE') else 'not above'} its "
          f"permutation SD), ranks {span('LBXBSE')} across models; SHAP rank {se['shap_rank']}; "
-         f"contribution rises with concentration",
+         f"{shape_txt('LBXBSE')}",
          "GWAS of blood selenium concentrations, loci at 5q14 and 21q22.3 [76]", "Primary exposure"),
         ("Cadmium",
          f"Permutation rank {prank('LBXBCD')} "
          f"({'above' if above_noise('LBXBCD') else 'within'} its permutation SD), SHAP rank "
-         f"{cd['shap_rank']}; retained for its strong prior literature",
+         f"{cd['shap_rank']}; {shape_txt('LBXBCD')}; retained for its strong prior literature",
          "Toxic-metal and multi-element GWAS [73,74]; never-smoker cadmium GWAS [75]", "Secondary exposure"),
         ("Manganese",
-         f"Permutation rank {prank('LBXBMN')}, SHAP rank {mn['shap_rank']}; no clear direction",
+         f"Permutation rank {prank('LBXBMN')}, SHAP rank {mn['shap_rank']}; {shape_txt('LBXBMN')}",
          "Two genome-wide-significant loci (4q24, 1q41) [73,74]", "Exploratory"),
         ("Alcohol consumption",
          f"Drinks per drinking day: SHAP rank {alc_s}, permutation rank {alc_p}",
@@ -470,7 +503,7 @@ def main():
          f"device-measured overall activity, a different construct",
          "UK Biobank accelerometer-derived GWAS, 14 loci [81]", "Exploratory"),
         ("Mercury",
-         f"Permutation rank {prank('LBXTHG')}, SHAP rank {hg['shap_rank']}",
+         f"Permutation rank {prank('LBXTHG')}, SHAP rank {hg['shap_rank']}; {shape_txt('LBXTHG')}",
          "Suggestive (not genome-wide-significant) loci only [77]; relaxed threshold (section 3.2.3)",
          "Exploratory (suggestive instrument)"),
     ]
@@ -524,11 +557,16 @@ def main():
                     "and robust methods (weighted median and MR-Egger with three or more SNPs, MR-PRESSO with "
                     "ten or more) will be used to limit the resulting bias; with fewer SNPs only Wald-ratio or "
                     "IVW estimates will be interpreted, cautiously.")
+    lead_sh = shape_of(N["metals_dependence"]["LBXBPB"]["binned_mean_shap"])
+    lead_why = ("showed an inverse cross-sectional association that may reflect confounding"
+                if lead_sh == "falling" else
+                "showed no consistent direction for lead once the other predictors were accounted for"
+                if lead_sh in ("flat", "irregular") else
+                f"showed a {lead_sh} pattern for lead that a cross-sectional model cannot interpret causally")
     set_text(h2[3], "H8: Genetically predicted blood selenium and lead will be associated with one or more "
-                    "MetS components (blood pressure, fasting glucose, triglycerides, HDL-C). The direction "
-                    "for lead is tested in both directions, because the machine-learning phase showed an "
-                    "inverse cross-sectional association that may reflect confounding; cadmium is tested as a "
-                    "secondary exposure.")
+                    "MetS components (blood pressure, fasting glucose, triglycerides, HDL-C). The effect of "
+                    f"lead is tested two-sided, because the machine-learning phase {lead_why}; cadmium is "
+                    "tested as a secondary exposure.")
     set_text(h2[4], "H9: Exposures ranked highest by the machine-learning phase (body mass index in "
                     "particular) will show the strongest and most consistent causal estimates, while any "
                     "exposure with a weak machine-learning signal but an adequate instrument will help "
