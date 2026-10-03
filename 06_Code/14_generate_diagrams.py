@@ -65,14 +65,16 @@ def load_pipeline_numbers() -> dict:
     n = {}
 
     excl = pd.read_csv(_require(cfg.OUT_METRICS / "exclusion_flow.csv", "02_clean_and_outcome.py"))
-    excl = excl.set_index("step")
-    n["n_pooled"] = int(excl.loc["0. Pooled sample (all cycles, all ages)", "n_remaining"])
-    n["n_age20"] = int(excl.loc["1. Age >= 20", "n_remaining"])
-    n["n_excl_age"] = int(excl.loc["1. Age >= 20", "n_excluded_this_step"])
-    n["n_complete_mets"] = int(excl.loc["2. Complete data on all 5 MetS lab/exam components", "n_remaining"])
-    n["n_excl_mets"] = int(excl.loc["2. Complete data on all 5 MetS lab/exam components", "n_excluded_this_step"])
-    n["n_final"] = int(excl.loc["3. At least 1 of 5 metals measured", "n_remaining"])
-    n["n_excl_metals"] = int(excl.loc["3. At least 1 of 5 metals measured", "n_excluded_this_step"])
+    # read by position (2026-10 audit: two exclusion steps were added, so the
+    # earlier lookups by exact step label broke)
+    rem = excl["n_remaining"].astype(int).tolist()
+    exc = excl["n_excluded_this_step"].fillna(0).astype(int).tolist()
+    n["n_pooled"] = rem[0]
+    n["n_age20"], n["n_excl_age"] = rem[1], exc[1]
+    n["n_not_preg"], n["n_excl_preg"] = rem[2], exc[2]
+    n["n_complete_mets"], n["n_excl_mets"] = rem[3], exc[3]
+    n["n_fasted"], n["n_excl_fasting"] = rem[4], exc[4]
+    n["n_final"], n["n_excl_metals"] = rem[5], exc[5]
 
     outc = pd.read_csv(_require(cfg.OUT_METRICS / "outcome_definition_comparison.csv", "02_clean_and_outcome.py"))
     harm = outc[outc["definition"].str.startswith("harmonized")].iloc[0]
@@ -195,10 +197,12 @@ def build_figure1(n: dict):
     y = 0.15 + 0.5  # title reserve
     box1_sub = f"Merged {n['n_modules']} modules ({n['module_list']}), all six 2-year cycles — n = {n['n_pooled']:,}"
     box2_sub = f"n = {n['n_age20']:,}"
-    box3_sub = (f"Waist circumference, systolic/diastolic BP, HDL-C, triglycerides, fasting glucose\n"
+    box2b_sub = f"n = {n['n_not_preg']:,}"
+    box3_sub = (f"Waist circumference, mean systolic/diastolic BP, HDL-C, triglycerides, fasting glucose\n"
                 f"n = {n['n_complete_mets']:,}")
+    box3b_sub = f"Fasted 8 to 24 h (non-zero NCHS fasting weight) — n = {n['n_fasted']:,}"
     box4_sub = f"Lead, cadmium, mercury, selenium, manganese — FINAL ANALYTIC COHORT: n = {n['n_final']:,}"
-    outcome_sub = (f"Harmonized AHA/NHLBI criteria (Alberti et al. 2009):\nlab/exam threshold OR drug treatment "
+    outcome_sub = (f"Harmonized criteria (Alberti et al. 2009):\nmeasured threshold OR drug treatment "
                    f"(BPQ050A / BPQ100D / DIQ050 / DIQ070)\n\n"
                    f"MetS+: n = {n['mets_pos_harmonized']:,} ({n['mets_pct_harmonized']:.1f}%)\n"
                    f"[lab-only definition: {n['mets_pct_labonly']:.1f}%; {n['n_reclassified']:,} reclassified]")
@@ -212,7 +216,9 @@ def build_figure1(n: dict):
 
     h1 = box_height(box1_sub); y1 = y; y += h1 + GAP
     h2 = box_height(box2_sub); y2 = y; y += h2 + GAP
+    h2b = box_height(box2b_sub); y2b = y; y += h2b + GAP
     h3 = box_height(box3_sub); y3 = y; y += h3 + GAP
+    h3b = box_height(box3b_sub); y3b = y; y += h3b + GAP
     h4 = box_height(box4_sub); y4 = y; y += h4 + 0.7
     h_split = max(box_height(outcome_sub), box_height(predictor_sub)); y5 = y; y += h_split + 0.55
     h_final = box_height(final_sub); y6 = y; y += h_final + 0.45
@@ -234,11 +240,19 @@ def build_figure1(n: dict):
 
     box(0.6, y2, W - 1.2, "Age ≥ 20 years", box2_sub, blue_e, blue_f)
     excl_note(y2 + h2 / 2, f"Excluded (age < 20 years):\nn = {n['n_excl_age']:,}")
-    arrow(W / 2, y2 + h2, y3)
+    arrow(W / 2, y2 + h2, y2b)
+
+    box(0.6, y2b, W - 1.2, "Not pregnant", box2b_sub, blue_e, blue_f)
+    excl_note(y2b + h2b / 2, f"Excluded (pregnant):\nn = {n['n_excl_preg']:,}")
+    arrow(W / 2, y2b + h2b, y3)
 
     box(0.6, y3, W - 1.2, "Complete data on all 5 MetS lab/exam components", box3_sub, blue_e, blue_f, fontsize_sub=10.2)
     excl_note(y3 + h3 / 2, f"Excluded (missing ≥1 of 5\nMetS components):\nn = {n['n_excl_mets']:,}")
-    arrow(W / 2, y3 + h3, y4)
+    arrow(W / 2, y3 + h3, y3b)
+
+    box(0.6, y3b, W - 1.2, "Met the fasting criterion", box3b_sub, blue_e, blue_f, fontsize_sub=10.2)
+    excl_note(y3b + h3b / 2, f"Excluded (did not meet\nfasting criterion):\nn = {n['n_excl_fasting']:,}")
+    arrow(W / 2, y3b + h3b, y4)
 
     box(0.6, y4, W - 1.2, "At least 1 of 5 blood metals measured", box4_sub, green_e, green_f)
     excl_note(y4 + h4 / 2, f"Excluded (no blood metal\nmeasured): n = {n['n_excl_metals']:,}")
@@ -286,11 +300,11 @@ def build_ai_pipeline_svg(n: dict) -> str:
     steps = [
         ("1", "blue", "Pooled NHANES Sample", "6 cycles, 2007–2018", f"n = {n['n_pooled']:,}"),
         ("2", "blue", "Age Filter", "Adults 20 years and older", f"n = {n['n_age20']:,} (−{n['n_excl_age']:,})"),
-        ("3", "blue", "Outcome Completeness", "All 5 MetS lab/exam components",
-         f"n = {n['n_complete_mets']:,} (−{n['n_excl_mets']:,})"),
+        ("3", "blue", "Exclusions", "Pregnant; incomplete MetS data; not fasted",
+         f"n = {n['n_fasted']:,} (−{n['n_excl_preg'] + n['n_excl_mets'] + n['n_excl_fasting']:,})"),
         ("4", "blue", "Exposure Availability", "At least 1 metal measured",
          f"n = {n['n_final']:,} (−{n['n_excl_metals']:,})"),
-        ("5", "blue", "Outcome Labeling", "Harmonized AHA/NHLBI (Alberti 2009)",
+        ("5", "blue", "Outcome Labeling", "Harmonized MetS (Alberti 2009)",
          f"{n['mets_pct_harmonized']:.1f}% MetS+ (n={n['mets_pos_harmonized']:,})"),
         ("6", "blue", "Feature Engineering", f"{n['n_predictors']} predictors, zero leakage",
          "5 metals + demographic/lifestyle"),

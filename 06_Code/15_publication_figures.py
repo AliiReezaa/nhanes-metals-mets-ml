@@ -6,8 +6,12 @@ critically -- writes every number that the manuscript text quotes into a single
 machine-readable file (outputs/metrics/publication_numbers.json) so the prose can
 be verified against the figures programmatically rather than by eye.
 
-All figures derive from ONE cached set of test-set predicted probabilities
+All figures derive from ONE set of test-set predicted probabilities
 (outputs/metrics/test_predictions.csv), so no two figures can silently disagree.
+2026-10 audit (C17): the predictions and the per-model permutation importances
+are recomputed from the current models on every run; the earlier version
+reused any cached file whose model names matched, even after the models had
+been retrained.
 
 Outputs
 -------
@@ -43,6 +47,7 @@ import config as cfg
 import feature_labels as fl
 import pipeline_utils as pu
 import pubstyle as ps
+import stats_utils as su
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
@@ -87,14 +92,10 @@ def load_everything():
 
 
 def build_prediction_cache(cmp_df, X_test, y_test):
-    """Predicted probabilities for every model on the held-out test set.
-    Cached to CSV so every downstream figure uses byte-identical inputs."""
+    """Predicted probabilities for every model on the held-out test set,
+    recomputed from the current models every run and saved to CSV so every
+    downstream figure uses byte-identical inputs."""
     cache_path = cfg.OUT_METRICS / "test_predictions.csv"
-    if cache_path.exists():
-        preds = pd.read_csv(cache_path)
-        if set(cmp_df["Model"]).issubset(preds.columns) and len(preds) == len(y_test):
-            print(f"  [cache] reusing {cache_path.name}")
-            return preds
     preds = pd.DataFrame({"y_true": y_test})
     for name in cmp_df["Model"]:
         path = cfg.OUT_MODELS / f"{name.replace(' ', '_')}.joblib"
@@ -116,29 +117,33 @@ def fig1_participant_flow():
     strobe = pd.read_csv(cfg.OUT_METRICS / "strobe_flow.csv")
     cycles = strobe[strobe["stage"].str.startswith("Cycle")]
 
+    # 2026-10 audit: the flow now has five exclusion steps (pregnancy and the
+    # fasting criterion were added), read from exclusion_flow.csv by position.
+    n_at = lambda i: int(flow.loc[i, "n_remaining"])
+    exc_at = lambda i: int(flow.loc[i, "n_excluded_this_step"])
     labels = [
-        ("NHANES 2007–2018 pooled sample\nsix consecutive two-year cycles",
-         int(flow.loc[0, "n_remaining"])),
-        ("Adults aged ≥ 20 years",
-         int(flow.loc[1, "n_remaining"])),
-        ("Complete data on all five\nMetS-defining components",
-         int(flow.loc[2, "n_remaining"])),
-        ("≥ 1 of 5 blood metals measured\n(final analytic cohort)",
-         int(flow.loc[3, "n_remaining"])),
+        ("NHANES 2007–2018 pooled sample\nsix consecutive two-year cycles", n_at(0)),
+        ("Adults aged ≥ 20 years", n_at(1)),
+        ("Not pregnant", n_at(2)),
+        ("Complete data on all five\nMetS-defining components", n_at(3)),
+        ("Met the fasting criterion\n(8 to 24 h)", n_at(4)),
+        ("≥ 1 of 5 blood metals measured\n(final analytic cohort)", n_at(5)),
     ]
     exclusions = [
-        f"Excluded: {int(flow.loc[1, 'n_excluded_this_step']):,}\naged < 20 years",
-        f"Excluded: {int(flow.loc[2, 'n_excluded_this_step']):,}\nmissing ≥ 1 MetS component",
-        f"Excluded: {int(flow.loc[3, 'n_excluded_this_step']):,}\nno blood metal measured",
+        f"Excluded: {exc_at(1):,}\naged < 20 years",
+        f"Excluded: {exc_at(2):,}\npregnant",
+        f"Excluded: {exc_at(3):,}\nmissing ≥ 1 MetS component",
+        f"Excluded: {exc_at(4):,}\ndid not meet fasting criterion",
+        f"Excluded: {exc_at(5):,}\nno blood metal measured",
     ]
 
-    fig, ax = plt.subplots(figsize=(ps.W_DOUBLE, 5.8))
-    ax.set_xlim(0, 10); ax.set_ylim(0, 10.9); ax.axis("off")
+    fig, ax = plt.subplots(figsize=(ps.W_DOUBLE, 7.4))
+    ax.set_xlim(0, 10); ax.set_ylim(0, 14.1); ax.axis("off")
 
     box_x, box_w = 0.55, 5.1
     exc_x, exc_w = 6.35, 3.2
-    ys = [8.95, 6.75, 4.55, 2.35]
-    box_h = 1.12
+    ys = [12.15, 10.15, 8.15, 6.15, 4.15, 2.15]
+    box_h = 1.05
     fig_center = (box_x + exc_x + exc_w) / 2
 
     for i, ((text, n), y) in enumerate(zip(labels, ys)):
@@ -169,9 +174,9 @@ def fig1_participant_flow():
     cyc_txt = "  ·  ".join(
         f"{r['stage'].split()[1].replace('_', '–')}: {int(r['n']):,}" for _, r in cycles.iterrows()
     )
-    ax.text(fig_center, 10.82, "Cycle contributions to the pooled sample",
+    ax.text(fig_center, 14.02, "Cycle contributions to the pooled sample",
             ha="center", va="top", fontsize=8.2, style="italic", color="#555555")
-    ax.text(fig_center, 10.50, cyc_txt, ha="center", va="top",
+    ax.text(fig_center, 13.70, cyc_txt, ha="center", va="top",
             fontsize=7.5, color="#555555")
 
     train_n = len(pd.read_csv(cfg.DATA_PROC_DIR / "train_seqn.csv"))
@@ -197,13 +202,11 @@ def fig1_participant_flow():
             ha="left", va="center", fontsize=7.8, style="italic", color="#555555")
 
     NUMBERS["flow"] = {
-        "pooled": int(flow.loc[0, "n_remaining"]),
-        "adults": int(flow.loc[1, "n_remaining"]),
-        "complete_mets": int(flow.loc[2, "n_remaining"]),
-        "final_cohort": int(flow.loc[3, "n_remaining"]),
-        "excluded_age": int(flow.loc[1, "n_excluded_this_step"]),
-        "excluded_mets": int(flow.loc[2, "n_excluded_this_step"]),
-        "excluded_metals": int(flow.loc[3, "n_excluded_this_step"]),
+        "pooled": n_at(0), "adults": n_at(1), "not_pregnant": n_at(2),
+        "complete_mets": n_at(3), "fasting_met": n_at(4), "final_cohort": n_at(5),
+        "excluded_age": exc_at(1), "excluded_pregnant": exc_at(2),
+        "excluded_mets": exc_at(3), "excluded_fasting": exc_at(4),
+        "excluded_metals": exc_at(5),
         "train_n": train_n, "test_n": test_n,
     }
     return ps.save(fig, OUT_FIG / "fig1_participant_flow")
@@ -307,8 +310,7 @@ def fig3_auc_forest(cmp_df, sig_df):
         if row["Model"] == top_name:
             txt = "reference"
         else:
-            p = row["p_value"]
-            txt = "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
+            txt = su.format_p(row["p_value"])
         axR.text(1.02, i, txt, transform=axR.get_yaxis_transform(),
                  va="center", ha="left", fontsize=7.6,
                  color="#333333" if row["statistically_indistinguishable_from_top"] else "#777777")
@@ -335,9 +337,6 @@ def calibration_slope_intercept(y, p):
     lr = LogisticRegression(penalty=None, solver="lbfgs", max_iter=1000).fit(lp, y)
     slope = float(lr.coef_[0][0])
     # calibration-in-the-large: intercept with slope fixed at 1 (offset model)
-    lr0 = LogisticRegression(penalty=None, solver="lbfgs", max_iter=1000, fit_intercept=True)
-    lr0.fit(np.zeros((len(y), 1)), y)  # placeholder, replaced below
-    # offset approach: mean(y) vs mean(p) on the logit scale
     from scipy.optimize import minimize_scalar
     def nll(a):
         z = a + lp.ravel()
@@ -409,7 +408,10 @@ def fig5_decision_curve(preds, cmp_df):
     y = preds["y_true"].values
     n = len(y)
     prevalence = float(y.mean())
-    thresholds = np.arange(0.02, 0.51, 0.01)
+    # 2026-10 audit (C23): the range now extends to 0.80. With a prevalence
+    # near 47% and Youden cut-offs near 0.5, stopping at 0.50 hid the part of
+    # the curve where the model's thresholds actually sit.
+    thresholds = np.arange(0.02, 0.81, 0.01)
     models = [m for m in cmp_df["Model"].head(TOP_N_MODELS) if m in preds.columns]
 
     fig, ax = plt.subplots(figsize=(ps.W_DOUBLE * 0.62, 3.4))
@@ -435,7 +437,7 @@ def fig5_decision_curve(preds, cmp_df):
 
     ax.set_xlabel("Risk threshold (probability at which intervention is warranted)")
     ax.set_ylabel("Net benefit")
-    ax.set_xlim(0.02, 0.50)
+    ax.set_xlim(0.02, 0.80)
     ax.set_ylim(-0.02, max(0.50, prevalence + 0.02))
     ax.grid(True, alpha=0.5)
     ax.legend(loc="lower left", handlelength=1.6, labelspacing=0.32, fontsize=7.6)
@@ -445,12 +447,19 @@ def fig5_decision_curve(preds, cmp_df):
 
     top = models[0]
     sel = {}
-    for pt in (0.10, 0.20, 0.30, 0.40):
+    for pt in (0.10, 0.20, 0.30, 0.40, 0.50, 0.60):
         nb_m = dca[(dca.model == top) & (np.isclose(dca.threshold, pt))]["net_benefit"].iloc[0]
         nb_a = dca[(dca.model == "Treat all") & (np.isclose(dca.threshold, pt))]["net_benefit"].iloc[0]
+        # 2026-10 audit (P11): the gain over "treat all" is a net REDUCTION IN
+        # UNNECESSARY INTERVENTIONS, (NB_model - NB_all) / (pt / (1 - pt)), at
+        # the same number of true cases found (Vickers & Elkin 2006). The
+        # earlier version called (NB_model - NB_all) x 1000 "additional true
+        # cases", which is wrong: against treat-all the model finds fewer cases.
+        delta = float(nb_m - nb_a)
         sel[f"{pt:.2f}"] = {"model_nb": float(nb_m), "treat_all_nb": float(nb_a),
-                            "delta": round(float(nb_m - nb_a), 4),
-                            "net_true_positives_per_1000": round(float((nb_m - nb_a) * 1000), 1)}
+                            "delta": round(delta, 4),
+                            "net_interventions_avoided_per_1000": round(delta / (pt / (1 - pt)) * 1000, 0),
+                            "net_true_positives_per_1000_vs_treat_none": round(float(nb_m) * 1000, 0)}
     NUMBERS["dca"] = {"prevalence_test": round(prevalence, 4), "top_model": top, "points": sel}
     return ps.save(fig, OUT_FIG / "fig5_decision_curve")
 
@@ -458,10 +467,22 @@ def fig5_decision_curve(preds, cmp_df):
 # ======================================================================
 # Figure 6 -- SHAP beeswarm
 # ======================================================================
-def fig6_shap_beeswarm(X_test, cont_cols, cat_cols):
+TREE_MODELS = ["CatBoost", "XGBoost", "LightGBM", "Gradient Boosting", "Random Forest", "Decision Tree"]
+
+
+def shap_model_name(cmp_df):
+    """The model SHAP is computed for: the highest-AUROC tree model (the same
+    rule 09_explain_shap.py uses). 2026-10 audit (C23): figures 6 to 8 used to
+    hard-code 'CatBoost' and crashed if CatBoost was absent or not the top."""
+    for m in cmp_df["Model"]:
+        if m in TREE_MODELS and (cfg.OUT_MODELS / f"{m.replace(' ', '_')}.joblib").exists():
+            return m
+    raise SystemExit("No fitted tree model available for SHAP.")
+
+
+def fig6_shap_beeswarm(X_test, cont_cols, cat_cols, name):
     import shap
-    name = "CatBoost"
-    pipe = joblib.load(cfg.OUT_MODELS / f"{name}.joblib")
+    pipe = joblib.load(cfg.OUT_MODELS / f"{name.replace(' ', '_')}.joblib")
     pre = pipe.named_steps["preprocess"]
     est = pipe.named_steps["model"]
     Xt = pd.DataFrame(pre.transform(X_test),
@@ -477,7 +498,7 @@ def fig6_shap_beeswarm(X_test, cont_cols, cat_cols):
     # via feature_labels.glossary(), so nothing is abbreviated without being defined.
     MAX_DISPLAY = 18
     disp = pd.DataFrame(Xt.values, columns=fl.abbrevs(Xt.columns))
-    # Only the rows the reader can actually see get glossed. Recording all 33 predictors
+    # Only the rows the reader can actually see get glossed. Recording all predictors
     # would pad the caption with expansions for labels that never appear in the panel.
     shown = (pd.Series(np.abs(sv).mean(axis=0), index=Xt.columns)
              .sort_values(ascending=False).head(MAX_DISPLAY).index)
@@ -500,9 +521,6 @@ def fig6_shap_beeswarm(X_test, cont_cols, cat_cols):
 # ======================================================================
 def compute_perm_by_model(cmp_df, X_test, y_test):
     cache = cfg.OUT_METRICS / "permutation_importance_by_model.csv"
-    if cache.exists():
-        print(f"  [cache] reusing {cache.name}")
-        return pd.read_csv(cache, index_col=0)
     out = {}
     for name in cmp_df["Model"].head(TOP_N_MODELS):
         path = cfg.OUT_MODELS / f"{name.replace(' ', '_')}.joblib"
@@ -518,23 +536,23 @@ def compute_perm_by_model(cmp_df, X_test, y_test):
     return df
 
 
-def fig7_concordance(perm_by_model):
+def fig7_concordance(perm_by_model, shap_name):
     shap_imp_all = pd.read_csv(cfg.OUT_METRICS / "shap_importance.csv")
     perm_imp = pd.read_csv(cfg.OUT_METRICS / "permutation_importance.csv")
 
-    # SHAP is computed in the TRANSFORMED feature space (46 columns: 33 predictors
-    # plus 13 continuous-variable missingness indicators), whereas permutation
-    # importance is computed on the 33 original predictor columns. Ranking SHAP
-    # over all 46 and permutation over 33 would put the two methods on different
-    # denominators and make the rank-rank comparison invalid, so SHAP is ranked
-    # among the same 33 original predictors here. The missingness-indicator SHAP
-    # values are retained separately below rather than discarded.
+    # SHAP is computed in the TRANSFORMED feature space (the predictors plus the
+    # missing-value flags), whereas permutation importance is computed on the
+    # original predictor columns. Ranking SHAP over both and permutation over
+    # the predictors only would put the two methods on different denominators,
+    # so SHAP is ranked among the same original predictors here. The
+    # missing-flag SHAP values are retained separately below.
     miss_mask = shap_imp_all["feature_code"].str.startswith("missingindicator")
     shap_missing = shap_imp_all[miss_mask].copy()
     shap_imp = shap_imp_all[~miss_mask].copy()
     shap_imp["shap_rank"] = shap_imp["mean_abs_shap"].rank(ascending=False, method="min").astype(int)
     perm_imp["perm_rank"] = perm_imp["perm_importance_mean"].rank(ascending=False, method="min").astype(int)
-    assert len(shap_imp) == len(perm_imp) == 33, (len(shap_imp), len(perm_imp))
+    n_pred = len(pd.read_csv(cfg.OUT_METRICS / "predictors_used.csv"))
+    assert len(shap_imp) == len(perm_imp) == n_pred, (len(shap_imp), len(perm_imp), n_pred)
     merged = shap_imp.merge(perm_imp[["feature_code", "perm_importance_mean", "perm_rank"]],
                             on="feature_code", how="inner")
 
@@ -571,8 +589,8 @@ def fig7_concordance(perm_by_model):
     rho = merged[["shap_rank", "perm_rank"]].corr(method="spearman").iloc[0, 1]
     axS.text(0.03, 0.94, f"Spearman ρ = {rho:.2f}", transform=axS.transAxes,
              ha="left", va="top", fontsize=8.4)
-    axS.set_xlabel("Rank by mean |SHAP| (CatBoost)")
-    axS.set_ylabel("Rank by permutation\nimportance (CatBoost)")
+    axS.set_xlabel(f"Rank by mean |SHAP| ({shap_name})")
+    axS.set_ylabel(f"Rank by permutation\nimportance ({shap_name})")
     axS.set_xlim(lim, 0.2); axS.set_ylim(lim, 0.2)
     axS.grid(True, alpha=0.4)
     ps.panel_label(axS, "A", dx=-0.115, dy=1.06)
@@ -638,7 +656,7 @@ def fig7_concordance(perm_by_model):
         {"feature": r.feature_code, "name": r.clinical_name,
          "perm_importance": float(r.perm_importance_mean), "rank": int(r.perm_rank)}
         for r in perm_imp.nsmallest(12, "perm_rank").itertuples()]
-    # informative-missingness signal, reported separately from the 33-predictor ranking
+    # missing-flag signal, reported separately from the predictor ranking
     sm = shap_missing.sort_values("mean_abs_shap", ascending=False).head(4)
     NUMBERS["missingness_indicator_shap"] = [
         {"feature": r.feature_code, "name": r.clinical_name,
@@ -650,9 +668,9 @@ def fig7_concordance(perm_by_model):
 # ======================================================================
 # Figure 8 -- metals SHAP dependence
 # ======================================================================
-def fig8_metals_dependence(X_test, cont_cols, cat_cols):
+def fig8_metals_dependence(X_test, cont_cols, cat_cols, name):
     import shap
-    pipe = joblib.load(cfg.OUT_MODELS / "CatBoost.joblib")
+    pipe = joblib.load(cfg.OUT_MODELS / f"{name.replace(' ', '_')}.joblib")
     pre = pipe.named_steps["preprocess"]
     est = pipe.named_steps["model"]
     names = pu.transformed_feature_names(cont_cols, cat_cols)
@@ -823,14 +841,17 @@ def fig9_subgroups(preds, test_df, cmp_df):
 # ======================================================================
 # Methods Figure M1 -- analysis pipeline schematic
 # ======================================================================
+N_PRED = None
+
+
 def figM1_pipeline():
     fig, ax = plt.subplots(figsize=(ps.W_DOUBLE, 3.15))
     ax.set_xlim(0, 100); ax.set_ylim(0, 44); ax.axis("off")
 
     stages = [
         ("1. Data assembly", "Six NHANES cycles\n2007–2018, merged on\nSEQN (13 modules)", "#EAF2F8", ps.OKABE_BLUE),
-        ("2. Outcome", "AHA/NHLBI harmonized\nMetS label (≥3 of 5)\nwith drug-treatment\nOR-clause", "#E8F6F3", ps.OKABE_GREEN),
-        ("3. Predictors", "33 predictors across\nmetal, demographic,\nanthropometric and\nlifestyle domains", "#FEF9E7", "#B9770E"),
+        ("2. Outcome", "Harmonized MetS\n(Alberti 2009; ≥3 of 5,\nmeasured value or\ndrug treatment)", "#E8F6F3", ps.OKABE_GREEN),
+        ("3. Predictors", f"{N_PRED} predictor columns\nacross metal,\ndemographic, body-size\nand lifestyle domains", "#FEF9E7", "#B9770E"),
         ("4. Partition", "80/20 stratified split;\ntest set sealed until\nfinal evaluation", "#FDEDEC", ps.OKABE_VERMIL),
     ]
     x = 2.0; w = 22.6; y = 25.0; h = 15.0
@@ -894,16 +915,20 @@ def main():
     fig4_calibration(preds, cmp_df)
     print("Figure 5: decision curve")
     fig5_decision_curve(preds, cmp_df)
-    print("Figure 6: SHAP beeswarm")
-    fig6_shap_beeswarm(X_test, cont_cols, cat_cols)
+    shap_name = shap_model_name(cmp_df)
+    NUMBERS["shap_model"] = shap_name
+    print(f"Figure 6: SHAP beeswarm ({shap_name})")
+    fig6_shap_beeswarm(X_test, cont_cols, cat_cols, shap_name)
     print("Figure 7: importance concordance")
     perm_by_model = compute_perm_by_model(cmp_df, X_test, y_test)
-    fig7_concordance(perm_by_model)
+    fig7_concordance(perm_by_model, shap_name)
     print("Figure 8: metals SHAP dependence")
-    fig8_metals_dependence(X_test, cont_cols, cat_cols)
+    fig8_metals_dependence(X_test, cont_cols, cat_cols, shap_name)
     print("Figure 9: subgroup AUC")
     fig9_subgroups(preds, test_df, cmp_df)
     print("Figure M1: analysis pipeline")
+    global N_PRED
+    N_PRED = len(feature_cols)
     figM1_pipeline()
 
     # ---- extra numbers the manuscript text quotes ----

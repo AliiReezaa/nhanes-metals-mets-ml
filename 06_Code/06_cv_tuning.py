@@ -8,9 +8,11 @@ scale/missing-flag) and SMOTENC are fit fresh inside that fold via the
 shared Pipeline -- see pipeline_utils.build_pipeline for why that matters.
 
 REBUILD NOTE: unchanged in its own logic from the original pipeline; it
-automatically picks up the corrected predictor set (harmonized ALQ_EVER,
-medication variables excluded), the missing-flags, and SMOTENC through
-pipeline_utils, with no direct changes needed here.
+automatically picks up the predictor set, the missing-flags, and SMOTENC
+through pipeline_utils.
+2026-10 audit (C17): a full run (no --models subset) now starts from empty
+best_params.json / tuning_summary.csv instead of merging into whatever an
+earlier run left behind; only a --models subset run merges.
 
 Scoring metric for model selection is ROC AUC (imbalance-appropriate;
 accuracy would be misleading at ~46% prevalence).
@@ -118,9 +120,14 @@ def main():
         print(f"  {name}: CV AUC = {best_score:.4f}  ({elapsed:.1f}s)  cv={args.cv} n_iter={n_iter_actual}  "
               f"params = {best_params}")
 
-    # Merge with any existing results so running a subset of models (e.g. one
-    # at a time, across separate invocations) doesn't wipe out the rest.
+    # Merge with existing results ONLY when a subset of models was requested
+    # (e.g. one at a time, across separate invocations). A full run replaces
+    # the files, so no stale entries from an earlier run survive (C17).
     out_json = cfg.OUT_METRICS / "best_params.json"
+    summary_path = cfg.OUT_METRICS / "tuning_summary.csv"
+    if not args.models:
+        for f in (out_json, summary_path):
+            f.unlink(missing_ok=True)
     existing = {}
     if out_json.exists():
         with open(out_json) as f:
@@ -130,7 +137,6 @@ def main():
         json.dump(existing, f, indent=2)
     print(f"\nSaved: {out_json}  ({len(existing)} models total on file)")
 
-    summary_path = cfg.OUT_METRICS / "tuning_summary.csv"
     existing_summary = pd.read_csv(summary_path) if summary_path.exists() else pd.DataFrame(columns=["model"])
     new_summary = pd.DataFrame(summary_rows)
     merged_summary = pd.concat([existing_summary[~existing_summary["model"].isin(new_summary["model"])], new_summary])

@@ -18,9 +18,11 @@ For each model:
 Nothing in this script touches data_processed/test_seqn.csv rows. The test
 set is opened for the first time in 08_evaluate.py.
 
-REBUILD NOTE: unchanged in its own logic from the original; it picks up the
-corrected predictor set, missing-flags, and SMOTENC automatically through
-pipeline_utils.
+REBUILD NOTE: it picks up the predictor set, missing-flags, and SMOTENC
+automatically through pipeline_utils.
+2026-10 audit (C17): a full run (no --models subset) deletes the models and
+thresholds of any earlier run first, so 08_evaluate.py can never pick up a
+stale model.
 
 Output: outputs/models/<model_name>.joblib
         outputs/metrics/thresholds.json
@@ -88,6 +90,12 @@ def main():
 
     skf = StratifiedKFold(n_splits=args.cv, shuffle=True, random_state=cfg.RANDOM_STATE)
 
+    thr_path = cfg.OUT_METRICS / "thresholds.json"
+    if not args.models:  # full run: start clean (C17)
+        for old in cfg.OUT_MODELS.glob("*.joblib"):
+            old.unlink()
+        thr_path.unlink(missing_ok=True)
+
     thresholds = {}
     for name, spec in registry.items():
         print(f"\n=== {name} ===")
@@ -118,7 +126,6 @@ def main():
         joblib.dump(pipe_final, model_path)
         print(f"  saved: {model_path}")
 
-    thr_path = cfg.OUT_METRICS / "thresholds.json"
     # merge with any existing thresholds (so running a subset of models doesn't wipe the rest)
     existing = {}
     if thr_path.exists():
