@@ -1,2 +1,2 @@
-N validation,Quantile scoring,N bootstrap (weight estimation),WQS index coefficient (log-odds per unit),SE,P value,OR per 1-quartile increase,OR: top vs. bottom quartile-index category
-3429,quartiles (g=4),200,0.1596,0.0629,0.011,1.173,1.614
+N validation,Quantile scoring,N bootstrap (weight estimation),WQS index coefficient (log-odds per unit),SE,P value,OR per 1-quartile increase,OR: top vs. bottom quartile-index category,Adjusted for
+3209,quartiles (g=4),200,-0.006,0.0747,0.936,0.994,0.982,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"

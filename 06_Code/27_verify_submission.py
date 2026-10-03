@@ -34,7 +34,7 @@ from docx import Document
 ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT
 NOT_PUBLISHED = {".git", ".venv", "venv", "outputs", "data_processed", "NHANES_data",
-                 "manuscript", "diagrams", "__pycache__", ".pytest_cache"}
+                 "manuscript", "diagrams", "__pycache__", ".pytest_cache", "catboost_info"}
 
 # import name -> pip package name, for the PACKAGES check
 IMPORT_TO_PIP = {"sklearn": "scikit-learn", "imblearn": "imbalanced-learn", "docx": "python-docx",

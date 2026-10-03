@@ -1,4 +1,4 @@
-model,cv_auc_harmonized_label,cv_auc_labonly_label,delta,harmonized_prevalence_pct,labonly_prevalence_pct
-CatBoost,0.8416,0.8097,0.0319,46.33,35.57
-XGBoost,0.8186,0.7897,0.0289,46.33,35.57
-Gradient Boosting,0.8442,0.8104,0.0338,46.33,35.57
+model,cv_auc_harmonized_label,cv_auc_labonly_label,delta,cv_auc_nolipidmed_label,cv_auc_bpfirst_label,harmonized_prevalence_pct,labonly_prevalence_pct,nolipidmed_prevalence_pct,bpfirst_prevalence_pct
+CatBoost,0.8438,0.8067,0.0371,0.8381,0.8436,46.69,35.22,40.1,47.03
+LightGBM,0.84,0.8044,0.0356,0.8353,0.8408,46.69,35.22,40.1,47.03
+XGBoost,0.8399,0.8025,0.0375,0.8347,0.8418,46.69,35.22,40.1,47.03

@@ -1,16 +1,16 @@
-Metal,Modifier,Mean |SHAP interaction|,Spearman rho,P value,Bonferroni alpha,Significant after Bonferroni
-Blood lead,Age,0.04546544377837905,-0.0476,0.025,0.00333,No
-Blood lead,BMI,0.018698348513858768,0.0008,0.971,0.00333,No
-Blood mercury,Age,0.015914717749399756,-0.0361,0.089,0.00333,No
-Blood mercury,BMI,0.0149888301574269,-0.1546,2.1e-13,0.00333,Yes
-Blood cadmium,Age,0.014092014339095068,-0.1592,4.0e-14,0.00333,Yes
-Blood cadmium,BMI,0.013768694982862296,0.0282,0.184,0.00333,No
-Blood manganese,Age,0.009542887149115383,0.3757,1.2e-75,0.00333,Yes
-Blood manganese,BMI,0.008651775040708994,0.1583,5.6e-14,0.00333,Yes
-Blood selenium,BMI,0.0071385060246217215,-0.1201,1.3e-08,0.00333,Yes
-Blood selenium,Age,0.005186304066983676,-0.0397,0.061,0.00333,No
-Blood cadmium,Sex (female),0.0039910256735907115,0.0762,3.2e-04,0.00333,Yes
-Blood lead,Sex (female),0.003023226128113754,-0.1805,8.8e-18,0.00333,Yes
-Blood mercury,Sex (female),0.0016734487587334824,0.1524,4.8e-13,0.00333,Yes
-Blood selenium,Sex (female),0.0012484646416549415,-0.0494,0.020,0.00333,No
-Blood manganese,Sex (female),0.001102890882759106,0.088,3.2e-05,0.00333,Yes
+Metal,Modifier,Mean |SHAP interaction| (descriptive),Regression n,Interaction beta (log metal x modifier),FDR-adjusted p,Significant after FDR (q < 0.05),LRT p
+Blood cadmium,Age,0.01684,9301,-0.0042,0.081,No,0.046
+Blood cadmium,BMI,0.01341,9301,0.0108,0.081,No,0.049
+Blood cadmium,Sex (female),0.00531,9301,0.1735,0.021,Yes,0.007
+Blood lead,Age,0.03077,9301,-0.0128,5.5e-07,Yes,7.3e-08
+Blood lead,BMI,0.01213,9301,0.0394,8.8e-09,Yes,5.9e-10
+Blood lead,Sex (female),0.0,9301,0.2337,0.010,Yes,0.003
+Blood manganese,Age,0.01308,5349,-0.0011,0.888,No,0.850
+Blood manganese,BMI,0.01446,5349,-0.0386,0.049,Yes,0.020
+Blood manganese,Sex (female),0.00176,5349,-0.1668,0.460,No,0.399
+Blood mercury,Age,0.01359,9301,0.0023,0.235,No,0.173
+Blood mercury,BMI,0.01394,9301,0.0242,7.3e-06,Yes,1.5e-06
+Blood mercury,Sex (female),0.00356,9301,0.0073,0.888,No,0.888
+Blood selenium,Age,0.01137,5349,-0.0243,0.198,No,0.132
+Blood selenium,BMI,0.01119,5349,0.0935,0.074,No,0.035
+Blood selenium,Sex (female),0.00314,5349,0.5654,0.329,No,0.264

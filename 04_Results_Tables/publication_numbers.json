@@ -2,90 +2,94 @@
   "flow": {
     "pooled": 59842,
     "adults": 34770,
-    "complete_mets": 13337,
-    "final_cohort": 11144,
+    "not_pregnant": 34398,
+    "complete_mets": 13745,
+    "fasting_met": 13050,
+    "final_cohort": 10879,
     "excluded_age": 25072,
-    "excluded_mets": 21433,
-    "excluded_metals": 2193,
-    "train_n": 8915,
-    "test_n": 2229
+    "excluded_pregnant": 372,
+    "excluded_mets": 20653,
+    "excluded_fasting": 695,
+    "excluded_metals": 2171,
+    "train_n": 8703,
+    "test_n": 2176
   },
   "roc": {
     "CatBoost": {
-      "auc": 0.8567,
+      "auc": 0.8532,
       "ci": [
-        0.84,
-        0.8722
-      ]
-    },
-    "LightGBM": {
-      "auc": 0.8561,
-      "ci": [
-        0.84,
-        0.8708
+        0.8369,
+        0.8692
       ]
     },
     "XGBoost": {
-      "auc": 0.8551,
+      "auc": 0.8521,
       "ci": [
-        0.8387,
-        0.8697
+        0.8362,
+        0.8683
       ]
     },
     "Gradient Boosting": {
-      "auc": 0.8547,
+      "auc": 0.8517,
       "ci": [
-        0.8385,
-        0.8697
+        0.8358,
+        0.8678
       ]
     },
-    "SVM": {
-      "auc": 0.8463,
+    "LightGBM": {
+      "auc": 0.8514,
       "ci": [
-        0.8289,
-        0.8622
-      ]
-    },
-    "Logistic Regression": {
-      "auc": 0.8448,
-      "ci": [
-        0.8276,
-        0.8606
+        0.8351,
+        0.8677
       ]
     },
     "Random Forest": {
-      "auc": 0.8447,
+      "auc": 0.8462,
       "ci": [
-        0.8268,
-        0.861
+        0.8299,
+        0.8623
+      ]
+    },
+    "Logistic Regression": {
+      "auc": 0.8431,
+      "ci": [
+        0.8264,
+        0.8599
+      ]
+    },
+    "SVM": {
+      "auc": 0.8404,
+      "ci": [
+        0.8244,
+        0.857
       ]
     },
     "Decision Tree": {
-      "auc": 0.83,
+      "auc": 0.8309,
       "ci": [
-        0.8114,
-        0.8462
-      ]
-    },
-    "MLP": {
-      "auc": 0.8062,
-      "ci": [
-        0.7879,
-        0.823
+        0.8138,
+        0.8468
       ]
     },
     "KNN": {
-      "auc": 0.802,
+      "auc": 0.807,
       "ci": [
-        0.7823,
-        0.8205
+        0.7883,
+        0.8248
+      ]
+    },
+    "MLP": {
+      "auc": 0.8017,
+      "ci": [
+        0.7838,
+        0.8187
       ]
     },
     "Naive Bayes": {
-      "auc": 0.7301,
+      "auc": 0.7458,
       "ci": [
-        0.7088,
-        0.752
+        0.7246,
+        0.765
       ]
     }
   },
@@ -99,94 +103,94 @@
       "p": 1.0,
       "tied": true
     },
-    "LightGBM": {
-      "auc_diff": 0.0006,
-      "ci": [
-        -0.0026,
-        0.004
-      ],
-      "p": 0.732,
-      "tied": true
-    },
     "XGBoost": {
-      "auc_diff": 0.0017,
+      "auc_diff": 0.001,
       "ci": [
-        -0.0013,
-        0.0046
+        -0.0021,
+        0.0044
       ],
-      "p": 0.268,
+      "p": 0.524,
       "tied": true
     },
     "Gradient Boosting": {
-      "auc_diff": 0.0021,
+      "auc_diff": 0.0014,
       "ci": [
-        -0.001,
-        0.0052
+        -0.0022,
+        0.0051
       ],
-      "p": 0.172,
+      "p": 0.423,
       "tied": true
     },
-    "SVM": {
-      "auc_diff": 0.0104,
+    "LightGBM": {
+      "auc_diff": 0.0017,
       "ci": [
-        0.0049,
-        0.0153
+        -0.0015,
+        0.0052
       ],
-      "p": 0.0,
+      "p": 0.302,
+      "tied": true
+    },
+    "Random Forest": {
+      "auc_diff": 0.007,
+      "ci": [
+        0.0023,
+        0.0115
+      ],
+      "p": 0.00237,
       "tied": false
     },
     "Logistic Regression": {
-      "auc_diff": 0.0119,
+      "auc_diff": 0.0101,
       "ci": [
-        0.0056,
-        0.0181
+        0.0043,
+        0.016
       ],
-      "p": 0.0,
+      "p": 0.000928,
       "tied": false
     },
-    "Random Forest": {
-      "auc_diff": 0.012,
+    "SVM": {
+      "auc_diff": 0.0128,
       "ci": [
-        0.0075,
-        0.0165
+        0.0074,
+        0.0181
       ],
-      "p": 0.0,
+      "p": 2.39e-06,
       "tied": false
     },
     "Decision Tree": {
-      "auc_diff": 0.0267,
+      "auc_diff": 0.0223,
       "ci": [
-        0.0185,
-        0.035
+        0.0136,
+        0.0307
       ],
-      "p": 0.0,
-      "tied": false
-    },
-    "MLP": {
-      "auc_diff": 0.0506,
-      "ci": [
-        0.0385,
-        0.0622
-      ],
-      "p": 0.0,
+      "p": 3.19e-07,
       "tied": false
     },
     "KNN": {
-      "auc_diff": 0.0548,
+      "auc_diff": 0.0461,
       "ci": [
-        0.0434,
-        0.0655
+        0.0358,
+        0.0568
       ],
-      "p": 0.0,
+      "p": 3.13e-17,
+      "tied": false
+    },
+    "MLP": {
+      "auc_diff": 0.0515,
+      "ci": [
+        0.0397,
+        0.063
+      ],
+      "p": 2.01e-16,
       "tied": false
     },
     "Naive Bayes": {
-      "auc_diff": 0.1266,
+      "auc_diff": 0.1073,
       "ci": [
-        0.1082,
-        0.1432
+        0.0921,
+        0.1242
       ],
-      "p": 0.0,
+      "p": 1.65e-35,
       "tied": false
     }
   },
@@ -195,252 +199,271 @@
   "calibration": {
     "CatBoost": {
       "model": "CatBoost",
-      "calibration_slope": 1.064,
-      "calibration_intercept": -0.091,
-      "brier": 0.1534,
-      "observed_expected_ratio": 0.97
-    },
-    "LightGBM": {
-      "model": "LightGBM",
-      "calibration_slope": 1.104,
-      "calibration_intercept": -0.102,
-      "brier": 0.1541,
-      "observed_expected_ratio": 0.966
+      "calibration_slope": 1.057,
+      "calibration_intercept": -0.051,
+      "brier": 0.1558,
+      "observed_expected_ratio": 0.983
     },
     "XGBoost": {
       "model": "XGBoost",
-      "calibration_slope": 1.089,
-      "calibration_intercept": -0.102,
-      "brier": 0.1544,
-      "observed_expected_ratio": 0.966
+      "calibration_slope": 1.074,
+      "calibration_intercept": -0.062,
+      "brier": 0.1563,
+      "observed_expected_ratio": 0.979
     },
     "Gradient Boosting": {
       "model": "Gradient Boosting",
-      "calibration_slope": 1.061,
-      "calibration_intercept": -0.09,
-      "brier": 0.1544,
-      "observed_expected_ratio": 0.97
+      "calibration_slope": 1.065,
+      "calibration_intercept": -0.063,
+      "brier": 0.1567,
+      "observed_expected_ratio": 0.979
     },
-    "SVM": {
-      "model": "SVM",
-      "calibration_slope": 0.992,
-      "calibration_intercept": -0.108,
-      "brier": 0.1594,
-      "observed_expected_ratio": 0.964
-    },
-    "Logistic Regression": {
-      "model": "Logistic Regression",
-      "calibration_slope": 1.079,
-      "calibration_intercept": -0.125,
-      "brier": 0.1609,
-      "observed_expected_ratio": 0.956
+    "LightGBM": {
+      "model": "LightGBM",
+      "calibration_slope": 1.096,
+      "calibration_intercept": -0.06,
+      "brier": 0.1569,
+      "observed_expected_ratio": 0.979
     },
     "Random Forest": {
       "model": "Random Forest",
-      "calibration_slope": 1.401,
-      "calibration_intercept": -0.077,
-      "brier": 0.1629,
-      "observed_expected_ratio": 0.97
+      "calibration_slope": 1.34,
+      "calibration_intercept": -0.05,
+      "brier": 0.1616,
+      "observed_expected_ratio": 0.981
+    },
+    "Logistic Regression": {
+      "model": "Logistic Regression",
+      "calibration_slope": 1.098,
+      "calibration_intercept": -0.091,
+      "brier": 0.1618,
+      "observed_expected_ratio": 0.968
+    },
+    "SVM": {
+      "model": "SVM",
+      "calibration_slope": 0.966,
+      "calibration_intercept": -0.064,
+      "brier": 0.1622,
+      "observed_expected_ratio": 0.979
     },
     "Decision Tree": {
       "model": "Decision Tree",
       "calibration_slope": 0.915,
-      "calibration_intercept": -0.116,
-      "brier": 0.1676,
-      "observed_expected_ratio": 0.962
-    },
-    "MLP": {
-      "model": "MLP",
-      "calibration_slope": 0.43,
-      "calibration_intercept": -0.275,
-      "brier": 0.1957,
-      "observed_expected_ratio": 0.941
+      "calibration_intercept": -0.085,
+      "brier": 0.1672,
+      "observed_expected_ratio": 0.972
     },
     "KNN": {
       "model": "KNN",
-      "calibration_slope": 1.094,
-      "calibration_intercept": -0.305,
-      "brier": 0.1847,
-      "observed_expected_ratio": 0.89
+      "calibration_slope": 1.092,
+      "calibration_intercept": -0.248,
+      "brier": 0.181,
+      "observed_expected_ratio": 0.91
+    },
+    "MLP": {
+      "model": "MLP",
+      "calibration_slope": 0.447,
+      "calibration_intercept": -0.096,
+      "brier": 0.1939,
+      "observed_expected_ratio": 0.977
     },
     "Naive Bayes": {
       "model": "Naive Bayes",
-      "calibration_slope": 0.178,
-      "calibration_intercept": 0.364,
-      "brier": 0.2651,
-      "observed_expected_ratio": 1.06
+      "calibration_slope": 0.186,
+      "calibration_intercept": 0.354,
+      "brier": 0.2484,
+      "observed_expected_ratio": 1.059
     }
   },
   "dca": {
-    "prevalence_test": 0.4634,
+    "prevalence_test": 0.4669,
     "top_model": "CatBoost",
     "points": {
       "0.10": {
-        "model_nb": 0.41807,
-        "treat_all_nb": 0.40382,
-        "delta": 0.0142,
-        "net_true_positives_per_1000": 14.2
+        "model_nb": 0.42014,
+        "treat_all_nb": 0.40768,
+        "delta": 0.0125,
+        "net_interventions_avoided_per_1000": 112.0,
+        "net_true_positives_per_1000_vs_treat_none": 420.0
       },
       "0.20": {
-        "model_nb": 0.37629,
-        "treat_all_nb": 0.3293,
-        "delta": 0.047,
-        "net_true_positives_per_1000": 47.0
+        "model_nb": 0.37546,
+        "treat_all_nb": 0.33364,
+        "delta": 0.0418,
+        "net_interventions_avoided_per_1000": 167.0,
+        "net_true_positives_per_1000_vs_treat_none": 375.0
       },
       "0.30": {
-        "model_nb": 0.33449,
-        "treat_all_nb": 0.23348,
-        "delta": 0.101,
-        "net_true_positives_per_1000": 101.0
+        "model_nb": 0.33193,
+        "treat_all_nb": 0.23845,
+        "delta": 0.0935,
+        "net_interventions_avoided_per_1000": 218.0,
+        "net_true_positives_per_1000_vs_treat_none": 332.0
       },
       "0.40": {
-        "model_nb": 0.28294,
-        "treat_all_nb": 0.10573,
-        "delta": 0.1772,
-        "net_true_positives_per_1000": 177.2
+        "model_nb": 0.28554,
+        "treat_all_nb": 0.11152,
+        "delta": 0.174,
+        "net_interventions_avoided_per_1000": 261.0,
+        "net_true_positives_per_1000_vs_treat_none": 286.0
+      },
+      "0.50": {
+        "model_nb": 0.23943,
+        "treat_all_nb": -0.06618,
+        "delta": 0.3056,
+        "net_interventions_avoided_per_1000": 306.0,
+        "net_true_positives_per_1000_vs_treat_none": 239.0
+      },
+      "0.60": {
+        "model_nb": 0.18865,
+        "treat_all_nb": -0.33272,
+        "delta": 0.5214,
+        "net_interventions_avoided_per_1000": 348.0,
+        "net_true_positives_per_1000_vs_treat_none": 189.0
       }
     }
   },
+  "shap_model": "CatBoost",
   "figure_abbreviations": {
-    "fig6_shap_beeswarm": "Abbreviations: BMI, body mass index (kg/m\u00b2); Vigorous rec. PA, vigorous recreational activity; Resting pulse, resting pulse (60 sec); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Blood Cd, blood cadmium (\u00b5g/L); Blood Pb, blood lead (\u00b5g/dL); Blood Se, blood selenium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); PIR, income-to-poverty ratio; Drinks/day, avg. alcoholic drinks/day (past 12 mo); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Moderate rec. PA, moderate recreational activity.",
-    "fig7_importance_concordance": "Abbreviations: Blood Mn, blood manganese (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); BMI, body mass index (kg/m\u00b2); Resting pulse, resting pulse (60 sec); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Vigorous rec. PA, vigorous recreational activity; Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Active transport, minutes walking/biking for transportation; Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Drinks/day, avg. alcoholic drinks/day (past 12 mo); PIR, income-to-poverty ratio.",
+    "fig6_shap_beeswarm": "Abbreviations: BMI, body mass index (kg/m\u00b2); Vigorous rec. PA, vigorous recreational activity; Resting pulse, resting pulse (60 sec); Diet quality, self-rated diet quality (1=excellent...5=poor); Eth: NH Black, race/ethnicity: Non-Hispanic Black; Drinks/drinking day, avg. drinks per drinking day (past 12 mo; 0 = non-drinker); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Active transport, minutes walking/biking for transportation; Blood Cd, blood cadmium (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Exam season, exam month: May-Oct (vs. Nov-Apr); Blood Pb, blood lead (\u00b5g/dL).",
+    "fig7_importance_concordance": "Abbreviations: Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Mn, blood manganese (\u00b5g/L); BMI, body mass index (kg/m\u00b2); Resting pulse, resting pulse (60 sec); Vigorous rec. PA, vigorous recreational activity; Eth: NH Black, race/ethnicity: Non-Hispanic Black; Eth: Other/Multi, race/ethnicity: Other/Multi-Racial; Drinks/drinking day, avg. drinks per drinking day (past 12 mo; 0 = non-drinker); Diet quality, self-rated diet quality (1=excellent...5=poor); Smoking intensity, current smoking intensity (0=none, 1=some days, 2=every day); Drank past 12 mo, drank alcohol in past 12 months.",
     "fig8_metals_shap_dependence": "Abbreviations: Blood Pb, blood lead (\u00b5g/dL); Blood Cd, blood cadmium (\u00b5g/L); Blood Hg, blood mercury, total (\u00b5g/L); Blood Se, blood selenium (\u00b5g/L); Blood Mn, blood manganese (\u00b5g/L)."
   },
   "metal_ranks": {
     "LBXBPB": {
       "clinical_name": "Blood lead (\u00b5g/dL)",
-      "shap_rank": 11,
-      "perm_rank": 9,
-      "mean_abs_shap": 0.0390751668782737,
+      "shap_rank": 18,
+      "perm_rank": 11,
+      "mean_abs_shap": 0.0298137648750319,
       "per_model_perm_rank": {
-        "CatBoost": 9,
-        "LightGBM": 7,
+        "CatBoost": 11,
         "XGBoost": 8,
-        "Gradient Boosting": 4
+        "Gradient Boosting": 6,
+        "LightGBM": 7
       }
     },
     "LBXBCD": {
       "clinical_name": "Blood cadmium (\u00b5g/L)",
-      "shap_rank": 10,
-      "perm_rank": 18,
-      "mean_abs_shap": 0.0437057085739112,
+      "shap_rank": 15,
+      "perm_rank": 13,
+      "mean_abs_shap": 0.0310726231496892,
       "per_model_perm_rank": {
-        "CatBoost": 18,
-        "LightGBM": 29,
-        "XGBoost": 17,
-        "Gradient Boosting": 28
+        "CatBoost": 13,
+        "XGBoost": 16,
+        "Gradient Boosting": 14,
+        "LightGBM": 16
       }
     },
     "LBXTHG": {
       "clinical_name": "Blood mercury, total (\u00b5g/L)",
-      "shap_rank": 14,
-      "perm_rank": 27,
-      "mean_abs_shap": 0.0362133529131223,
+      "shap_rank": 19,
+      "perm_rank": 15,
+      "mean_abs_shap": 0.0294187465691304,
       "per_model_perm_rank": {
-        "CatBoost": 27,
-        "LightGBM": 33,
-        "XGBoost": 15,
-        "Gradient Boosting": 33
+        "CatBoost": 15,
+        "XGBoost": 19,
+        "Gradient Boosting": 20,
+        "LightGBM": 30
       }
     },
     "LBXBSE": {
       "clinical_name": "Blood selenium (\u00b5g/L)",
-      "shap_rank": 12,
-      "perm_rank": 11,
-      "mean_abs_shap": 0.0388473966940879,
+      "shap_rank": 16,
+      "perm_rank": 16,
+      "mean_abs_shap": 0.0303168328041988,
       "per_model_perm_rank": {
-        "CatBoost": 11,
-        "LightGBM": 12,
-        "XGBoost": 14,
-        "Gradient Boosting": 27
+        "CatBoost": 16,
+        "XGBoost": 10,
+        "Gradient Boosting": 9,
+        "LightGBM": 12
       }
     },
     "LBXBMN": {
       "clinical_name": "Blood manganese (\u00b5g/L)",
-      "shap_rank": 21,
-      "perm_rank": 22,
-      "mean_abs_shap": 0.0168579075754093,
+      "shap_rank": 23,
+      "perm_rank": 17,
+      "mean_abs_shap": 0.0147704038207346,
       "per_model_perm_rank": {
-        "CatBoost": 22,
-        "LightGBM": 19,
-        "XGBoost": 26,
-        "Gradient Boosting": 29
+        "CatBoost": 17,
+        "XGBoost": 18,
+        "Gradient Boosting": 26,
+        "LightGBM": 32
       }
     }
   },
-  "spearman_shap_perm": 0.622,
-  "n_predictors_ranked": 33,
+  "spearman_shap_perm": 0.674,
+  "n_predictors_ranked": 32,
   "shap_top": [
     {
       "feature": "BMXBMI",
       "name": "Body mass index (kg/m\u00b2)",
-      "mean_abs_shap": 1.0254143667893576,
+      "mean_abs_shap": 1.047445091458814,
       "rank": 1
     },
     {
       "feature": "RIDAGEYR",
       "name": "Age (years)",
-      "mean_abs_shap": 0.9913405943249664,
+      "mean_abs_shap": 0.938243490237908,
       "rank": 2
     },
     {
       "feature": "PAQ650",
       "name": "Vigorous recreational activity",
-      "mean_abs_shap": 0.1940927833193834,
+      "mean_abs_shap": 0.1753319673666494,
       "rank": 3
     },
     {
       "feature": "BPXPLS",
       "name": "Resting pulse (60 sec)",
-      "mean_abs_shap": 0.1644127331994063,
+      "mean_abs_shap": 0.1515871323436051,
       "rank": 4
-    },
-    {
-      "feature": "RIDRETH1_4.0",
-      "name": "Race/ethnicity: Non-Hispanic Black",
-      "mean_abs_shap": 0.079602792045637,
-      "rank": 5
     },
     {
       "feature": "DBQ700",
       "name": "Self-rated diet quality (1=excellent...5=poor)",
-      "mean_abs_shap": 0.0746824753006475,
-      "rank": 6
-    },
-    {
-      "feature": "DMDMARTL_5.0",
-      "name": "Marital status: Never married",
-      "mean_abs_shap": 0.0671507242701488,
-      "rank": 7
+      "mean_abs_shap": 0.101577031741971,
+      "rank": 5
     },
     {
       "feature": "DMDEDUC2",
       "name": "Education level",
-      "mean_abs_shap": 0.0629671287407407,
+      "mean_abs_shap": 0.0773435424197014,
+      "rank": 6
+    },
+    {
+      "feature": "RIDRETH1_4.0",
+      "name": "Race/ethnicity: Non-Hispanic Black",
+      "mean_abs_shap": 0.0628741806109033,
+      "rank": 7
+    },
+    {
+      "feature": "ALQ130",
+      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
+      "mean_abs_shap": 0.0561527050152076,
       "rank": 8
     },
     {
-      "feature": "RIDRETH1_5.0",
-      "name": "Race/ethnicity: Other/Multi-Racial",
-      "mean_abs_shap": 0.0462094296320101,
+      "feature": "DMDMARTL_5.0",
+      "name": "Marital status: Never married",
+      "mean_abs_shap": 0.0561246886959937,
       "rank": 9
     },
     {
-      "feature": "LBXBCD",
-      "name": "Blood cadmium (\u00b5g/L)",
-      "mean_abs_shap": 0.0437057085739112,
+      "feature": "sex_female",
+      "name": "Sex: Female",
+      "mean_abs_shap": 0.0445675556740633,
       "rank": 10
     },
     {
-      "feature": "LBXBPB",
-      "name": "Blood lead (\u00b5g/dL)",
-      "mean_abs_shap": 0.0390751668782737,
+      "feature": "SMQ040",
+      "name": "Current smoking intensity (0=none, 1=some days, 2=every day)",
+      "mean_abs_shap": 0.0445127944781816,
       "rank": 11
     },
     {
-      "feature": "LBXBSE",
-      "name": "Blood selenium (\u00b5g/L)",
-      "mean_abs_shap": 0.0388473966940879,
+      "feature": "DMDHHSIZ",
+      "name": "Household size",
+      "mean_abs_shap": 0.0406900976170813,
       "rank": 12
     }
   ],
@@ -448,829 +471,1049 @@
     {
       "feature": "BMXBMI",
       "name": "Body mass index (kg/m\u00b2)",
-      "perm_importance": 0.1603445010311883,
+      "perm_importance": 0.1652705844420308,
       "rank": 1
     },
     {
       "feature": "RIDAGEYR",
       "name": "Age (years)",
-      "perm_importance": 0.1563162299630586,
+      "perm_importance": 0.1466063670920444,
       "rank": 2
     },
     {
       "feature": "BPXPLS",
       "name": "Resting pulse (60 sec)",
-      "perm_importance": 0.0084457064043747,
+      "perm_importance": 0.0054834713548736,
       "rank": 3
-    },
-    {
-      "feature": "sex_female",
-      "name": "Sex: Female",
-      "perm_importance": 0.002535638316816,
-      "rank": 4
-    },
-    {
-      "feature": "RIDRETH1_4.0",
-      "name": "Race/ethnicity: Non-Hispanic Black",
-      "perm_importance": 0.0021194397588607,
-      "rank": 5
     },
     {
       "feature": "PAQ650",
       "name": "Vigorous recreational activity",
-      "perm_importance": 0.001908669427294,
+      "perm_importance": 0.003031241515069,
+      "rank": 4
+    },
+    {
+      "feature": "sex_female",
+      "name": "Sex: Female",
+      "perm_importance": 0.0027104262829213,
+      "rank": 5
+    },
+    {
+      "feature": "ALQ130",
+      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker)",
+      "perm_importance": 0.0017786960358401,
       "rank": 6
     },
     {
       "feature": "RIDRETH1_5.0",
       "name": "Race/ethnicity: Other/Multi-Racial",
-      "perm_importance": 0.0016163915212698,
+      "perm_importance": 0.0015052267173498,
       "rank": 7
     },
     {
-      "feature": "DBQ700",
-      "name": "Self-rated diet quality (1=excellent...5=poor)",
-      "perm_importance": 0.0013021786076208,
+      "feature": "ALQ_PAST12",
+      "name": "Drank alcohol in past 12 months",
+      "perm_importance": 0.0014415897366276,
       "rank": 8
     },
     {
-      "feature": "LBXBPB",
-      "name": "Blood lead (\u00b5g/dL)",
-      "perm_importance": 0.0012252846694533,
+      "feature": "RIDRETH1_4.0",
+      "name": "Race/ethnicity: Non-Hispanic Black",
+      "perm_importance": 0.0013434190877,
       "rank": 9
-    },
-    {
-      "feature": "PAD645",
-      "name": "Minutes walking/biking for transportation",
-      "perm_importance": 0.0012033496618286,
-      "rank": 10
-    },
-    {
-      "feature": "LBXBSE",
-      "name": "Blood selenium (\u00b5g/L)",
-      "perm_importance": 0.0006919645025206,
-      "rank": 11
     },
     {
       "feature": "SMQ040",
       "name": "Current smoking intensity (0=none, 1=some days, 2=every day)",
-      "perm_importance": 0.0006697057309457,
+      "perm_importance": 0.0011980722237305,
+      "rank": 10
+    },
+    {
+      "feature": "LBXBPB",
+      "name": "Blood lead (\u00b5g/dL)",
+      "perm_importance": 0.001144108064078,
+      "rank": 11
+    },
+    {
+      "feature": "DMDMARTL_5.0",
+      "name": "Marital status: Never married",
+      "perm_importance": 0.0010494162367633,
       "rank": 12
     }
   ],
   "missingness_indicator_shap": [
     {
-      "feature": "missingindicator_ALQ130",
-      "name": "Avg. alcoholic drinks/day (past 12 mo): was measured/observed",
-      "mean_abs_shap": 0.02128
-    },
-    {
       "feature": "missingindicator_INDFMPIR",
-      "name": "Income-to-poverty ratio: was measured/observed",
-      "mean_abs_shap": 0.01911
+      "name": "Income-to-poverty ratio: missing (imputed)",
+      "mean_abs_shap": 0.01287
     },
     {
-      "feature": "missingindicator_ALQ_EVER",
-      "name": "Ever consumed alcohol (harmonized ALQ101/ALQ111): was measured/observed",
-      "mean_abs_shap": 0.01203
+      "feature": "missingindicator_ALQ130",
+      "name": "Avg. drinks per drinking day (past 12 mo; 0 = non-drinker): missing (imputed)",
+      "mean_abs_shap": 0.00898
     },
     {
       "feature": "missingindicator_LBXBSE",
-      "name": "Blood selenium (\u00b5g/L): was measured/observed",
-      "mean_abs_shap": 0.00462
+      "name": "Selenium & manganese not measured (2007-2010 cycles)",
+      "mean_abs_shap": 0.00357
+    },
+    {
+      "feature": "missingindicator_BMXBMI",
+      "name": "Body mass index (kg/m\u00b2): missing (imputed)",
+      "mean_abs_shap": 9e-05
     }
   ],
-  "n_transformed_columns_shap": 46,
+  "n_transformed_columns_shap": 37,
   "metals_dependence": {
     "LBXBPB": {
       "binned_centers": [
-        0.38,
-        0.54,
-        0.67,
-        0.8,
-        0.95,
-        1.1,
-        1.27,
-        1.46,
-        1.72,
-        2.07,
-        2.6,
-        4.045
+        0.36,
+        0.53,
+        0.68,
+        0.81,
+        0.94,
+        1.07,
+        1.23,
+        1.43,
+        1.66,
+        1.95,
+        2.5,
+        3.75
       ],
       "binned_mean_shap": [
-        -0.0049,
+        0.0365,
+        0.0232,
+        0.0297,
+        0.0203,
+        0.021,
         0.0083,
-        0.0182,
-        0.0271,
-        0.0233,
-        0.0145,
-        0.0118,
-        0.0105,
-        0.0058,
-        -0.0097,
-        -0.0417,
-        -0.1507
+        -0.0034,
+        -0.0042,
+        -0.0072,
+        -0.0254,
+        -0.0267,
+        -0.0703
       ],
-      "n_observed": 2229
+      "n_observed": 2176
     },
     "LBXBCD": {
       "binned_centers": [
+        0.11,
         0.14,
         0.14,
-        0.19,
-        0.23,
-        0.27,
-        0.31,
-        0.37,
-        0.44,
-        0.54,
-        0.7,
-        1.015,
-        1.9
+        0.22,
+        0.26,
+        0.3,
+        0.35,
+        0.42,
+        0.53,
+        0.69,
+        0.99,
+        1.7
       ],
       "binned_mean_shap": [
-        0.0501,
-        0.0489,
-        0.0096,
-        -0.048,
-        -0.0486,
-        -0.0333,
-        -0.0357,
-        -0.0321,
-        -0.0268,
-        -0.0044,
-        0.0281,
-        0.1037
+        0.0476,
+        0.0359,
+        0.0275,
+        -0.0111,
+        -0.0166,
+        -0.0157,
+        -0.022,
+        -0.033,
+        -0.0315,
+        -0.0248,
+        -0.0011,
+        0.0554
       ],
-      "n_observed": 2229
+      "n_observed": 2176
     },
     "LBXTHG": {
       "binned_centers": [
         0.2,
-        0.23,
-        0.38,
-        0.495,
-        0.62,
+        0.2,
+        0.39,
+        0.5,
+        0.6,
         0.75,
-        0.92,
-        1.15,
-        1.46,
-        2.025,
-        2.955,
-        5.345
+        0.91,
+        1.1,
+        1.41,
+        1.94,
+        2.72,
+        6.315
       ],
       "binned_mean_shap": [
-        0.0533,
-        0.0458,
-        0.0235,
-        0.0189,
-        0.018,
-        0.0171,
-        -0.002,
-        -0.0119,
-        -0.023,
-        -0.0455,
-        -0.0665,
-        -0.0282
+        0.0426,
+        0.0395,
+        0.0125,
+        0.0066,
+        0.0078,
+        0.0061,
+        0.0031,
+        -0.0005,
+        -0.0103,
+        -0.0315,
+        -0.0521,
+        -0.0062
       ],
-      "n_observed": 2229
+      "n_observed": 2176
     },
     "LBXBSE": {
       "binned_centers": [
-        155.685,
-        167.365,
-        173.98,
-        179.16,
-        184.015,
-        188.38,
-        192.51,
-        198.11,
-        202.995,
-        209.335,
-        219.84,
-        240.135
+        154.88,
+        166.88,
+        174.635,
+        180.0,
+        184.82,
+        189.43,
+        193.95,
+        199.06,
+        204.12,
+        210.965,
+        219.36,
+        240.25
       ],
       "binned_mean_shap": [
-        -0.0389,
-        -0.0415,
-        -0.0381,
-        -0.0304,
-        -0.0263,
-        -0.0218,
-        -0.0148,
-        0.0004,
-        0.0197,
-        0.058,
-        0.0823,
-        0.2351
+        0.017,
+        -0.0055,
+        -0.0149,
+        -0.0236,
+        -0.0202,
+        -0.0209,
+        0.0017,
+        0.0082,
+        0.0048,
+        0.0087,
+        0.014,
+        0.2145
       ],
-      "n_observed": 1309
+      "n_observed": 1303
     },
     "LBXBMN": {
       "binned_centers": [
-        5.345,
-        6.55,
-        7.34,
-        8.01,
-        8.66,
-        9.31,
-        9.85,
-        10.51,
-        11.51,
-        12.58,
-        14.39,
-        17.7
+        5.215,
+        6.42,
+        7.17,
+        7.84,
+        8.51,
+        9.2,
+        9.75,
+        10.5,
+        11.4,
+        12.555,
+        14.19,
+        17.45
       ],
       "binned_mean_shap": [
-        0.0434,
-        -0.0026,
-        -0.0035,
-        -0.0026,
-        -0.0013,
-        0.0,
-        -0.0039,
-        -0.0032,
-        0.0,
-        0.0016,
-        0.0048,
-        -0.0257
+        0.0195,
+        -0.0079,
+        -0.0097,
+        -0.0087,
+        -0.0023,
+        0.0027,
+        0.0031,
+        -0.0017,
+        -0.0045,
+        -0.0021,
+        0.001,
+        -0.0176
       ],
-      "n_observed": 1309
+      "n_observed": 1303
     }
   },
   "subgroups": [
     {
       "subgroup": "Overall",
-      "n": 2229,
-      "n_positive": 1033,
-      "prevalence_pct": 46.3,
-      "auc": 0.8567,
-      "ci_low": 0.84,
-      "ci_high": 0.8722,
-      "calibration_slope": 1.064,
-      "slope_ci_low": 0.975,
-      "slope_ci_high": 1.154,
-      "calibration_intercept": -0.091,
-      "intercept_ci_low": -0.193,
-      "intercept_ci_high": 0.0,
-      "observed_expected_ratio": 0.97,
-      "oe_ci_low": 0.935,
-      "oe_ci_high": 1.0
+      "n": 2176,
+      "n_positive": 1016,
+      "prevalence_pct": 46.7,
+      "auc": 0.8532,
+      "ci_low": 0.8369,
+      "ci_high": 0.8692,
+      "calibration_slope": 1.057,
+      "slope_ci_low": 0.968,
+      "slope_ci_high": 1.164,
+      "calibration_intercept": -0.051,
+      "intercept_ci_low": -0.163,
+      "intercept_ci_high": 0.049,
+      "observed_expected_ratio": 0.983,
+      "oe_ci_low": 0.945,
+      "oe_ci_high": 1.016
     },
     {
       "subgroup": "Male",
-      "n": 1094,
-      "n_positive": 521,
-      "prevalence_pct": 47.6,
-      "auc": 0.8477,
-      "ci_low": 0.824,
-      "ci_high": 0.8687,
-      "calibration_slope": 1.054,
-      "slope_ci_low": 0.925,
-      "slope_ci_high": 1.197,
-      "calibration_intercept": -0.008,
-      "intercept_ci_low": -0.149,
-      "intercept_ci_high": 0.131,
-      "observed_expected_ratio": 0.997,
-      "oe_ci_low": 0.949,
-      "oe_ci_high": 1.045
+      "n": 1031,
+      "n_positive": 498,
+      "prevalence_pct": 48.3,
+      "auc": 0.8575,
+      "ci_low": 0.8341,
+      "ci_high": 0.8797,
+      "calibration_slope": 1.091,
+      "slope_ci_low": 0.966,
+      "slope_ci_high": 1.247,
+      "calibration_intercept": 0.09,
+      "intercept_ci_low": -0.058,
+      "intercept_ci_high": 0.234,
+      "observed_expected_ratio": 1.031,
+      "oe_ci_low": 0.98,
+      "oe_ci_high": 1.082
     },
     {
       "subgroup": "Female",
-      "n": 1135,
-      "n_positive": 512,
-      "prevalence_pct": 45.1,
-      "auc": 0.8653,
-      "ci_low": 0.8424,
-      "ci_high": 0.885,
-      "calibration_slope": 1.079,
-      "slope_ci_low": 0.958,
-      "slope_ci_high": 1.207,
-      "calibration_intercept": -0.177,
-      "intercept_ci_low": -0.314,
-      "intercept_ci_high": -0.023,
-      "observed_expected_ratio": 0.943,
-      "oe_ci_low": 0.9,
-      "oe_ci_high": 0.993
+      "n": 1145,
+      "n_positive": 518,
+      "prevalence_pct": 45.2,
+      "auc": 0.8508,
+      "ci_low": 0.8288,
+      "ci_high": 0.872,
+      "calibration_slope": 1.044,
+      "slope_ci_low": 0.935,
+      "slope_ci_high": 1.184,
+      "calibration_intercept": -0.181,
+      "intercept_ci_low": -0.326,
+      "intercept_ci_high": -0.034,
+      "observed_expected_ratio": 0.94,
+      "oe_ci_low": 0.892,
+      "oe_ci_high": 0.989
     },
     {
       "subgroup": "Age 20\u201340 y",
-      "n": 763,
-      "n_positive": 176,
-      "prevalence_pct": 23.1,
-      "auc": 0.8612,
-      "ci_low": 0.8339,
-      "ci_high": 0.8883,
-      "calibration_slope": 1.135,
-      "slope_ci_low": 0.976,
-      "slope_ci_high": 1.339,
-      "calibration_intercept": -0.009,
-      "intercept_ci_low": -0.196,
-      "intercept_ci_high": 0.193,
-      "observed_expected_ratio": 0.995,
-      "oe_ci_low": 0.894,
-      "oe_ci_high": 1.111
+      "n": 760,
+      "n_positive": 174,
+      "prevalence_pct": 22.9,
+      "auc": 0.8551,
+      "ci_low": 0.8241,
+      "ci_high": 0.8871,
+      "calibration_slope": 1.029,
+      "slope_ci_low": 0.873,
+      "slope_ci_high": 1.244,
+      "calibration_intercept": -0.15,
+      "intercept_ci_low": -0.345,
+      "intercept_ci_high": 0.048,
+      "observed_expected_ratio": 0.924,
+      "oe_ci_low": 0.827,
+      "oe_ci_high": 1.025
     },
     {
-      "subgroup": "Age 41\u201360 y",
-      "n": 755,
-      "n_positive": 340,
-      "prevalence_pct": 45.0,
-      "auc": 0.8259,
-      "ci_low": 0.7942,
-      "ci_high": 0.8546,
-      "calibration_slope": 1.189,
-      "slope_ci_low": 1.018,
-      "slope_ci_high": 1.388,
-      "calibration_intercept": -0.265,
-      "intercept_ci_low": -0.421,
-      "intercept_ci_high": -0.099,
-      "observed_expected_ratio": 0.902,
-      "oe_ci_low": 0.845,
-      "oe_ci_high": 0.964
+      "subgroup": "Age 41\u201359 y",
+      "n": 717,
+      "n_positive": 348,
+      "prevalence_pct": 48.5,
+      "auc": 0.7953,
+      "ci_low": 0.7641,
+      "ci_high": 0.8284,
+      "calibration_slope": 1.02,
+      "slope_ci_low": 0.878,
+      "slope_ci_high": 1.208,
+      "calibration_intercept": -0.029,
+      "intercept_ci_low": -0.205,
+      "intercept_ci_high": 0.139,
+      "observed_expected_ratio": 0.989,
+      "oe_ci_low": 0.923,
+      "oe_ci_high": 1.051
     },
     {
-      "subgroup": "Age > 60 y",
-      "n": 711,
-      "n_positive": 517,
-      "prevalence_pct": 72.7,
-      "auc": 0.7407,
-      "ci_low": 0.7007,
-      "ci_high": 0.7835,
-      "calibration_slope": 0.875,
-      "slope_ci_low": 0.711,
-      "slope_ci_high": 1.069,
-      "calibration_intercept": 0.05,
-      "intercept_ci_low": -0.127,
-      "intercept_ci_high": 0.24,
-      "observed_expected_ratio": 1.011,
-      "oe_ci_low": 0.971,
-      "oe_ci_high": 1.052
+      "subgroup": "Age > 59 y",
+      "n": 699,
+      "n_positive": 494,
+      "prevalence_pct": 70.7,
+      "auc": 0.7803,
+      "ci_low": 0.7398,
+      "ci_high": 0.8155,
+      "calibration_slope": 1.092,
+      "slope_ci_low": 0.895,
+      "slope_ci_high": 1.307,
+      "calibration_intercept": 0.004,
+      "intercept_ci_low": -0.169,
+      "intercept_ci_high": 0.19,
+      "observed_expected_ratio": 1.001,
+      "oe_ci_low": 0.959,
+      "oe_ci_high": 1.044
     },
     {
       "subgroup": "Non-Hispanic White",
-      "n": 877,
-      "n_positive": 445,
-      "prevalence_pct": 50.7,
-      "auc": 0.8503,
-      "ci_low": 0.8261,
-      "ci_high": 0.8742,
-      "calibration_slope": 1.08,
-      "slope_ci_low": 0.959,
-      "slope_ci_high": 1.232,
-      "calibration_intercept": -0.08,
-      "intercept_ci_low": -0.247,
-      "intercept_ci_high": 0.078,
-      "observed_expected_ratio": 0.975,
-      "oe_ci_low": 0.924,
-      "oe_ci_high": 1.024
+      "n": 908,
+      "n_positive": 446,
+      "prevalence_pct": 49.1,
+      "auc": 0.8502,
+      "ci_low": 0.8256,
+      "ci_high": 0.8728,
+      "calibration_slope": 1.021,
+      "slope_ci_low": 0.9,
+      "slope_ci_high": 1.152,
+      "calibration_intercept": -0.085,
+      "intercept_ci_low": -0.252,
+      "intercept_ci_high": 0.086,
+      "observed_expected_ratio": 0.974,
+      "oe_ci_low": 0.921,
+      "oe_ci_high": 1.026
     },
     {
       "subgroup": "Mexican American",
-      "n": 363,
-      "n_positive": 165,
-      "prevalence_pct": 45.5,
-      "auc": 0.8644,
-      "ci_low": 0.8271,
-      "ci_high": 0.9004,
-      "calibration_slope": 1.099,
-      "slope_ci_low": 0.883,
-      "slope_ci_high": 1.395,
-      "calibration_intercept": -0.159,
-      "intercept_ci_low": -0.41,
-      "intercept_ci_high": 0.091,
-      "observed_expected_ratio": 0.947,
-      "oe_ci_low": 0.864,
-      "oe_ci_high": 1.031
+      "n": 337,
+      "n_positive": 152,
+      "prevalence_pct": 45.1,
+      "auc": 0.8296,
+      "ci_low": 0.7827,
+      "ci_high": 0.8714,
+      "calibration_slope": 1.022,
+      "slope_ci_low": 0.788,
+      "slope_ci_high": 1.333,
+      "calibration_intercept": -0.103,
+      "intercept_ci_low": -0.374,
+      "intercept_ci_high": 0.142,
+      "observed_expected_ratio": 0.962,
+      "oe_ci_low": 0.861,
+      "oe_ci_high": 1.052
     },
     {
       "subgroup": "Non-Hispanic Black",
-      "n": 478,
-      "n_positive": 208,
-      "prevalence_pct": 43.5,
-      "auc": 0.8401,
-      "ci_low": 0.8048,
-      "ci_high": 0.8747,
-      "calibration_slope": 0.965,
-      "slope_ci_low": 0.803,
-      "slope_ci_high": 1.179,
-      "calibration_intercept": -0.128,
-      "intercept_ci_low": -0.338,
-      "intercept_ci_high": 0.101,
-      "observed_expected_ratio": 0.955,
-      "oe_ci_low": 0.883,
-      "oe_ci_high": 1.035
+      "n": 424,
+      "n_positive": 199,
+      "prevalence_pct": 46.9,
+      "auc": 0.8614,
+      "ci_low": 0.8275,
+      "ci_high": 0.8947,
+      "calibration_slope": 1.173,
+      "slope_ci_low": 0.974,
+      "slope_ci_high": 1.457,
+      "calibration_intercept": -0.029,
+      "intercept_ci_low": -0.246,
+      "intercept_ci_high": 0.22,
+      "observed_expected_ratio": 0.99,
+      "oe_ci_low": 0.913,
+      "oe_ci_high": 1.076
     },
     {
       "subgroup": "Other Hispanic",
-      "n": 236,
-      "n_positive": 117,
-      "prevalence_pct": 49.6,
-      "auc": 0.8622,
-      "ci_low": 0.8161,
-      "ci_high": 0.9065,
-      "calibration_slope": 1.162,
-      "slope_ci_low": 0.908,
-      "slope_ci_high": 1.526,
-      "calibration_intercept": -0.036,
-      "intercept_ci_low": -0.332,
-      "intercept_ci_high": 0.262,
-      "observed_expected_ratio": 0.988,
-      "oe_ci_low": 0.889,
-      "oe_ci_high": 1.086
+      "n": 233,
+      "n_positive": 110,
+      "prevalence_pct": 47.2,
+      "auc": 0.8575,
+      "ci_low": 0.8075,
+      "ci_high": 0.9026,
+      "calibration_slope": 1.133,
+      "slope_ci_low": 0.88,
+      "slope_ci_high": 1.562,
+      "calibration_intercept": -0.101,
+      "intercept_ci_low": -0.417,
+      "intercept_ci_high": 0.206,
+      "observed_expected_ratio": 0.966,
+      "oe_ci_low": 0.859,
+      "oe_ci_high": 1.067
     },
     {
       "subgroup": "Other/Multi-racial",
-      "n": 275,
-      "n_positive": 98,
-      "prevalence_pct": 35.6,
-      "auc": 0.8777,
-      "ci_low": 0.8315,
-      "ci_high": 0.9195,
-      "calibration_slope": 1.089,
-      "slope_ci_low": 0.84,
-      "slope_ci_high": 1.492,
-      "calibration_intercept": -0.013,
-      "intercept_ci_low": -0.329,
-      "intercept_ci_high": 0.306,
-      "observed_expected_ratio": 0.995,
-      "oe_ci_low": 0.871,
-      "oe_ci_high": 1.127
+      "n": 274,
+      "n_positive": 109,
+      "prevalence_pct": 39.8,
+      "auc": 0.8774,
+      "ci_low": 0.8344,
+      "ci_high": 0.9155,
+      "calibration_slope": 1.067,
+      "slope_ci_low": 0.824,
+      "slope_ci_high": 1.432,
+      "calibration_intercept": 0.154,
+      "intercept_ci_low": -0.174,
+      "intercept_ci_high": 0.451,
+      "observed_expected_ratio": 1.06,
+      "oe_ci_low": 0.935,
+      "oe_ci_high": 1.177
     }
   ],
   "subgroup_model": "CatBoost",
   "performance": {
     "CatBoost": {
-      "AUC": 0.8567,
-      "AUC_95CI_low": 0.84,
-      "AUC_95CI_high": 0.8722,
-      "AUPRC": 0.8114,
-      "Brier": 0.1534,
-      "Cutoff_tuned_cutoff": 0.5276,
-      "Accuracy_tuned_cutoff": 0.7743,
-      "Sensitivity_tuned_cutoff": 0.7531,
-      "Specificity_tuned_cutoff": 0.7926,
-      "PPV_tuned_cutoff": 0.7583,
-      "NPV_tuned_cutoff": 0.788,
-      "F1_tuned_cutoff": 0.7557,
-      "Kappa_tuned_cutoff": 0.546,
-      "Youden_tuned_cutoff": 0.5458,
+      "AUC": 0.8532,
+      "AUC_95CI_low": 0.8369,
+      "AUC_95CI_high": 0.8692,
+      "AUPRC": 0.8228,
+      "Brier": 0.1558,
+      "Cutoff_tuned_cutoff": 0.5109,
+      "Accuracy_tuned_cutoff": 0.773,
+      "Sensitivity_tuned_cutoff": 0.7835,
+      "Specificity_tuned_cutoff": 0.7638,
+      "PPV_tuned_cutoff": 0.7439,
+      "NPV_tuned_cutoff": 0.8011,
+      "F1_tuned_cutoff": 0.7632,
+      "Kappa_tuned_cutoff": 0.5455,
+      "Youden_tuned_cutoff": 0.5473,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7752,
-      "Sensitivity_at_0.5": 0.788,
-      "Specificity_at_0.5": 0.7642,
-      "PPV_at_0.5": 0.7427,
-      "NPV_at_0.5": 0.8067,
-      "F1_at_0.5": 0.7647,
-      "Kappa_at_0.5": 0.5499,
-      "Youden_at_0.5": 0.5522,
-      "statistically_indistinguishable_from_top": true
-    },
-    "LightGBM": {
-      "AUC": 0.8561,
-      "AUC_95CI_low": 0.84,
-      "AUC_95CI_high": 0.8708,
-      "AUPRC": 0.8145,
-      "Brier": 0.1541,
-      "Cutoff_tuned_cutoff": 0.5103,
-      "Accuracy_tuned_cutoff": 0.7703,
-      "Sensitivity_tuned_cutoff": 0.7764,
-      "Specificity_tuned_cutoff": 0.7651,
-      "PPV_tuned_cutoff": 0.7405,
-      "NPV_tuned_cutoff": 0.7984,
-      "F1_tuned_cutoff": 0.758,
-      "Kappa_tuned_cutoff": 0.5396,
-      "Youden_tuned_cutoff": 0.5414,
-      "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7685,
-      "Sensitivity_at_0.5": 0.7851,
-      "Specificity_at_0.5": 0.7542,
-      "PPV_at_0.5": 0.7339,
-      "NPV_at_0.5": 0.8025,
-      "F1_at_0.5": 0.7587,
-      "Kappa_at_0.5": 0.5367,
-      "Youden_at_0.5": 0.5393,
+      "Accuracy_at_0.5": 0.7725,
+      "Sensitivity_at_0.5": 0.7943,
+      "Specificity_at_0.5": 0.7534,
+      "PPV_at_0.5": 0.7383,
+      "NPV_at_0.5": 0.807,
+      "F1_at_0.5": 0.7653,
+      "Kappa_at_0.5": 0.5452,
+      "Youden_at_0.5": 0.5477,
+      "Accuracy_tuned_cutoff_95CI_low": 0.756,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7904,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.759,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8101,
+      "Specificity_tuned_cutoff_95CI_low": 0.7401,
+      "Specificity_tuned_cutoff_95CI_high": 0.7879,
+      "PPV_tuned_cutoff_95CI_low": 0.7178,
+      "PPV_tuned_cutoff_95CI_high": 0.7679,
+      "NPV_tuned_cutoff_95CI_low": 0.7773,
+      "NPV_tuned_cutoff_95CI_high": 0.8247,
+      "F1_tuned_cutoff_95CI_low": 0.7433,
+      "F1_tuned_cutoff_95CI_high": 0.7825,
+      "Kappa_tuned_cutoff_95CI_low": 0.5117,
+      "Kappa_tuned_cutoff_95CI_high": 0.58,
+      "Youden_tuned_cutoff_95CI_low": 0.5129,
+      "Youden_tuned_cutoff_95CI_high": 0.5815,
+      "AUPRC_95CI_low": 0.797,
+      "AUPRC_95CI_high": 0.8442,
+      "Brier_95CI_low": 0.1473,
+      "Brier_95CI_high": 0.1641,
       "statistically_indistinguishable_from_top": true
     },
     "XGBoost": {
-      "AUC": 0.8551,
-      "AUC_95CI_low": 0.8387,
-      "AUC_95CI_high": 0.8697,
-      "AUPRC": 0.8092,
-      "Brier": 0.1544,
-      "Cutoff_tuned_cutoff": 0.5064,
-      "Accuracy_tuned_cutoff": 0.773,
-      "Sensitivity_tuned_cutoff": 0.789,
-      "Specificity_tuned_cutoff": 0.7592,
-      "PPV_tuned_cutoff": 0.7389,
-      "NPV_tuned_cutoff": 0.8064,
-      "F1_tuned_cutoff": 0.7631,
-      "Kappa_tuned_cutoff": 0.5456,
-      "Youden_tuned_cutoff": 0.5482,
+      "AUC": 0.8521,
+      "AUC_95CI_low": 0.8362,
+      "AUC_95CI_high": 0.8683,
+      "AUPRC": 0.8182,
+      "Brier": 0.1563,
+      "Cutoff_tuned_cutoff": 0.5311,
+      "Accuracy_tuned_cutoff": 0.7675,
+      "Sensitivity_tuned_cutoff": 0.7618,
+      "Specificity_tuned_cutoff": 0.7724,
+      "PPV_tuned_cutoff": 0.7457,
+      "NPV_tuned_cutoff": 0.7873,
+      "F1_tuned_cutoff": 0.7537,
+      "Kappa_tuned_cutoff": 0.5335,
+      "Youden_tuned_cutoff": 0.5342,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7716,
-      "Sensitivity_at_0.5": 0.7909,
-      "Specificity_at_0.5": 0.755,
-      "PPV_at_0.5": 0.736,
-      "NPV_at_0.5": 0.807,
-      "F1_at_0.5": 0.7625,
-      "Kappa_at_0.5": 0.5432,
-      "Youden_at_0.5": 0.5459,
+      "Accuracy_at_0.5": 0.767,
+      "Sensitivity_at_0.5": 0.7933,
+      "Specificity_at_0.5": 0.744,
+      "PPV_at_0.5": 0.7307,
+      "NPV_at_0.5": 0.8043,
+      "F1_at_0.5": 0.7607,
+      "Kappa_at_0.5": 0.5344,
+      "Youden_at_0.5": 0.5373,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7495,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7849,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7355,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.7895,
+      "Specificity_tuned_cutoff_95CI_low": 0.7481,
+      "Specificity_tuned_cutoff_95CI_high": 0.7954,
+      "PPV_tuned_cutoff_95CI_low": 0.7193,
+      "PPV_tuned_cutoff_95CI_high": 0.7701,
+      "NPV_tuned_cutoff_95CI_low": 0.7627,
+      "NPV_tuned_cutoff_95CI_high": 0.8131,
+      "F1_tuned_cutoff_95CI_low": 0.7326,
+      "F1_tuned_cutoff_95CI_high": 0.7737,
+      "Kappa_tuned_cutoff_95CI_low": 0.4979,
+      "Kappa_tuned_cutoff_95CI_high": 0.5686,
+      "Youden_tuned_cutoff_95CI_low": 0.4977,
+      "Youden_tuned_cutoff_95CI_high": 0.5698,
+      "AUPRC_95CI_low": 0.7925,
+      "AUPRC_95CI_high": 0.8413,
+      "Brier_95CI_low": 0.1479,
+      "Brier_95CI_high": 0.1647,
       "statistically_indistinguishable_from_top": true
     },
     "Gradient Boosting": {
-      "AUC": 0.8547,
-      "AUC_95CI_low": 0.8385,
-      "AUC_95CI_high": 0.8697,
-      "AUPRC": 0.8039,
-      "Brier": 0.1544,
-      "Cutoff_tuned_cutoff": 0.5179,
-      "Accuracy_tuned_cutoff": 0.7703,
-      "Sensitivity_tuned_cutoff": 0.7657,
-      "Specificity_tuned_cutoff": 0.7742,
-      "PPV_tuned_cutoff": 0.7455,
-      "NPV_tuned_cutoff": 0.7928,
-      "F1_tuned_cutoff": 0.7555,
-      "Kappa_tuned_cutoff": 0.539,
-      "Youden_tuned_cutoff": 0.54,
+      "AUC": 0.8517,
+      "AUC_95CI_low": 0.8358,
+      "AUC_95CI_high": 0.8678,
+      "AUPRC": 0.82,
+      "Brier": 0.1567,
+      "Cutoff_tuned_cutoff": 0.5524,
+      "Accuracy_tuned_cutoff": 0.7638,
+      "Sensitivity_tuned_cutoff": 0.7402,
+      "Specificity_tuned_cutoff": 0.7845,
+      "PPV_tuned_cutoff": 0.7505,
+      "NPV_tuned_cutoff": 0.7751,
+      "F1_tuned_cutoff": 0.7453,
+      "Kappa_tuned_cutoff": 0.5251,
+      "Youden_tuned_cutoff": 0.5246,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7694,
-      "Sensitivity_at_0.5": 0.7793,
-      "Specificity_at_0.5": 0.7609,
-      "PPV_at_0.5": 0.7379,
-      "NPV_at_0.5": 0.7996,
-      "F1_at_0.5": 0.758,
-      "Kappa_at_0.5": 0.5381,
-      "Youden_at_0.5": 0.5402,
+      "Accuracy_at_0.5": 0.7652,
+      "Sensitivity_at_0.5": 0.7835,
+      "Specificity_at_0.5": 0.7491,
+      "PPV_at_0.5": 0.7323,
+      "NPV_at_0.5": 0.798,
+      "F1_at_0.5": 0.757,
+      "Kappa_at_0.5": 0.5303,
+      "Youden_at_0.5": 0.5326,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7449,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7817,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7135,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.7689,
+      "Specificity_tuned_cutoff_95CI_low": 0.76,
+      "Specificity_tuned_cutoff_95CI_high": 0.8074,
+      "PPV_tuned_cutoff_95CI_low": 0.7237,
+      "PPV_tuned_cutoff_95CI_high": 0.7761,
+      "NPV_tuned_cutoff_95CI_low": 0.7481,
+      "NPV_tuned_cutoff_95CI_high": 0.8008,
+      "F1_tuned_cutoff_95CI_low": 0.7242,
+      "F1_tuned_cutoff_95CI_high": 0.7668,
+      "Kappa_tuned_cutoff_95CI_low": 0.4876,
+      "Kappa_tuned_cutoff_95CI_high": 0.5612,
+      "Youden_tuned_cutoff_95CI_low": 0.4876,
+      "Youden_tuned_cutoff_95CI_high": 0.5608,
+      "AUPRC_95CI_low": 0.7957,
+      "AUPRC_95CI_high": 0.8424,
+      "Brier_95CI_low": 0.1476,
+      "Brier_95CI_high": 0.1652,
       "statistically_indistinguishable_from_top": true
     },
-    "SVM": {
-      "AUC": 0.8463,
-      "AUC_95CI_low": 0.8289,
-      "AUC_95CI_high": 0.8622,
-      "AUPRC": 0.8055,
-      "Brier": 0.1594,
-      "Cutoff_tuned_cutoff": 0.4444,
-      "Accuracy_tuned_cutoff": 0.7573,
-      "Sensitivity_tuned_cutoff": 0.817,
-      "Specificity_tuned_cutoff": 0.7057,
-      "PPV_tuned_cutoff": 0.7057,
-      "NPV_tuned_cutoff": 0.817,
-      "F1_tuned_cutoff": 0.7573,
-      "Kappa_tuned_cutoff": 0.5172,
-      "Youden_tuned_cutoff": 0.5227,
+    "LightGBM": {
+      "AUC": 0.8514,
+      "AUC_95CI_low": 0.8351,
+      "AUC_95CI_high": 0.8677,
+      "AUPRC": 0.8199,
+      "Brier": 0.1569,
+      "Cutoff_tuned_cutoff": 0.5319,
+      "Accuracy_tuned_cutoff": 0.7661,
+      "Sensitivity_tuned_cutoff": 0.75,
+      "Specificity_tuned_cutoff": 0.7802,
+      "PPV_tuned_cutoff": 0.7493,
+      "NPV_tuned_cutoff": 0.7808,
+      "F1_tuned_cutoff": 0.7496,
+      "Kappa_tuned_cutoff": 0.5301,
+      "Youden_tuned_cutoff": 0.5302,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.764,
-      "Sensitivity_at_0.5": 0.7851,
-      "Specificity_at_0.5": 0.7458,
-      "PPV_at_0.5": 0.7274,
-      "NPV_at_0.5": 0.8007,
-      "F1_at_0.5": 0.7551,
-      "Kappa_at_0.5": 0.5281,
-      "Youden_at_0.5": 0.5309,
+      "Accuracy_at_0.5": 0.7638,
+      "Sensitivity_at_0.5": 0.7785,
+      "Specificity_at_0.5": 0.7509,
+      "PPV_at_0.5": 0.7324,
+      "NPV_at_0.5": 0.7947,
+      "F1_at_0.5": 0.7548,
+      "Kappa_at_0.5": 0.5273,
+      "Youden_at_0.5": 0.5294,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7477,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7835,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7244,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.7764,
+      "Specificity_tuned_cutoff_95CI_low": 0.7552,
+      "Specificity_tuned_cutoff_95CI_high": 0.8036,
+      "PPV_tuned_cutoff_95CI_low": 0.7222,
+      "PPV_tuned_cutoff_95CI_high": 0.775,
+      "NPV_tuned_cutoff_95CI_low": 0.7552,
+      "NPV_tuned_cutoff_95CI_high": 0.8053,
+      "F1_tuned_cutoff_95CI_low": 0.7284,
+      "F1_tuned_cutoff_95CI_high": 0.7704,
+      "Kappa_tuned_cutoff_95CI_low": 0.4932,
+      "Kappa_tuned_cutoff_95CI_high": 0.565,
+      "Youden_tuned_cutoff_95CI_low": 0.4938,
+      "Youden_tuned_cutoff_95CI_high": 0.5652,
+      "AUPRC_95CI_low": 0.7954,
+      "AUPRC_95CI_high": 0.8423,
+      "Brier_95CI_low": 0.1483,
+      "Brier_95CI_high": 0.1654,
+      "statistically_indistinguishable_from_top": true
+    },
+    "Random Forest": {
+      "AUC": 0.8462,
+      "AUC_95CI_low": 0.8299,
+      "AUC_95CI_high": 0.8623,
+      "AUPRC": 0.8056,
+      "Brier": 0.1616,
+      "Cutoff_tuned_cutoff": 0.4864,
+      "Accuracy_tuned_cutoff": 0.7642,
+      "Sensitivity_tuned_cutoff": 0.7884,
+      "Specificity_tuned_cutoff": 0.7431,
+      "PPV_tuned_cutoff": 0.7288,
+      "NPV_tuned_cutoff": 0.8004,
+      "F1_tuned_cutoff": 0.7574,
+      "Kappa_tuned_cutoff": 0.5288,
+      "Youden_tuned_cutoff": 0.5315,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7629,
+      "Sensitivity_at_0.5": 0.7726,
+      "Specificity_at_0.5": 0.7543,
+      "PPV_at_0.5": 0.7336,
+      "NPV_at_0.5": 0.7911,
+      "F1_at_0.5": 0.7526,
+      "Kappa_at_0.5": 0.5252,
+      "Youden_at_0.5": 0.5269,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7459,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7826,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7633,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8133,
+      "Specificity_tuned_cutoff_95CI_low": 0.7187,
+      "Specificity_tuned_cutoff_95CI_high": 0.7685,
+      "PPV_tuned_cutoff_95CI_low": 0.7021,
+      "PPV_tuned_cutoff_95CI_high": 0.7536,
+      "NPV_tuned_cutoff_95CI_low": 0.775,
+      "NPV_tuned_cutoff_95CI_high": 0.8235,
+      "F1_tuned_cutoff_95CI_low": 0.7365,
+      "F1_tuned_cutoff_95CI_high": 0.7781,
+      "Kappa_tuned_cutoff_95CI_low": 0.492,
+      "Kappa_tuned_cutoff_95CI_high": 0.5643,
+      "Youden_tuned_cutoff_95CI_low": 0.4947,
+      "Youden_tuned_cutoff_95CI_high": 0.5668,
+      "AUPRC_95CI_low": 0.7777,
+      "AUPRC_95CI_high": 0.8293,
+      "Brier_95CI_low": 0.1543,
+      "Brier_95CI_high": 0.1689,
       "statistically_indistinguishable_from_top": false
     },
     "Logistic Regression": {
-      "AUC": 0.8448,
-      "AUC_95CI_low": 0.8276,
-      "AUC_95CI_high": 0.8606,
-      "AUPRC": 0.7882,
-      "Brier": 0.1609,
-      "Cutoff_tuned_cutoff": 0.4568,
-      "Accuracy_tuned_cutoff": 0.7672,
-      "Sensitivity_tuned_cutoff": 0.8199,
-      "Specificity_tuned_cutoff": 0.7216,
-      "PPV_tuned_cutoff": 0.7178,
-      "NPV_tuned_cutoff": 0.8227,
-      "F1_tuned_cutoff": 0.7655,
-      "Kappa_tuned_cutoff": 0.5363,
-      "Youden_tuned_cutoff": 0.5415,
+      "AUC": 0.8431,
+      "AUC_95CI_low": 0.8264,
+      "AUC_95CI_high": 0.8599,
+      "AUPRC": 0.7918,
+      "Brier": 0.1618,
+      "Cutoff_tuned_cutoff": 0.4461,
+      "Accuracy_tuned_cutoff": 0.7679,
+      "Sensitivity_tuned_cutoff": 0.8327,
+      "Specificity_tuned_cutoff": 0.7112,
+      "PPV_tuned_cutoff": 0.7163,
+      "NPV_tuned_cutoff": 0.8291,
+      "F1_tuned_cutoff": 0.7701,
+      "Kappa_tuned_cutoff": 0.5385,
+      "Youden_tuned_cutoff": 0.5439,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7672,
-      "Sensitivity_at_0.5": 0.7735,
-      "Specificity_at_0.5": 0.7617,
-      "PPV_at_0.5": 0.7371,
-      "NPV_at_0.5": 0.7956,
-      "F1_at_0.5": 0.7548,
-      "Kappa_at_0.5": 0.5334,
-      "Youden_at_0.5": 0.5352,
+      "Accuracy_at_0.5": 0.7647,
+      "Sensitivity_at_0.5": 0.7628,
+      "Specificity_at_0.5": 0.7664,
+      "PPV_at_0.5": 0.7409,
+      "NPV_at_0.5": 0.7867,
+      "F1_at_0.5": 0.7517,
+      "Kappa_at_0.5": 0.5282,
+      "Youden_at_0.5": 0.5292,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7509,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7849,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.8111,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8537,
+      "Specificity_tuned_cutoff_95CI_low": 0.686,
+      "Specificity_tuned_cutoff_95CI_high": 0.7369,
+      "PPV_tuned_cutoff_95CI_low": 0.6899,
+      "PPV_tuned_cutoff_95CI_high": 0.7413,
+      "NPV_tuned_cutoff_95CI_low": 0.806,
+      "NPV_tuned_cutoff_95CI_high": 0.8522,
+      "F1_tuned_cutoff_95CI_low": 0.75,
+      "F1_tuned_cutoff_95CI_high": 0.7886,
+      "Kappa_tuned_cutoff_95CI_low": 0.5058,
+      "Kappa_tuned_cutoff_95CI_high": 0.5713,
+      "Youden_tuned_cutoff_95CI_low": 0.5112,
+      "Youden_tuned_cutoff_95CI_high": 0.5781,
+      "AUPRC_95CI_low": 0.7626,
+      "AUPRC_95CI_high": 0.8199,
+      "Brier_95CI_low": 0.1535,
+      "Brier_95CI_high": 0.1699,
       "statistically_indistinguishable_from_top": false
     },
-    "Random Forest": {
-      "AUC": 0.8447,
-      "AUC_95CI_low": 0.8268,
-      "AUC_95CI_high": 0.861,
-      "AUPRC": 0.7963,
-      "Brier": 0.1629,
-      "Cutoff_tuned_cutoff": 0.4994,
-      "Accuracy_tuned_cutoff": 0.7636,
-      "Sensitivity_tuned_cutoff": 0.7522,
-      "Specificity_tuned_cutoff": 0.7734,
-      "PPV_tuned_cutoff": 0.7414,
-      "NPV_tuned_cutoff": 0.7832,
-      "F1_tuned_cutoff": 0.7468,
-      "Kappa_tuned_cutoff": 0.5251,
-      "Youden_tuned_cutoff": 0.5256,
+    "SVM": {
+      "AUC": 0.8404,
+      "AUC_95CI_low": 0.8244,
+      "AUC_95CI_high": 0.857,
+      "AUPRC": 0.7998,
+      "Brier": 0.1622,
+      "Cutoff_tuned_cutoff": 0.4726,
+      "Accuracy_tuned_cutoff": 0.7597,
+      "Sensitivity_tuned_cutoff": 0.7923,
+      "Specificity_tuned_cutoff": 0.731,
+      "PPV_tuned_cutoff": 0.7207,
+      "NPV_tuned_cutoff": 0.8008,
+      "F1_tuned_cutoff": 0.7548,
+      "Kappa_tuned_cutoff": 0.5201,
+      "Youden_tuned_cutoff": 0.5234,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7636,
-      "Sensitivity_at_0.5": 0.7522,
-      "Specificity_at_0.5": 0.7734,
-      "PPV_at_0.5": 0.7414,
-      "NPV_at_0.5": 0.7832,
-      "F1_at_0.5": 0.7468,
-      "Kappa_at_0.5": 0.5251,
-      "Youden_at_0.5": 0.5256,
+      "Accuracy_at_0.5": 0.7629,
+      "Sensitivity_at_0.5": 0.7785,
+      "Specificity_at_0.5": 0.7491,
+      "PPV_at_0.5": 0.7311,
+      "NPV_at_0.5": 0.7943,
+      "F1_at_0.5": 0.7541,
+      "Kappa_at_0.5": 0.5256,
+      "Youden_at_0.5": 0.5277,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7426,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7776,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7674,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8161,
+      "Specificity_tuned_cutoff_95CI_low": 0.7068,
+      "Specificity_tuned_cutoff_95CI_high": 0.7567,
+      "PPV_tuned_cutoff_95CI_low": 0.6936,
+      "PPV_tuned_cutoff_95CI_high": 0.746,
+      "NPV_tuned_cutoff_95CI_low": 0.7757,
+      "NPV_tuned_cutoff_95CI_high": 0.8236,
+      "F1_tuned_cutoff_95CI_low": 0.7355,
+      "F1_tuned_cutoff_95CI_high": 0.7747,
+      "Kappa_tuned_cutoff_95CI_low": 0.4864,
+      "Kappa_tuned_cutoff_95CI_high": 0.5556,
+      "Youden_tuned_cutoff_95CI_low": 0.49,
+      "Youden_tuned_cutoff_95CI_high": 0.5595,
+      "AUPRC_95CI_low": 0.7722,
+      "AUPRC_95CI_high": 0.8264,
+      "Brier_95CI_low": 0.1532,
+      "Brier_95CI_high": 0.1707,
       "statistically_indistinguishable_from_top": false
     },
     "Decision Tree": {
-      "AUC": 0.83,
-      "AUC_95CI_low": 0.8114,
-      "AUC_95CI_high": 0.8462,
-      "AUPRC": 0.7689,
-      "Brier": 0.1676,
-      "Cutoff_tuned_cutoff": 0.4932,
-      "Accuracy_tuned_cutoff": 0.7425,
-      "Sensitivity_tuned_cutoff": 0.8103,
-      "Specificity_tuned_cutoff": 0.6839,
-      "PPV_tuned_cutoff": 0.6889,
-      "NPV_tuned_cutoff": 0.8067,
-      "F1_tuned_cutoff": 0.7447,
-      "Kappa_tuned_cutoff": 0.4883,
-      "Youden_tuned_cutoff": 0.4942,
+      "AUC": 0.8309,
+      "AUC_95CI_low": 0.8138,
+      "AUC_95CI_high": 0.8468,
+      "AUPRC": 0.7778,
+      "Brier": 0.1672,
+      "Cutoff_tuned_cutoff": 0.4929,
+      "Accuracy_tuned_cutoff": 0.7505,
+      "Sensitivity_tuned_cutoff": 0.7283,
+      "Specificity_tuned_cutoff": 0.7698,
+      "PPV_tuned_cutoff": 0.7349,
+      "NPV_tuned_cutoff": 0.7639,
+      "F1_tuned_cutoff": 0.7316,
+      "Kappa_tuned_cutoff": 0.4984,
+      "Youden_tuned_cutoff": 0.4982,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7425,
-      "Sensitivity_at_0.5": 0.8103,
-      "Specificity_at_0.5": 0.6839,
-      "PPV_at_0.5": 0.6889,
-      "NPV_at_0.5": 0.8067,
-      "F1_at_0.5": 0.7447,
-      "Kappa_at_0.5": 0.4883,
-      "Youden_at_0.5": 0.4942,
-      "statistically_indistinguishable_from_top": false
-    },
-    "MLP": {
-      "AUC": 0.8062,
-      "AUC_95CI_low": 0.7879,
-      "AUC_95CI_high": 0.823,
-      "AUPRC": 0.7608,
-      "Brier": 0.1957,
-      "Cutoff_tuned_cutoff": 0.4491,
-      "Accuracy_tuned_cutoff": 0.7241,
-      "Sensitivity_tuned_cutoff": 0.7686,
-      "Specificity_tuned_cutoff": 0.6856,
-      "PPV_tuned_cutoff": 0.6786,
-      "NPV_tuned_cutoff": 0.7743,
-      "F1_tuned_cutoff": 0.7208,
-      "Kappa_tuned_cutoff": 0.4502,
-      "Youden_tuned_cutoff": 0.4543,
-      "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7259,
-      "Sensitivity_at_0.5": 0.7473,
-      "Specificity_at_0.5": 0.7074,
-      "PPV_at_0.5": 0.6881,
-      "NPV_at_0.5": 0.7642,
-      "F1_at_0.5": 0.7165,
-      "Kappa_at_0.5": 0.452,
-      "Youden_at_0.5": 0.4547,
+      "Accuracy_at_0.5": 0.7505,
+      "Sensitivity_at_0.5": 0.7283,
+      "Specificity_at_0.5": 0.7698,
+      "PPV_at_0.5": 0.7349,
+      "NPV_at_0.5": 0.7639,
+      "F1_at_0.5": 0.7316,
+      "Kappa_at_0.5": 0.4984,
+      "Youden_at_0.5": 0.4982,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7325,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7679,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.6998,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.7575,
+      "Specificity_tuned_cutoff_95CI_low": 0.7463,
+      "Specificity_tuned_cutoff_95CI_high": 0.7921,
+      "PPV_tuned_cutoff_95CI_low": 0.707,
+      "PPV_tuned_cutoff_95CI_high": 0.7606,
+      "NPV_tuned_cutoff_95CI_low": 0.7401,
+      "NPV_tuned_cutoff_95CI_high": 0.7887,
+      "F1_tuned_cutoff_95CI_low": 0.7098,
+      "F1_tuned_cutoff_95CI_high": 0.7528,
+      "Kappa_tuned_cutoff_95CI_low": 0.4622,
+      "Kappa_tuned_cutoff_95CI_high": 0.5345,
+      "Youden_tuned_cutoff_95CI_low": 0.4625,
+      "Youden_tuned_cutoff_95CI_high": 0.5338,
+      "AUPRC_95CI_low": 0.7505,
+      "AUPRC_95CI_high": 0.8035,
+      "Brier_95CI_low": 0.1588,
+      "Brier_95CI_high": 0.1759,
       "statistically_indistinguishable_from_top": false
     },
     "KNN": {
-      "AUC": 0.802,
-      "AUC_95CI_low": 0.7823,
-      "AUC_95CI_high": 0.8205,
-      "AUPRC": 0.738,
-      "Brier": 0.1847,
+      "AUC": 0.807,
+      "AUC_95CI_low": 0.7883,
+      "AUC_95CI_high": 0.8248,
+      "AUPRC": 0.7499,
+      "Brier": 0.181,
       "Cutoff_tuned_cutoff": 0.52,
-      "Accuracy_tuned_cutoff": 0.7277,
-      "Sensitivity_tuned_cutoff": 0.8093,
-      "Specificity_tuned_cutoff": 0.6572,
+      "Accuracy_tuned_cutoff": 0.7174,
+      "Sensitivity_tuned_cutoff": 0.7746,
+      "Specificity_tuned_cutoff": 0.6672,
       "PPV_tuned_cutoff": 0.6709,
-      "NPV_tuned_cutoff": 0.7996,
-      "F1_tuned_cutoff": 0.7337,
-      "Kappa_tuned_cutoff": 0.46,
-      "Youden_tuned_cutoff": 0.4665,
+      "NPV_tuned_cutoff": 0.7717,
+      "F1_tuned_cutoff": 0.719,
+      "Kappa_tuned_cutoff": 0.4377,
+      "Youden_tuned_cutoff": 0.4418,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.7277,
-      "Sensitivity_at_0.5": 0.8093,
-      "Specificity_at_0.5": 0.6572,
+      "Accuracy_at_0.5": 0.7174,
+      "Sensitivity_at_0.5": 0.7746,
+      "Specificity_at_0.5": 0.6672,
       "PPV_at_0.5": 0.6709,
-      "NPV_at_0.5": 0.7996,
-      "F1_at_0.5": 0.7337,
-      "Kappa_at_0.5": 0.46,
-      "Youden_at_0.5": 0.4665,
+      "NPV_at_0.5": 0.7717,
+      "F1_at_0.5": 0.719,
+      "Kappa_at_0.5": 0.4377,
+      "Youden_at_0.5": 0.4418,
+      "Accuracy_tuned_cutoff_95CI_low": 0.6981,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7358,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7495,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8006,
+      "Specificity_tuned_cutoff_95CI_low": 0.6402,
+      "Specificity_tuned_cutoff_95CI_high": 0.6943,
+      "PPV_tuned_cutoff_95CI_low": 0.6409,
+      "PPV_tuned_cutoff_95CI_high": 0.6969,
+      "NPV_tuned_cutoff_95CI_low": 0.7447,
+      "NPV_tuned_cutoff_95CI_high": 0.798,
+      "F1_tuned_cutoff_95CI_low": 0.6973,
+      "F1_tuned_cutoff_95CI_high": 0.7393,
+      "Kappa_tuned_cutoff_95CI_low": 0.4001,
+      "Kappa_tuned_cutoff_95CI_high": 0.4742,
+      "Youden_tuned_cutoff_95CI_low": 0.4045,
+      "Youden_tuned_cutoff_95CI_high": 0.4791,
+      "AUPRC_95CI_low": 0.7199,
+      "AUPRC_95CI_high": 0.7783,
+      "Brier_95CI_low": 0.1733,
+      "Brier_95CI_high": 0.189,
+      "statistically_indistinguishable_from_top": false
+    },
+    "MLP": {
+      "AUC": 0.8017,
+      "AUC_95CI_low": 0.7838,
+      "AUC_95CI_high": 0.8187,
+      "AUPRC": 0.7524,
+      "Brier": 0.1939,
+      "Cutoff_tuned_cutoff": 0.3383,
+      "Accuracy_tuned_cutoff": 0.7284,
+      "Sensitivity_tuned_cutoff": 0.8268,
+      "Specificity_tuned_cutoff": 0.6422,
+      "PPV_tuned_cutoff": 0.6693,
+      "NPV_tuned_cutoff": 0.8089,
+      "F1_tuned_cutoff": 0.7398,
+      "Kappa_tuned_cutoff": 0.4623,
+      "Youden_tuned_cutoff": 0.469,
+      "Cutoff_at_0.5": 0.5,
+      "Accuracy_at_0.5": 0.7399,
+      "Sensitivity_at_0.5": 0.7451,
+      "Specificity_at_0.5": 0.7353,
+      "PPV_at_0.5": 0.7115,
+      "NPV_at_0.5": 0.7671,
+      "F1_at_0.5": 0.7279,
+      "Kappa_at_0.5": 0.479,
+      "Youden_at_0.5": 0.4804,
+      "Accuracy_tuned_cutoff_95CI_low": 0.7096,
+      "Accuracy_tuned_cutoff_95CI_high": 0.7468,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.8041,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.8492,
+      "Specificity_tuned_cutoff_95CI_low": 0.6147,
+      "Specificity_tuned_cutoff_95CI_high": 0.6698,
+      "PPV_tuned_cutoff_95CI_low": 0.6414,
+      "PPV_tuned_cutoff_95CI_high": 0.6944,
+      "NPV_tuned_cutoff_95CI_low": 0.7843,
+      "NPV_tuned_cutoff_95CI_high": 0.8343,
+      "F1_tuned_cutoff_95CI_low": 0.7197,
+      "F1_tuned_cutoff_95CI_high": 0.7581,
+      "Kappa_tuned_cutoff_95CI_low": 0.4274,
+      "Kappa_tuned_cutoff_95CI_high": 0.497,
+      "Youden_tuned_cutoff_95CI_low": 0.4343,
+      "Youden_tuned_cutoff_95CI_high": 0.5041,
+      "AUPRC_95CI_low": 0.7239,
+      "AUPRC_95CI_high": 0.7804,
+      "Brier_95CI_low": 0.1821,
+      "Brier_95CI_high": 0.2059,
       "statistically_indistinguishable_from_top": false
     },
     "Naive Bayes": {
-      "AUC": 0.7301,
-      "AUC_95CI_low": 0.7088,
-      "AUC_95CI_high": 0.752,
-      "AUPRC": 0.669,
-      "Brier": 0.2651,
-      "Cutoff_tuned_cutoff": 0.6233,
-      "Accuracy_tuned_cutoff": 0.6635,
-      "Sensitivity_tuned_cutoff": 0.5682,
-      "Specificity_tuned_cutoff": 0.7458,
-      "PPV_tuned_cutoff": 0.6588,
-      "NPV_tuned_cutoff": 0.6667,
-      "F1_tuned_cutoff": 0.6102,
-      "Kappa_tuned_cutoff": 0.317,
-      "Youden_tuned_cutoff": 0.3141,
+      "AUC": 0.7458,
+      "AUC_95CI_low": 0.7246,
+      "AUC_95CI_high": 0.765,
+      "AUPRC": 0.6872,
+      "Brier": 0.2484,
+      "Cutoff_tuned_cutoff": 0.2203,
+      "Accuracy_tuned_cutoff": 0.6737,
+      "Sensitivity_tuned_cutoff": 0.7431,
+      "Specificity_tuned_cutoff": 0.6129,
+      "PPV_tuned_cutoff": 0.6271,
+      "NPV_tuned_cutoff": 0.7315,
+      "F1_tuned_cutoff": 0.6802,
+      "Kappa_tuned_cutoff": 0.352,
+      "Youden_tuned_cutoff": 0.356,
       "Cutoff_at_0.5": 0.5,
-      "Accuracy_at_0.5": 0.6608,
-      "Sensitivity_at_0.5": 0.6176,
-      "Specificity_at_0.5": 0.6982,
-      "PPV_at_0.5": 0.6386,
-      "NPV_at_0.5": 0.6789,
-      "F1_at_0.5": 0.628,
-      "Kappa_at_0.5": 0.3165,
-      "Youden_at_0.5": 0.3158,
+      "Accuracy_at_0.5": 0.6852,
+      "Sensitivity_at_0.5": 0.6417,
+      "Specificity_at_0.5": 0.7233,
+      "PPV_at_0.5": 0.6701,
+      "NPV_at_0.5": 0.6974,
+      "F1_at_0.5": 0.6556,
+      "Kappa_at_0.5": 0.366,
+      "Youden_at_0.5": 0.365,
+      "Accuracy_tuned_cutoff_95CI_low": 0.653,
+      "Accuracy_tuned_cutoff_95CI_high": 0.6916,
+      "Sensitivity_tuned_cutoff_95CI_low": 0.7154,
+      "Sensitivity_tuned_cutoff_95CI_high": 0.7682,
+      "Specificity_tuned_cutoff_95CI_low": 0.585,
+      "Specificity_tuned_cutoff_95CI_high": 0.6387,
+      "PPV_tuned_cutoff_95CI_low": 0.5986,
+      "PPV_tuned_cutoff_95CI_high": 0.6523,
+      "NPV_tuned_cutoff_95CI_low": 0.7015,
+      "NPV_tuned_cutoff_95CI_high": 0.7592,
+      "F1_tuned_cutoff_95CI_low": 0.6566,
+      "F1_tuned_cutoff_95CI_high": 0.7013,
+      "Kappa_tuned_cutoff_95CI_low": 0.3102,
+      "Kappa_tuned_cutoff_95CI_high": 0.3872,
+      "Youden_tuned_cutoff_95CI_low": 0.3134,
+      "Youden_tuned_cutoff_95CI_high": 0.392,
+      "AUPRC_95CI_low": 0.6564,
+      "AUPRC_95CI_high": 0.7185,
+      "Brier_95CI_low": 0.2339,
+      "Brier_95CI_high": 0.2644,
       "statistically_indistinguishable_from_top": false
     }
   },
   "tuning": {
     "CatBoost": {
-      "cv_auc": 0.8463,
-      "seconds": 348.6,
+      "cv_auc": 0.8438,
+      "seconds": 256.9,
       "cv_folds": 10.0,
       "n_iter_actual": 12.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__learning_rate\": 0.05, \"model__iterations\": 200, \"model__depth\": 6}"
     },
+    "LightGBM": {
+      "cv_auc": 0.84,
+      "seconds": 202.6,
+      "cv_folds": 10.0,
+      "n_iter_actual": 12.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__num_leaves\": 15, \"model__n_estimators\": 500, \"model__learning_rate\": 0.01}"
+    },
     "XGBoost": {
-      "cv_auc": 0.8446,
-      "seconds": 301.3,
+      "cv_auc": 0.8399,
+      "seconds": 183.6,
       "cv_folds": 10.0,
       "n_iter_actual": 12.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__n_estimators\": 200, \"model__max_depth\": 3, \"model__learning_rate\": 0.05}"
     },
     "Gradient Boosting": {
-      "cv_auc": 0.8443,
-      "seconds": 392.4,
+      "cv_auc": 0.8393,
+      "seconds": 267.1,
       "cv_folds": 10.0,
       "n_iter_actual": 8.0,
       "search_method": "RandomizedSearchCV",
-      "best_params": "{\"model__n_estimators\": 200, \"model__max_depth\": 2, \"model__learning_rate\": 0.1}"
-    },
-    "LightGBM": {
-      "cv_auc": 0.8438,
-      "seconds": 321.4,
-      "cv_folds": 10.0,
-      "n_iter_actual": 12.0,
-      "search_method": "RandomizedSearchCV",
-      "best_params": "{\"model__num_leaves\": 15, \"model__n_estimators\": 500, \"model__learning_rate\": 0.01}"
+      "best_params": "{\"model__n_estimators\": 100, \"model__max_depth\": 3, \"model__learning_rate\": 0.1}"
     },
     "SVM": {
-      "cv_auc": 0.8398,
-      "seconds": 1593.3,
+      "cv_auc": 0.8374,
+      "seconds": 1236.5,
       "cv_folds": 10.0,
       "n_iter_actual": 6.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__kernel\": \"rbf\", \"model__C\": 1}"
     },
-    "Logistic Regression": {
-      "cv_auc": 0.8396,
-      "seconds": 85.5,
-      "cv_folds": 10.0,
-      "n_iter_actual": 4.0,
-      "search_method": "RandomizedSearchCV",
-      "best_params": "{\"model__penalty\": \"l2\", \"model__C\": 0.01}"
-    },
     "Random Forest": {
-      "cv_auc": 0.8377,
-      "seconds": 659.5,
+      "cv_auc": 0.8371,
+      "seconds": 504.9,
       "cv_folds": 10.0,
       "n_iter_actual": 12.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__n_estimators\": 500, \"model__min_samples_leaf\": 5, \"model__max_depth\": null}"
     },
+    "Logistic Regression": {
+      "cv_auc": 0.8352,
+      "seconds": 51.6,
+      "cv_folds": 10.0,
+      "n_iter_actual": 4.0,
+      "search_method": "RandomizedSearchCV",
+      "best_params": "{\"model__penalty\": \"l2\", \"model__C\": 0.01}"
+    },
     "Decision Tree": {
-      "cv_auc": 0.8238,
-      "seconds": 258.3,
+      "cv_auc": 0.8184,
+      "seconds": 154.5,
       "cv_folds": 10.0,
       "n_iter_actual": 12.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__min_samples_leaf\": 20, \"model__max_depth\": 5}"
     },
     "KNN": {
-      "cv_auc": 0.7991,
-      "seconds": 58.8,
+      "cv_auc": 0.8018,
+      "seconds": 38.9,
       "cv_folds": 10.0,
       "n_iter_actual": 3.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__n_neighbors\": 25}"
     },
     "MLP": {
-      "cv_auc": 0.7943,
-      "seconds": 518.1,
+      "cv_auc": 0.7898,
+      "seconds": 543.7,
       "cv_folds": 10.0,
       "n_iter_actual": 4.0,
       "search_method": "RandomizedSearchCV",
       "best_params": "{\"model__hidden_layer_sizes\": [64], \"model__alpha\": 0.001}"
     },
     "Naive Bayes": {
-      "cv_auc": 0.7472,
-      "seconds": 20.7,
+      "cv_auc": 0.7438,
+      "seconds": 12.7,
       "cv_folds": 10.0,
       "n_iter_actual": NaN,
       "search_method": "cross_val_score (no hyperparameters to search)",
@@ -1278,196 +1521,469 @@
     }
   },
   "thresholds": {
-    "Logistic Regression": 0.4568305774599954,
-    "Decision Tree": 0.49321266968325794,
-    "Random Forest": 0.499399132656962,
-    "Gradient Boosting": 0.5179078157762977,
-    "LightGBM": 0.5103215611425922,
-    "XGBoost": 0.5064496397972107,
-    "SVM": 0.4443931056951595,
-    "Naive Bayes": 0.6232808862858226,
-    "MLP": 0.44911244930522587,
+    "Logistic Regression": 0.44607913744762545,
+    "Decision Tree": 0.4928571428571429,
+    "Random Forest": 0.486364892181449,
+    "Gradient Boosting": 0.5524396492597423,
+    "LightGBM": 0.5318829420808151,
+    "XGBoost": 0.5310594439506531,
+    "SVM": 0.47264832071397206,
+    "Naive Bayes": 0.2203038132797832,
+    "MLP": 0.3383431647343664,
     "KNN": 0.52,
-    "CatBoost": 0.5276437772060281
+    "CatBoost": 0.5108852036962782
   },
   "outcome_definition": [
     {
-      "definition": "lab_only (original pipeline)",
-      "n": 11144,
-      "n_positive": 3962,
-      "prevalence_pct": 35.55,
+      "definition": "lab_only (measured values only)",
+      "n": 10879,
+      "n_positive": 3842,
+      "prevalence_pct": 35.32,
       "n_reclassified_negative_to_positive": NaN,
       "n_reclassified_positive_to_negative": NaN,
       "n_on_any_relevant_medication": NaN
     },
     {
-      "definition": "harmonized (this fix: + drug-treatment clause)",
-      "n": 11144,
-      "n_positive": 5163,
-      "prevalence_pct": 46.33,
-      "n_reclassified_negative_to_positive": 1201.0,
+      "definition": "harmonized (measured value or drug treatment; primary)",
+      "n": 10879,
+      "n_positive": 5079,
+      "prevalence_pct": 46.69,
+      "n_reclassified_negative_to_positive": 1237.0,
       "n_reclassified_positive_to_negative": 0.0,
-      "n_on_any_relevant_medication": 4032.0
+      "n_on_any_relevant_medication": 3987.0
+    },
+    {
+      "definition": "harmonized without the lipid-medication clause (sensitivity)",
+      "n": 10879,
+      "n_positive": 4385,
+      "prevalence_pct": 40.31,
+      "n_reclassified_negative_to_positive": NaN,
+      "n_reclassified_positive_to_negative": NaN,
+      "n_on_any_relevant_medication": NaN
+    },
+    {
+      "definition": "harmonized with the first blood-pressure reading only (sensitivity)",
+      "n": 10879,
+      "n_positive": 5109,
+      "prevalence_pct": 46.96,
+      "n_reclassified_negative_to_positive": NaN,
+      "n_reclassified_positive_to_negative": NaN,
+      "n_on_any_relevant_medication": NaN
     }
   ],
   "sensitivity_diq010": [
     {
       "model": "CatBoost",
-      "cv_auc_primary": 0.8416,
-      "cv_auc_plus_diq010": 0.8515,
-      "delta": 0.0099
+      "cv_auc_primary": 0.8438,
+      "cv_auc_plus_diq010": 0.8533,
+      "delta": 0.0095
+    },
+    {
+      "model": "LightGBM",
+      "cv_auc_primary": 0.84,
+      "cv_auc_plus_diq010": 0.8504,
+      "delta": 0.0104
     },
     {
       "model": "XGBoost",
-      "cv_auc_primary": 0.8186,
-      "cv_auc_plus_diq010": 0.8314,
-      "delta": 0.0128
-    },
-    {
-      "model": "Gradient Boosting",
-      "cv_auc_primary": 0.8442,
-      "cv_auc_plus_diq010": 0.8547,
-      "delta": 0.0105
+      "cv_auc_primary": 0.8399,
+      "cv_auc_plus_diq010": 0.8512,
+      "delta": 0.0112
     }
   ],
   "sensitivity_metals_scope": [
     {
       "model": "CatBoost",
-      "cv_auc_all_5_metals": 0.8416,
-      "cv_auc_lead_only": 0.8427,
-      "delta": 0.0011
+      "cv_auc_all_5_metals": 0.8438,
+      "cv_auc_lead_only": 0.8428,
+      "delta": -0.001
     },
     {
-      "model": "XGBoost",
-      "cv_auc_all_5_metals": 0.8186,
-      "cv_auc_lead_only": 0.8188,
+      "model": "LightGBM",
+      "cv_auc_all_5_metals": 0.84,
+      "cv_auc_lead_only": 0.8401,
       "delta": 0.0002
     },
     {
-      "model": "Gradient Boosting",
-      "cv_auc_all_5_metals": 0.8442,
-      "cv_auc_lead_only": 0.8445,
-      "delta": 0.0003
+      "model": "XGBoost",
+      "cv_auc_all_5_metals": 0.8399,
+      "cv_auc_lead_only": 0.8399,
+      "delta": -0.0
     }
   ],
   "sensitivity_smote_vs_classweight": [
     {
       "model": "CatBoost",
-      "cv_auc_smote": 0.8416,
-      "cv_auc_class_weight": 0.842,
-      "delta": 0.0005
+      "cv_auc_smote": 0.8438,
+      "cv_auc_class_weight": 0.843,
+      "delta": -0.0008
+    },
+    {
+      "model": "LightGBM",
+      "cv_auc_smote": 0.84,
+      "cv_auc_class_weight": 0.8387,
+      "delta": -0.0013
     },
     {
       "model": "XGBoost",
-      "cv_auc_smote": 0.8186,
-      "cv_auc_class_weight": 0.8196,
-      "delta": 0.001
-    },
-    {
-      "model": "Gradient Boosting",
-      "cv_auc_smote": 0.8442,
-      "cv_auc_class_weight": NaN,
-      "delta": NaN
+      "cv_auc_smote": 0.8399,
+      "cv_auc_class_weight": 0.8397,
+      "delta": -0.0003
     }
   ],
   "sensitivity_outcome_definition": [
     {
       "model": "CatBoost",
-      "cv_auc_harmonized_label": 0.8416,
-      "cv_auc_labonly_label": 0.8097,
-      "delta": 0.0319,
-      "harmonized_prevalence_pct": 46.33,
-      "labonly_prevalence_pct": 35.57
+      "cv_auc_harmonized_label": 0.8438,
+      "cv_auc_labonly_label": 0.8067,
+      "delta": 0.0371,
+      "cv_auc_nolipidmed_label": 0.8381,
+      "cv_auc_bpfirst_label": 0.8436,
+      "harmonized_prevalence_pct": 46.69,
+      "labonly_prevalence_pct": 35.22,
+      "nolipidmed_prevalence_pct": 40.1,
+      "bpfirst_prevalence_pct": 47.03
+    },
+    {
+      "model": "LightGBM",
+      "cv_auc_harmonized_label": 0.84,
+      "cv_auc_labonly_label": 0.8044,
+      "delta": 0.0356,
+      "cv_auc_nolipidmed_label": 0.8353,
+      "cv_auc_bpfirst_label": 0.8408,
+      "harmonized_prevalence_pct": 46.69,
+      "labonly_prevalence_pct": 35.22,
+      "nolipidmed_prevalence_pct": 40.1,
+      "bpfirst_prevalence_pct": 47.03
     },
     {
       "model": "XGBoost",
-      "cv_auc_harmonized_label": 0.8186,
-      "cv_auc_labonly_label": 0.7897,
-      "delta": 0.0289,
-      "harmonized_prevalence_pct": 46.33,
-      "labonly_prevalence_pct": 35.57
-    },
-    {
-      "model": "Gradient Boosting",
-      "cv_auc_harmonized_label": 0.8442,
-      "cv_auc_labonly_label": 0.8104,
-      "delta": 0.0338,
-      "harmonized_prevalence_pct": 46.33,
-      "labonly_prevalence_pct": 35.57
+      "cv_auc_harmonized_label": 0.8399,
+      "cv_auc_labonly_label": 0.8025,
+      "delta": 0.0375,
+      "cv_auc_nolipidmed_label": 0.8347,
+      "cv_auc_bpfirst_label": 0.8418,
+      "harmonized_prevalence_pct": 46.69,
+      "labonly_prevalence_pct": 35.22,
+      "nolipidmed_prevalence_pct": 40.1,
+      "bpfirst_prevalence_pct": 47.03
     }
   ],
   "collinearity": [
     {
       "var_1": "BMXHIP",
       "var_2": "BMXBMI",
-      "pearson_r": 0.9367,
-      "pct_missing_var_1_train": 81.97,
+      "pearson_r": 0.932,
+      "pct_missing_var_1_train": 81.35,
       "decision": "excluded from predictor set (PREDICTOR_VARS in config.py): redundant with BMXBMI and majority-missing"
     }
+  ],
+  "incremental_value": [
+    {
+      "model": "full",
+      "algorithm": "CatBoost",
+      "n_predictors": 32,
+      "cv_auc": 0.8438,
+      "cv_auc_sd": 0.012,
+      "test_auc": 0.8532,
+      "test_auc_ci_low": 0.8369,
+      "test_auc_ci_high": 0.8692,
+      "delta_vs_full": 0.0,
+      "delta_ci_low": 0.0,
+      "delta_ci_high": 0.0,
+      "delong_p": 1.0
+    },
+    {
+      "model": "no_metals",
+      "algorithm": "CatBoost",
+      "n_predictors": 27,
+      "cv_auc": 0.8423,
+      "cv_auc_sd": 0.0115,
+      "test_auc": 0.8531,
+      "test_auc_ci_low": 0.8372,
+      "test_auc_ci_high": 0.8689,
+      "delta_vs_full": -0.0001,
+      "delta_ci_low": -0.0028,
+      "delta_ci_high": 0.0028,
+      "delong_p": 0.951
+    },
+    {
+      "model": "lead_only",
+      "algorithm": "CatBoost",
+      "n_predictors": 28,
+      "cv_auc": 0.8428,
+      "cv_auc_sd": 0.0119,
+      "test_auc": 0.8528,
+      "test_auc_ci_low": 0.8371,
+      "test_auc_ci_high": 0.8685,
+      "delta_vs_full": -0.0004,
+      "delta_ci_low": -0.0031,
+      "delta_ci_high": 0.0023,
+      "delong_p": 0.778
+    },
+    {
+      "model": "no_bmi",
+      "algorithm": "CatBoost",
+      "n_predictors": 31,
+      "cv_auc": 0.7734,
+      "cv_auc_sd": 0.0104,
+      "test_auc": 0.7736,
+      "test_auc_ci_low": 0.7514,
+      "test_auc_ci_high": 0.793,
+      "delta_vs_full": -0.0796,
+      "delta_ci_low": -0.0949,
+      "delta_ci_high": -0.0641,
+      "delong_p": 2.61e-26
+    },
+    {
+      "model": "age_bmi_lr",
+      "algorithm": "Logistic Regression",
+      "n_predictors": 2,
+      "cv_auc": 0.8264,
+      "cv_auc_sd": 0.0119,
+      "test_auc": 0.8346,
+      "test_auc_ci_low": 0.8169,
+      "test_auc_ci_high": 0.8525,
+      "delta_vs_full": -0.0186,
+      "delta_ci_low": -0.0263,
+      "delta_ci_high": -0.0113,
+      "delong_p": 2.48e-06
+    }
+  ],
+  "repeated_cv": [
+    {
+      "model": "CatBoost",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8419,
+      "sd_auc_folds": 0.0116,
+      "p2_5_auc": 0.8219,
+      "p97_5_auc": 0.8627,
+      "min_repeat_mean": 0.8397,
+      "max_repeat_mean": 0.8438
+    },
+    {
+      "model": "XGBoost",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8401,
+      "sd_auc_folds": 0.0112,
+      "p2_5_auc": 0.8225,
+      "p97_5_auc": 0.8613,
+      "min_repeat_mean": 0.8388,
+      "max_repeat_mean": 0.8418
+    },
+    {
+      "model": "LightGBM",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8397,
+      "sd_auc_folds": 0.0114,
+      "p2_5_auc": 0.8183,
+      "p97_5_auc": 0.861,
+      "min_repeat_mean": 0.8383,
+      "max_repeat_mean": 0.8411
+    },
+    {
+      "model": "Gradient Boosting",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8392,
+      "sd_auc_folds": 0.011,
+      "p2_5_auc": 0.8195,
+      "p97_5_auc": 0.8603,
+      "min_repeat_mean": 0.8382,
+      "max_repeat_mean": 0.8405
+    },
+    {
+      "model": "SVM",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8372,
+      "sd_auc_folds": 0.0115,
+      "p2_5_auc": 0.8137,
+      "p97_5_auc": 0.8595,
+      "min_repeat_mean": 0.8352,
+      "max_repeat_mean": 0.8384
+    },
+    {
+      "model": "Random Forest",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8366,
+      "sd_auc_folds": 0.0118,
+      "p2_5_auc": 0.8162,
+      "p97_5_auc": 0.8582,
+      "min_repeat_mean": 0.8351,
+      "max_repeat_mean": 0.8375
+    },
+    {
+      "model": "Logistic Regression",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8356,
+      "sd_auc_folds": 0.0123,
+      "p2_5_auc": 0.8131,
+      "p97_5_auc": 0.8609,
+      "min_repeat_mean": 0.8352,
+      "max_repeat_mean": 0.8362
+    },
+    {
+      "model": "Decision Tree",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8177,
+      "sd_auc_folds": 0.0125,
+      "p2_5_auc": 0.7923,
+      "p97_5_auc": 0.8396,
+      "min_repeat_mean": 0.8154,
+      "max_repeat_mean": 0.8195
+    },
+    {
+      "model": "KNN",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.8014,
+      "sd_auc_folds": 0.0133,
+      "p2_5_auc": 0.7708,
+      "p97_5_auc": 0.8249,
+      "min_repeat_mean": 0.7999,
+      "max_repeat_mean": 0.8028
+    },
+    {
+      "model": "MLP",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.7896,
+      "sd_auc_folds": 0.0164,
+      "p2_5_auc": 0.7584,
+      "p97_5_auc": 0.8203,
+      "min_repeat_mean": 0.788,
+      "max_repeat_mean": 0.7924
+    },
+    {
+      "model": "Naive Bayes",
+      "n_fits": 50,
+      "folds": 10,
+      "repeats": 5,
+      "mean_auc": 0.7438,
+      "sd_auc_folds": 0.0172,
+      "p2_5_auc": 0.7165,
+      "p97_5_auc": 0.7717,
+      "min_repeat_mean": 0.7429,
+      "max_repeat_mean": 0.7454
+    }
+  ],
+  "temporal_validation": [
+    {
+      "Validation design": "Random split (primary analysis)",
+      "Model": "CatBoost",
+      "Train n": 8703,
+      "Test n": 2176,
+      "Test AUROC": 0.8532,
+      "AUROC 95% CI low": 0.8369,
+      "AUROC 95% CI high": 0.8692,
+      "Calibration slope": 1.057,
+      "Calibration intercept (in-the-large)": -0.051,
+      "O:E ratio": 0.983,
+      "Brier score": 0.1558,
+      "Hyperparameters": "{\"model__learning_rate\": 0.05, \"model__iterations\": 200, \"model__depth\": 6}"
+    },
+    {
+      "Validation design": "Temporal holdout (develop 2007-2014, test 2015-2018; re-tuned)",
+      "Model": "CatBoost",
+      "Train n": 7786,
+      "Test n": 3093,
+      "Test AUROC": 0.8326,
+      "AUROC 95% CI low": 0.8187,
+      "AUROC 95% CI high": 0.8463,
+      "Calibration slope": 1.06,
+      "Calibration intercept (in-the-large)": -0.008,
+      "O:E ratio": 0.997,
+      "Brier score": 0.1658,
+      "Hyperparameters": "{\"model__depth\": 6, \"model__iterations\": 500, \"model__learning_rate\": 0.01}"
+    }
+  ],
+  "missing_flags": [
+    "INDFMPIR",
+    "BMXBMI",
+    "ALQ130",
+    "PAD645",
+    "LBXBSE"
   ],
   "missingness": [
     {
       "variable": "DIQ070",
-      "pct_missing": 82.26
+      "pct_missing": 81.7
     },
     {
       "variable": "BPQ100D",
-      "pct_missing": 75.16
+      "pct_missing": 74.65
     },
     {
       "variable": "BPQ050A",
-      "pct_missing": 68.36
-    },
-    {
-      "variable": "SMQ040",
-      "pct_missing": 55.28
-    },
-    {
-      "variable": "LBXBMN",
-      "pct_missing": 43.31
+      "pct_missing": 67.86
     },
     {
       "variable": "LBXBSE",
-      "pct_missing": 43.31
+      "pct_missing": 42.02
     },
     {
-      "variable": "ALQ130",
-      "pct_missing": 36.61
+      "variable": "LBXBMN",
+      "pct_missing": 42.02
     },
     {
       "variable": "INDFMPIR",
-      "pct_missing": 9.21
+      "pct_missing": 9.13
     },
     {
-      "variable": "ALQ_EVER",
-      "pct_missing": 6.25
+      "variable": "ALQ130",
+      "pct_missing": 5.93
+    },
+    {
+      "variable": "ALQ_PAST12",
+      "pct_missing": 5.91
     },
     {
       "variable": "BMXBMI",
-      "pct_missing": 0.22
-    },
-    {
-      "variable": "DMDEDUC2",
-      "pct_missing": 0.09
+      "pct_missing": 0.2
     },
     {
       "variable": "PAD645",
-      "pct_missing": 0.08
+      "pct_missing": 0.14
+    },
+    {
+      "variable": "DMDEDUC2",
+      "pct_missing": 0.06
     },
     {
       "variable": "SMQ020",
-      "pct_missing": 0.05
+      "pct_missing": 0.06
     },
     {
-      "variable": "DMDMARTL",
-      "pct_missing": 0.04
+      "variable": "SMQ040",
+      "pct_missing": 0.06
     },
     {
       "variable": "PAQ605",
-      "pct_missing": 0.04
+      "pct_missing": 0.05
     },
     {
       "variable": "DBQ700",
+      "pct_missing": 0.03
+    },
+    {
+      "variable": "DMDMARTL",
       "pct_missing": 0.03
     },
     {
@@ -1479,7 +1995,7 @@
       "pct_missing": 0.02
     },
     {
-      "variable": "BPXSY1",
+      "variable": "SBP_MEAN",
       "pct_missing": 0.0
     },
     {
@@ -1507,7 +2023,7 @@
       "pct_missing": 0.0
     },
     {
-      "variable": "BPXDI1",
+      "variable": "DBP_MEAN",
       "pct_missing": 0.0
     },
     {
@@ -1543,8 +2059,8 @@
       "pct_missing": 0.0
     }
   ],
-  "n_predictors": 33,
-  "n_transformed_features": 46,
-  "train_prevalence_pct": 46.3264,
-  "test_prevalence_pct": 46.3437
+  "n_predictors": 32,
+  "n_transformed_features": 37,
+  "train_prevalence_pct": 46.6851,
+  "test_prevalence_pct": 46.6912
 }

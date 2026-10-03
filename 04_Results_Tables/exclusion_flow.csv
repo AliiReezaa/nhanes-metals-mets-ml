@@ -1,6 +1,8 @@
 step,n_remaining,n_excluded_this_step
 "0. Pooled sample (all cycles, all ages)",59842,0.0
 1. Age >= 20,34770,25072.0
-2. Complete data on all 5 MetS lab/exam components,13337,21433.0
-3. At least 1 of 5 metals measured,11144,2193.0
-4. Final analytic cohort (mets_status computed),11144,0.0
+2. Not pregnant,34398,372.0
+3. Complete data on all 5 MetS lab/exam components,13745,20653.0
+4. Met fasting criterion (8 to 24 h; non-zero fasting weight),13050,695.0
+5. At least 1 of 5 metals measured,10879,2171.0
+6. Final analytic cohort (mets_status computed),10879,0.0

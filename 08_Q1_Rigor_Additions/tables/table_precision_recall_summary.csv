@@ -1,2 +1,2 @@
 Model,N test,Test prevalence,AUROC,AUPRC
-CatBoost (primary),2229,0.4634,0.8567,0.8114
+CatBoost (primary),2176,0.4669,0.8532,0.8228

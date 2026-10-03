@@ -1,99 +1,92 @@
-# Blood Metals and Metabolic Syndrome — AI/ML Component
+# Blood Metals and Metabolic Syndrome: Machine-Learning Component
 
-Submission package prepared 2026-09-18.
+Package refreshed 2026-10-03.
 
 This package covers the machine-learning arm of the study: predicting metabolic syndrome
-(MetS) in pooled NHANES 2007–2018 data from demographic, lifestyle, anthropometric and
+(MetS) in pooled NHANES 2007-2018 adults from demographic, lifestyle, body-size and
 blood-metal predictors, and identifying which predictors carry the signal. The Mendelian
-randomization arm is described as planned work in the proposal and has not yet been run;
+randomization (MR) arm is described as planned work in the proposal and has not been run;
 no MR results appear anywhere in this package.
+
+## Run everything with one click
+
+| System | Do this |
+|---|---|
+| Windows | Double-click `RUN_ME_Windows.bat` |
+| macOS | Double-click `RUN_ME_macOS.command` (first time: right-click, Open) |
+| Linux | Run `bash RUN_ME_Linux.sh` |
+| Any | Run `python RUN_ME.py` (or `python3 RUN_ME.py`) |
+
+You need Python 3.11, 3.12 or 3.13 from python.org. The launcher installs the pinned
+packages of `06_Code/requirements.txt` into a private `.venv` folder, asks one question
+(FULL from the raw NHANES files, PACKAGED from the cleaned data in `05_Data_Processed/`,
+or a QUICK test drive), runs every step in order, and ends with
+`outputs/reproduction_report.txt`, which compares your numbers with the published ones.
+FULL and PACKAGED take a few hours (the 10-fold tuning fits several thousand models), so
+keep the computer awake. Everything the run creates goes into `outputs/`,
+`data_processed/` and `manuscript/`; the published folders are only changed by
+`06_Code/26_build_submission.py`.
 
 ## How the folders are organised
 
 | Folder | Contents |
 |---|---|
 | `01_Manuscript/` | Methods, Results and Supplementary Material, as .docx and .pdf |
-| `02_Proposal/` | The revised research proposal, as .docx and .pdf |
-| `03_Figures/Main/` | Figures 1–5, numbered as the manuscripts cite them |
-| `03_Figures/Supplementary/` | Figures S1–S5 |
+| `02_Proposal/` | The research proposal (and a partial plain-language draft), as .docx and .pdf |
+| `03_Figures/Main/`, `03_Figures/Supplementary/` | Figures 1-5 and S1-S5, numbered as the manuscripts cite them |
 | `04_Results_Tables/` | Every metrics table the manuscripts draw on, plus the citation audit records |
 | `05_Data_Processed/` | The analytic dataset and the exact train/test split |
-| `06_Code/` | The full pipeline, numbered in execution order |
-| `00_MANIFEST.csv` | Every file above, with size, MD5 checksum and a one-line description |
+| `06_Code/` | The pipeline, numbered in execution order, plus shared helper modules |
+| `07_Novelty_Additions/`, `08_Q1_Rigor_Additions/` | Exploratory analyses, each with its own README |
+| `00_MANIFEST.csv` | Every published file with size, MD5 checksum and a one-line description |
+| `FIX_CHECKLIST.md` | Every issue found in the October 2026 audit and the commit that fixed it |
 
-Every figure is supplied twice: a 600 dpi PNG for reading, and a vector PDF for
-typesetting. The two are drawn from the same code path, so they cannot disagree.
+Every figure is supplied as a 600 dpi PNG and a vector PDF drawn from the same code.
+
+## Running the steps by hand
+
+```bash
+python -m venv .venv
+# Windows: .venv\Scripts\activate      macOS/Linux: source .venv/bin/activate
+pip install -r 06_Code/requirements.txt
+
+python 06_Code/00_download_nhanes.py          # FULL only: raw files into NHANES_data/
+for s in 01 02 03 04 06 07 08 09 10 11 13; do python 06_Code/"$s"_*.py; done
+python 06_Code/12_visualize.py                # optional charts and dashboard
+for f in 07_Novelty_Additions/code/*.py 08_Q1_Rigor_Additions/code/*.py; do python "$f"; done
+python 06_Code/14_generate_diagrams.py        # proposal diagrams
+python 06_Code/15_publication_figures.py      # figures and the numbers JSON
+python 06_Code/16_write_methods_docx.py
+python 06_Code/17_write_results_docx.py
+python 06_Code/21_write_supplement.py
+python 06_Code/29_update_proposal.py          # proposal text, tables and figures
+python 06_Code/26_build_submission.py         # refresh the published folders
+python 06_Code/18_verify_manuscript_numbers.py
+python 06_Code/20_verify_citations.py
+python 06_Code/27_verify_submission.py
+```
+
+To start from the shipped cleaned data instead of the raw files (PACKAGED), copy
+`05_Data_Processed/nhanes_with_outcome.csv` into a `data_processed/` folder and start the
+loop at 03. The random seed is fixed in `06_Code/config.py`, and the split is pinned by
+SEQN in `05_Data_Processed/train_seqn.csv` and `test_seqn.csv`.
 
 ## What has been checked, and how
 
-Four verification scripts run over this material. All four pass as packaged.
+- `06_Code/18_verify_manuscript_numbers.py` traces every numeric token in the three
+  manuscript documents back to a value in the pipeline's output. Current result: 1,301 tokens checked, 0 requiring adjudication.
+- `06_Code/20_verify_citations.py` checks the Methods references against the PubMed
+  records captured in `04_Results_Tables/reference_verification.json`.
+- `06_Code/24_audit_proposal_references.py` and `25_verify_proposal_citations.py` audit
+  the proposal's reference bank and its citation numbering.
+- `06_Code/27_verify_submission.py` checks the package as received: every published file
+  is in the manifest with a matching checksum, every figure and table the text cites
+  exists, no document carries a draft marker, no PDF page is blank, and every
+  third-party package the code imports is pinned in `requirements.txt`.
+- `06_Code/28_compare_to_reference.py` compares a fresh run with the published tables.
 
-- `06_Code/18_verify_manuscript_numbers.py` takes every numeric token in the three
-  manuscript documents and tries to trace it back to a value that actually exists in the
-  pipeline's output. It builds the allowed pool from the metrics tables, the numbers JSON
-  and a declared set of structural constants, and prints anything it cannot account for
-  rather than passing it silently. Current result: 997 tokens checked, 0 requiring adjudication. This proves no number was
-  invented, mistyped, or left behind by an earlier draft; it does not prove that a real
-  number is attached to the right claim, which is what reading is for.
-- `06_Code/20_verify_citations.py` checks the Methods references: that every marker
-  resolves, that every reference is cited, that first-mention order is ascending, that
-  PMIDs and DOIs are unique, and that each entry matches the PubMed record captured in
-  `04_Results_Tables/reference_verification.json`.
-- `06_Code/24_audit_proposal_references.py` does the same field-by-field comparison for
-  the proposal's 111-entry reference bank — title, first author, journal, year, volume,
-  issue, pages and DOI against PubMed's own record.
-- `06_Code/25_verify_proposal_citations.py` checks the finished proposal document rather
-  than the script that produced it: numbering runs 1–99 with no gaps, no reference goes
-  uncited, first mentions ascend, and every listed entry renders exactly as the bank says
-  it should.
-- `06_Code/27_verify_submission.py` checks this package as you received it, which is the
-  one thing the others cannot: that every file on disk is in the manifest and every
-  checksum still matches, that every figure and table the text cites exists here and
-  nothing sits here uncited, that no document carries a leftover draft marker, and that
-  no page in any PDF is blank.
+## Data
 
-## Reproducing the analysis
-
-```bash
-python -m venv venv && ./venv/bin/pip install -r 06_Code/requirements.txt
-
-# modelling pipeline, in order
-for s in 01 02 03 04 06 07 08 09 10 11 12 13; do ./venv/bin/python 06_Code/$s_*.py; done
-
-# figures and the numbers JSON
-./venv/bin/python 06_Code/15_publication_figures.py
-
-# documents (these need python-docx)
-python3 06_Code/16_write_methods_docx.py
-python3 06_Code/17_write_results_docx.py
-python3 06_Code/21_write_supplement.py
-python3 06_Code/23_rewrite_proposal_citations.py
-
-# verification
-python3 06_Code/18_verify_manuscript_numbers.py
-python3 06_Code/20_verify_citations.py
-python3 06_Code/24_audit_proposal_references.py
-python3 06_Code/25_verify_proposal_citations.py
-```
-
-Step 01 reads the raw NHANES `.xpt` files, which are not included here — they are public
-and are downloaded from the CDC (the URL is given in the Methods, Data subsection). Every
-step from 02 onward runs from `05_Data_Processed/`, which is included.
-
-The random seed is fixed in `06_Code/config.py`. The train/test split is additionally
-pinned by SEQN in `05_Data_Processed/train_seqn.csv` and `test_seqn.csv`, so the partition
-is reproducible even if the splitting code changes.
-
-## Two things worth flagging
-
-**Six claims in the proposal were rewritten rather than cited.** Each asserted something
-for which no real article could be found — a peri-menopausal blood-lead study, marital
-status and household size as MetS risk factors, an HIV/BMI threshold claim, wine being
-less harmful than beer or spirits, and a 13-SNP blood-lead instrument. The rewritten
-sentences say what the literature that does exist actually shows. The full list, with the
-reasoning, is in the docstring of `06_Code/23_rewrite_proposal_citations.py` under
-`REMOVED_CLAIMS`.
-
-**Every reference was checked against PubMed before use, and seven did not survive.** Four
-resolved to entirely different papers, and three could not be found at all. One of the
-seven was already in the previous draft of the proposal, cited by name in the prose.
+The raw NHANES `.xpt` files are public and are not included; `00_download_nhanes.py`
+fetches them from the CDC website (https://wwwn.cdc.gov/nchs/nhanes/), or they can be
+downloaded by hand into `NHANES_data/NHANES_<years>/`.

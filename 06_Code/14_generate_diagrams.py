@@ -163,7 +163,7 @@ def build_figure1(n: dict):
     green_e, green_f = "#1B5E3F", "#DCF0E4"
     tan_e, tan_f = "#8A5A12", "#FBEFDA"
     W = 12.0
-    TITLE_H, LINE_H, PAD_TOP, PAD_BOT = 0.32, 0.245, 0.16, 0.26
+    TITLE_H, LINE_H, PAD_TOP, PAD_BOT = 0.32, 0.27, 0.16, 0.30
 
     def box_height(subtitle, fontsize_title=14.5):
         n_lines = subtitle.count("\n") + 1
@@ -194,22 +194,23 @@ def build_figure1(n: dict):
 
     GAP = 0.55
     y = 0.15 + 0.5  # title reserve
-    box1_sub = f"Merged {n['n_modules']} modules ({n['module_list']}), all six 2-year cycles; n = {n['n_pooled']:,}"
+    box1_sub = (f"Merged {n['n_modules']} modules ({n['module_list']})\n"
+                f"across all six 2-year cycles; n = {n['n_pooled']:,}")
     box2_sub = f"n = {n['n_age20']:,}"
     box2b_sub = f"n = {n['n_not_preg']:,}"
     box3_sub = (f"Waist circumference, mean systolic/diastolic BP, HDL-C, triglycerides, fasting glucose\n"
                 f"n = {n['n_complete_mets']:,}")
     box3b_sub = f"Fasted 8 to 24 h (non-zero NCHS fasting weight); n = {n['n_fasted']:,}"
     box4_sub = f"Lead, cadmium, mercury, selenium, manganese. FINAL ANALYTIC COHORT: n = {n['n_final']:,}"
-    outcome_sub = (f"Harmonized criteria (Alberti et al. 2009):\nmeasured threshold OR drug treatment "
+    outcome_sub = (f"Harmonized criteria (Alberti et al. 2009):\nmeasured threshold OR drug treatment\n"
                    f"(BPQ050A / BPQ100D / DIQ050 / DIQ070)\n\n"
-                   f"MetS+: n = {n['mets_pos_harmonized']:,} ({n['mets_pct_harmonized']:.1f}%)\n"
-                   f"[lab-only definition: {n['mets_pct_labonly']:.1f}%; {n['n_reclassified']:,} reclassified]")
-    predictor_sub = (f"{n['n_predictors']} predictors: 5 blood metals + demographic /\nanthropometric / lifestyle covariates\n\n"
-                      f"All 5 MetS-defining components AND all 4\nmedication-status variables EXCLUDED (leakage-safe by design)")
-    final_sub = (f"n = {n['n_final']:,} participants × {n['n_predictors']} predictors + 1 outcome label\n\n"
-                 f"Worst-missing predictor: {n['worst_missing_var']} ({n['worst_missing_pct']:.1f}% missing), imputed "
-                 f"and flagged with an always-present\nmissing-value indicator, inside each cross-validation fold only, "
+                   f"MetS: n = {n['mets_pos_harmonized']:,} ({n['mets_pct_harmonized']:.1f}%)\n"
+                   f"[measured values only: {n['mets_pct_labonly']:.1f}%;\n{n['n_reclassified']:,} reclassified by treatment]")
+    predictor_sub = (f"{n['n_predictors']} predictor columns: 5 blood metals\n+ demographic / anthropometric /\nlifestyle covariates\n\n"
+                      f"The 5 MetS components and the 4\nmedication items are EXCLUDED\n(they define the outcome)")
+    final_sub = (f"n = {n['n_final']:,} participants × {n['n_predictors']} predictor columns + 1 outcome label\n\n"
+                 f"Most incomplete predictor: {n['worst_missing_var']} ({n['worst_missing_pct']:.1f}% missing),\n"
+                 f"imputed and flagged with a missing-value indicator inside each\ncross-validation fold, "
                  f"never before the train/test split\n\n"
                  f"Stratified 80/20 split (Sec. 3.1.6): {n['n_train']:,} train / {n['n_test']:,} test")
 

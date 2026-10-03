@@ -1,3 +1,3 @@
 Example,Actual MetS status,Predicted P(MetS),"Model base value (log-odds, expected value)",Top contributing feature (|SHAP|),Top feature |SHAP| value (log-odds)
-True positive,1,0.9694,-0.1445,BMI,1.4368
-True negative,0,0.0043,-0.1445,BMI,2.2837
+True positive,1,0.9515,-0.1528,BMI,1.3804
+True negative,0,0.0033,-0.1528,BMI,2.1627

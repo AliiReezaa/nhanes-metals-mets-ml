@@ -78,6 +78,11 @@ _shap["rank"] = _shap["mean_abs_shap"].rank(ascending=False, method="min").astyp
 SHAP_RANK = _shap.set_index("feature_code")["rank"]
 
 
+def sgn(v, dp):
+    """Signed number with a true minus sign, so it cannot break across lines."""
+    return f"{v:+.{dp}f}".replace("-", "\u2212")
+
+
 def shap_rank(code):
     return int(SHAP_RANK[code])
 
@@ -153,6 +158,8 @@ def set_text(p, text):
 
 def sub(p, old, new):
     t = p.text
+    if new in t:
+        return  # already applied; the script is safe to run more than once
     if old not in t:
         if new in t:
             return  # already applied
@@ -358,10 +365,20 @@ def main():
     # ---- 3.2.1 Study design (P5, P8)
     pb, se, cd, hg, mn = (mr[k] for k in ["LBXBPB", "LBXBSE", "LBXBCD", "LBXTHG", "LBXBMN"])
     no_met = inc.loc["no_metals"]
-    lead_rank_metals = sorted(cfg.PREDICTOR_VARS["metals"], key=prank)
-    if set(lead_rank_metals[:2]) != {"LBXBPB", "LBXBSE"}:
-        print(f"[WARNING] the two highest metals by permutation importance are {lead_rank_metals[:2]}, "
-              f"not lead and selenium; revisit the exposure tiers before submission.")
+    METALS = ["LBXBPB", "LBXBSE", "LBXBCD", "LBXTHG", "LBXBMN"]
+    MNAME = {"LBXBPB": "lead", "LBXBSE": "selenium", "LBXBCD": "cadmium", "LBXTHG": "mercury",
+             "LBXBMN": "manganese"}
+    xmean = {m: float(np.mean(list(mr[m]["per_model_perm_rank"].values()))) for m in METALS}
+    by_cross = sorted(METALS, key=xmean.get)
+    if by_cross[:2] != ["LBXBPB", "LBXBSE"]:
+        print(f"[WARNING] by mean permutation rank across the four leading models the two highest metals "
+              f"are {by_cross[:2]}, not lead then selenium; revisit the exposure tiers before submission.")
+
+    def metal_ev(m):
+        return (f"{MNAME[m]} (permutation rank {prank(m)} of {n_pred} in {top}, "
+                f"{'above' if above_noise(m) else 'within'} its permutation standard deviation; "
+                f"{span(m)} across the four leading models)")
+
     set_text(para(doc, "3.2.1. Study design", 0),
              "This MR study tests whether blood metal exposures, together with any non-metal factor the "
              "machine-learning phase identifies as a comparably strong predictor, have a causal effect on "
@@ -373,14 +390,13 @@ def main():
              f"evidence (section 3.1.7). In the final run on the {n_final:,}-participant cohort, body "
              f"mass index and age dominated the ranking; the five metals sat in the middle and lower "
              f"part of it, and removing all five changed test-set discrimination by "
-             f"{no_met['delta_vs_full']:+.4f} AUROC units (DeLong p = {no_met['delong_p']:.3g}). "
-             f"Lead (permutation rank {prank('LBXBPB')} of {n_pred}; {span('LBXBPB')} across the four "
-             f"leading models) and selenium (rank {prank('LBXBSE')}; {span('LBXBSE')}) carried the most "
-             f"consistent metal signal, whereas cadmium (rank {prank('LBXBCD')}), manganese "
-             f"(rank {prank('LBXBMN')}) and mercury (rank {prank('LBXTHG')}) "
-             f"{'were at or near noise level' if not any(above_noise(m) for m in ['LBXBCD', 'LBXBMN', 'LBXTHG']) else 'were less consistent'}. "
-             f"Lead and selenium are therefore primary metal exposures and cadmium, which has the "
-             f"strongest prior literature and a published never-smoker instrument, is secondary. The "
+             f"{sgn(no_met['delta_vs_full'], 4)} AUROC units (DeLong p = {no_met['delong_p']:.3g}). "
+             f"The metal evidence, from strongest to weakest by mean rank across the four leading "
+             f"models, was: " + "; ".join(metal_ev(m) for m in by_cross) + ". "
+             f"Lead, the most stable metal across models, and selenium, the next most stable, are the "
+             f"primary metal exposures. Cadmium is secondary: its signal was distinguishable from "
+             f"noise in {top} but less stable across models, and it has the strongest prior "
+             f"literature and a published never-smoker instrument. The "
              f"second criterion is a usable genetic instrument under the rule in section 3.2.3, applied "
              f"identically to every exposure. An associational ranking and a causal test answer "
              f"different questions: a factor can be predictive without being causal, or causal without "
@@ -472,7 +488,7 @@ def main():
     rows = [
         ("Body mass index",
          f"SHAP rank {shap_rank('BMXBMI')} and permutation rank {prank('BMXBMI')} of {n_pred}; removing it "
-         f"changed test AUROC by {inc.loc['no_bmi', 'delta_vs_full']:+.4f}. Part of its weight is "
+         f"changed test AUROC by {sgn(inc.loc['no_bmi', 'delta_vs_full'], 4)}. Part of its weight is "
          f"definitional, because waist circumference defines one MetS component",
          "GIANT consortium meta-analyses, ~700,000 participants [78,79]", "Primary exposure"),
         ("Lead",

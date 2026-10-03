@@ -8,6 +8,8 @@ stage,n
 "TOTAL pooled (all cycles, all ages)",59842
 "0. Pooled sample (all cycles, all ages)",59842
 1. Age >= 20,34770
-2. Complete data on all 5 MetS lab/exam components,13337
-3. At least 1 of 5 metals measured,11144
-4. Final analytic cohort (mets_status computed),11144
+2. Not pregnant,34398
+3. Complete data on all 5 MetS lab/exam components,13745
+4. Met fasting criterion (8 to 24 h; non-zero fasting weight),13050
+5. At least 1 of 5 metals measured,10879
+6. Final analytic cohort (mets_status computed),10879

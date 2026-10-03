@@ -46,7 +46,7 @@ MET = ROOT / "outputs" / "metrics"
 
 # Folders that are regenerated on every run and never published.
 NOT_PUBLISHED = {".git", ".venv", "venv", "outputs", "data_processed", "NHANES_data",
-                 "manuscript", "diagrams", "__pycache__", ".pytest_cache"}
+                 "manuscript", "diagrams", "__pycache__", ".pytest_cache", "catboost_info"}
 NOT_PUBLISHED_FILES = {".DS_Store", "00_MANIFEST.csv"}
 
 ADDITION_FOLDERS = ["07_Novelty_Additions", "08_Q1_Rigor_Additions"]
@@ -206,6 +206,7 @@ CODE_ORDER_NOTE = {
     "26": "refresh the published folders, README and manifest from a finished run",
     "27": "verify the published package",
     "28": "compare a fresh run with the published results",
+    "29": "update the research proposal text, tables and figures from the final results",
 }
 
 

@@ -59,6 +59,7 @@ python 06_Code/15_publication_figures.py      # figures and the numbers JSON
 python 06_Code/16_write_methods_docx.py
 python 06_Code/17_write_results_docx.py
 python 06_Code/21_write_supplement.py
+python 06_Code/29_update_proposal.py          # proposal text, tables and figures
 python 06_Code/26_build_submission.py         # refresh the published folders
 python 06_Code/18_verify_manuscript_numbers.py
 python 06_Code/20_verify_citations.py

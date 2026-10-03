@@ -203,6 +203,11 @@ def verify(path: Path, allowed: set):
             cands = {round(v, d) for d in range(0, 11)}
             if cands & allowed:
                 continue
+            # citation markers such as [21,22] or [5–7]
+            if re.match(r"\[[\d,–\-]+\]", text[max(0, m.start() - 1):]) or (
+                    m.start() > 0 and text[m.start() - 1] in "[,–" and "]" in text[m.end():m.end() + 8]
+                    and "[" in text[max(0, m.start() - 8):m.start()]):
+                continue
             # numbers embedded in a variable name or a cross-reference
             window = text[max(0, m.start() - 22):m.end() + 6]
             if SKIP_CONTEXT.search(window):

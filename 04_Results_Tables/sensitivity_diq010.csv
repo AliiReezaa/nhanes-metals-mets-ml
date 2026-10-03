@@ -1,4 +1,4 @@
 model,cv_auc_primary,cv_auc_plus_diq010,delta
-CatBoost,0.8416,0.8515,0.0099
-XGBoost,0.8186,0.8314,0.0128
-Gradient Boosting,0.8442,0.8547,0.0105
+CatBoost,0.8438,0.8533,0.0095
+LightGBM,0.84,0.8504,0.0104
+XGBoost,0.8399,0.8512,0.0112

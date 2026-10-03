@@ -1,3 +1,4 @@
 Variable 1,Variable 2,Spearman rho
-Ever smoked,Smoking intensity,0.557
-Smoking intensity,Blood Cd,0.556
+Drank past 12 mo,Drinks/drinking day,0.814
+Smoking intensity,Blood Cd,0.552
+Ever smoked,Smoking intensity,0.551

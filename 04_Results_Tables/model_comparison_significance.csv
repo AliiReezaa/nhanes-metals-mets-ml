@@ -1,12 +1,12 @@
-model,is_top_model,auc_diff_vs_top,diff_95ci_low,diff_95ci_high,p_value,statistically_indistinguishable_from_top
-CatBoost,True,0.0,0.0,0.0,1.0,True
-LightGBM,False,0.0006,-0.0026,0.004,0.732,True
-XGBoost,False,0.0017,-0.0013,0.0046,0.268,True
-Gradient Boosting,False,0.0021,-0.001,0.0052,0.172,True
-SVM,False,0.0104,0.0049,0.0153,0.0,False
-Logistic Regression,False,0.0119,0.0056,0.0181,0.0,False
-Random Forest,False,0.012,0.0075,0.0165,0.0,False
-Decision Tree,False,0.0267,0.0185,0.035,0.0,False
-MLP,False,0.0506,0.0385,0.0622,0.0,False
-KNN,False,0.0548,0.0434,0.0655,0.0,False
-Naive Bayes,False,0.1266,0.1082,0.1432,0.0,False
+model,is_top_model,auc_diff_vs_top,diff_95ci_low,diff_95ci_high,p_value,statistically_indistinguishable_from_top,p_method
+CatBoost,True,0.0,0.0,0.0,1.0,True,
+XGBoost,False,0.001,-0.0021,0.0044,0.524,True,DeLong
+Gradient Boosting,False,0.0014,-0.0022,0.0051,0.423,True,DeLong
+LightGBM,False,0.0017,-0.0015,0.0052,0.302,True,DeLong
+Random Forest,False,0.007,0.0023,0.0115,0.00237,False,DeLong
+Logistic Regression,False,0.0101,0.0043,0.016,0.000928,False,DeLong
+SVM,False,0.0128,0.0074,0.0181,2.39e-06,False,DeLong
+Decision Tree,False,0.0223,0.0136,0.0307,3.19e-07,False,DeLong
+KNN,False,0.0461,0.0358,0.0568,3.13e-17,False,DeLong
+MLP,False,0.0515,0.0397,0.063,2.01e-16,False,DeLong
+Naive Bayes,False,0.1073,0.0921,0.1242,1.65e-35,False,DeLong

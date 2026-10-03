@@ -1,3 +1,5 @@
 definition,n,n_positive,prevalence_pct,n_reclassified_negative_to_positive,n_reclassified_positive_to_negative,n_on_any_relevant_medication
-lab_only (original pipeline),11144,3962,35.55,,,
-harmonized (this fix: + drug-treatment clause),11144,5163,46.33,1201.0,0.0,4032.0
+lab_only (measured values only),10879,3842,35.32,,,
+harmonized (measured value or drug treatment; primary),10879,5079,46.69,1237.0,0.0,3987.0
+harmonized without the lipid-medication clause (sensitivity),10879,4385,40.31,,,
+harmonized with the first blood-pressure reading only (sensitivity),10879,5109,46.96,,,

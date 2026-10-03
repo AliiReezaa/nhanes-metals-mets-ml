@@ -4,8 +4,8 @@
       "model__penalty": "l2",
       "model__C": 0.01
     },
-    "cv_auc": 0.8395585896413064,
-    "seconds": 85.5,
+    "cv_auc": 0.8351800535807671,
+    "seconds": 51.6,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 4,
@@ -17,8 +17,8 @@
       "model__min_samples_leaf": 20,
       "model__max_depth": 5
     },
-    "cv_auc": 0.8238422431475302,
-    "seconds": 258.3,
+    "cv_auc": 0.8183571820629639,
+    "seconds": 154.5,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 12,
@@ -31,8 +31,8 @@
       "model__min_samples_leaf": 5,
       "model__max_depth": null
     },
-    "cv_auc": 0.8377288592016697,
-    "seconds": 659.5,
+    "cv_auc": 0.8371357119276264,
+    "seconds": 504.9,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 12,
@@ -41,12 +41,12 @@
   },
   "Gradient Boosting": {
     "best_params": {
-      "model__n_estimators": 200,
-      "model__max_depth": 2,
+      "model__n_estimators": 100,
+      "model__max_depth": 3,
       "model__learning_rate": 0.1
     },
-    "cv_auc": 0.8443061446296014,
-    "seconds": 392.4,
+    "cv_auc": 0.8392507029397634,
+    "seconds": 267.1,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 8,
@@ -59,8 +59,8 @@
       "model__n_estimators": 500,
       "model__learning_rate": 0.01
     },
-    "cv_auc": 0.8437784774250051,
-    "seconds": 321.4,
+    "cv_auc": 0.8399626720412986,
+    "seconds": 202.6,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 12,
@@ -73,8 +73,8 @@
       "model__max_depth": 3,
       "model__learning_rate": 0.05
     },
-    "cv_auc": 0.8446451585598871,
-    "seconds": 301.3,
+    "cv_auc": 0.8399493464966117,
+    "seconds": 183.6,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 12,
@@ -86,8 +86,8 @@
       "model__kernel": "rbf",
       "model__C": 1
     },
-    "cv_auc": 0.8398144934673386,
-    "seconds": 1593.3,
+    "cv_auc": 0.8373908132231558,
+    "seconds": 1236.5,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 6,
@@ -96,8 +96,8 @@
   },
   "Naive Bayes": {
     "best_params": {},
-    "cv_auc": 0.7472380061036805,
-    "seconds": 20.7,
+    "cv_auc": 0.7437716942789028,
+    "seconds": 12.7,
     "cv_folds": 10,
     "n_iter_requested": null,
     "n_iter_actual": null,
@@ -111,8 +111,8 @@
       ],
       "model__alpha": 0.001
     },
-    "cv_auc": 0.7943249535914827,
-    "seconds": 518.1,
+    "cv_auc": 0.7897551211723327,
+    "seconds": 543.7,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 4,
@@ -123,8 +123,8 @@
     "best_params": {
       "model__n_neighbors": 25
     },
-    "cv_auc": 0.7990969017496439,
-    "seconds": 58.8,
+    "cv_auc": 0.8017521363129271,
+    "seconds": 38.9,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 3,
@@ -137,8 +137,8 @@
       "model__iterations": 200,
       "model__depth": 6
     },
-    "cv_auc": 0.8462899951910563,
-    "seconds": 348.6,
+    "cv_auc": 0.843792872073936,
+    "seconds": 256.9,
     "cv_folds": 10,
     "n_iter_requested": 20,
     "n_iter_actual": 12,

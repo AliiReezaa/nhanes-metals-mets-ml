@@ -1,246 +1,396 @@
 model,threshold,net_benefit
-CatBoost,0.02,0.45293
-CatBoost,0.03,0.44867
-CatBoost,0.04,0.44424
-CatBoost,0.05,0.43923
-CatBoost,0.06,0.43501
-CatBoost,0.07,0.43032
-CatBoost,0.08,0.4268
-CatBoost,0.09,0.42223
-CatBoost,0.1,0.41807
-CatBoost,0.11,0.41353
-CatBoost,0.12,0.40901
-CatBoost,0.13,0.40471
-CatBoost,0.14,0.40045
-CatBoost,0.15,0.3973
-CatBoost,0.16,0.3936
-CatBoost,0.17,0.38859
-CatBoost,0.18,0.38383
-CatBoost,0.19,0.38108
-CatBoost,0.2,0.37629
-CatBoost,0.21,0.37264
-CatBoost,0.22,0.36974
-CatBoost,0.23,0.36456
-CatBoost,0.24,0.36138
-CatBoost,0.25,0.35696
-CatBoost,0.26,0.35232
-CatBoost,0.27,0.34926
-CatBoost,0.28,0.3453
-CatBoost,0.29,0.33883
-CatBoost,0.3,0.33449
-CatBoost,0.31,0.33029
-CatBoost,0.32,0.32552
-CatBoost,0.33,0.32038
-CatBoost,0.34,0.31735
-CatBoost,0.35,0.31132
-CatBoost,0.36,0.30468
-CatBoost,0.37,0.30169
-CatBoost,0.38,0.2967
-CatBoost,0.39,0.28999
-CatBoost,0.4,0.28294
-CatBoost,0.41,0.27748
-CatBoost,0.42,0.27229
-CatBoost,0.43,0.26475
-CatBoost,0.44,0.26149
-CatBoost,0.45,0.25841
-CatBoost,0.46,0.25324
-CatBoost,0.47,0.24919
-CatBoost,0.48,0.2444
-CatBoost,0.49,0.24033
-CatBoost,0.5,0.23867
-LightGBM,0.02,0.45249
-LightGBM,0.03,0.44739
-LightGBM,0.04,0.44312
-LightGBM,0.05,0.43869
-LightGBM,0.06,0.43477
-LightGBM,0.07,0.43041
-LightGBM,0.08,0.42665
-LightGBM,0.09,0.42237
-LightGBM,0.1,0.41867
-LightGBM,0.11,0.41377
-LightGBM,0.12,0.40942
-LightGBM,0.13,0.40449
-LightGBM,0.14,0.40018
-LightGBM,0.15,0.3968
-LightGBM,0.16,0.39396
-LightGBM,0.17,0.3886
-LightGBM,0.18,0.38323
-LightGBM,0.19,0.37953
-LightGBM,0.2,0.37539
-LightGBM,0.21,0.37138
-LightGBM,0.22,0.36687
-LightGBM,0.23,0.36344
-LightGBM,0.24,0.35919
-LightGBM,0.25,0.35352
-LightGBM,0.26,0.34961
-LightGBM,0.27,0.34562
-LightGBM,0.28,0.34118
-LightGBM,0.29,0.33604
-LightGBM,0.3,0.33141
-LightGBM,0.31,0.32684
-LightGBM,0.32,0.32222
-LightGBM,0.33,0.31881
-LightGBM,0.34,0.31374
-LightGBM,0.35,0.30856
-LightGBM,0.36,0.30238
-LightGBM,0.37,0.30023
-LightGBM,0.38,0.29587
-LightGBM,0.39,0.29022
-LightGBM,0.4,0.28428
-LightGBM,0.41,0.27812
-LightGBM,0.42,0.27442
-LightGBM,0.43,0.27005
-LightGBM,0.44,0.26206
-LightGBM,0.45,0.25764
-LightGBM,0.46,0.25361
-LightGBM,0.47,0.24844
-LightGBM,0.48,0.24485
-LightGBM,0.49,0.23902
-LightGBM,0.5,0.23194
-XGBoost,0.02,0.45309
-XGBoost,0.03,0.44754
-XGBoost,0.04,0.44338
-XGBoost,0.05,0.43909
-XGBoost,0.06,0.43478
-XGBoost,0.07,0.43023
-XGBoost,0.08,0.42636
-XGBoost,0.09,0.42232
-XGBoost,0.1,0.41842
-XGBoost,0.11,0.41427
-XGBoost,0.12,0.41121
-XGBoost,0.13,0.4072
-XGBoost,0.14,0.40239
-XGBoost,0.15,0.39788
-XGBoost,0.16,0.39383
-XGBoost,0.17,0.38788
-XGBoost,0.18,0.38452
-XGBoost,0.19,0.37992
-XGBoost,0.2,0.37461
-XGBoost,0.21,0.37105
-XGBoost,0.22,0.3675
-XGBoost,0.23,0.36335
-XGBoost,0.24,0.35796
-XGBoost,0.25,0.35322
-XGBoost,0.26,0.349
-XGBoost,0.27,0.34395
-XGBoost,0.28,0.34066
-XGBoost,0.29,0.33532
-XGBoost,0.3,0.33186
-XGBoost,0.31,0.32843
-XGBoost,0.32,0.3247
-XGBoost,0.33,0.31795
-XGBoost,0.34,0.31324
-XGBoost,0.35,0.30697
-XGBoost,0.36,0.30243
-XGBoost,0.37,0.29444
-XGBoost,0.38,0.29161
-XGBoost,0.39,0.28689
-XGBoost,0.4,0.28219
-XGBoost,0.41,0.27565
-XGBoost,0.42,0.27306
-XGBoost,0.43,0.26654
-XGBoost,0.44,0.26136
-XGBoost,0.45,0.25935
-XGBoost,0.46,0.25191
-XGBoost,0.47,0.24696
-XGBoost,0.48,0.24074
-XGBoost,0.49,0.23781
-XGBoost,0.5,0.23508
-Gradient Boosting,0.02,0.45259
-Gradient Boosting,0.03,0.44727
-Gradient Boosting,0.04,0.44218
-Gradient Boosting,0.05,0.43753
-Gradient Boosting,0.06,0.43282
-Gradient Boosting,0.07,0.42925
-Gradient Boosting,0.08,0.42515
-Gradient Boosting,0.09,0.42116
-Gradient Boosting,0.1,0.41783
-Gradient Boosting,0.11,0.41477
-Gradient Boosting,0.12,0.41201
-Gradient Boosting,0.13,0.40917
-Gradient Boosting,0.14,0.40385
-Gradient Boosting,0.15,0.39989
-Gradient Boosting,0.16,0.39552
-Gradient Boosting,0.17,0.39064
-Gradient Boosting,0.18,0.38459
-Gradient Boosting,0.19,0.38089
-Gradient Boosting,0.2,0.3764
-Gradient Boosting,0.21,0.37331
-Gradient Boosting,0.22,0.36853
-Gradient Boosting,0.23,0.36476
-Gradient Boosting,0.24,0.36009
-Gradient Boosting,0.25,0.35517
-Gradient Boosting,0.26,0.35077
-Gradient Boosting,0.27,0.34567
-Gradient Boosting,0.28,0.34064
-Gradient Boosting,0.29,0.33831
-Gradient Boosting,0.3,0.33462
-Gradient Boosting,0.31,0.33089
-Gradient Boosting,0.32,0.32592
-Gradient Boosting,0.33,0.31987
-Gradient Boosting,0.34,0.31479
-Gradient Boosting,0.35,0.30945
-Gradient Boosting,0.36,0.30184
-Gradient Boosting,0.37,0.29685
-Gradient Boosting,0.38,0.29061
-Gradient Boosting,0.39,0.28758
-Gradient Boosting,0.4,0.28294
-Gradient Boosting,0.41,0.27806
-Gradient Boosting,0.42,0.27275
-Gradient Boosting,0.43,0.26938
-Gradient Boosting,0.44,0.26581
-Gradient Boosting,0.45,0.26074
-Gradient Boosting,0.46,0.25833
-Gradient Boosting,0.47,0.25342
-Gradient Boosting,0.48,0.24461
-Gradient Boosting,0.49,0.23717
-Gradient Boosting,0.5,0.23284
-Treat all,0.02,0.45249
-Treat all,0.03,0.44684
-Treat all,0.04,0.44108
-Treat all,0.05,0.4352
-Treat all,0.06,0.42919
-Treat all,0.07,0.42305
-Treat all,0.08,0.41678
-Treat all,0.09,0.41037
-Treat all,0.1,0.40382
-Treat all,0.11,0.39712
-Treat all,0.12,0.39027
-Treat all,0.13,0.38326
-Treat all,0.14,0.37609
-Treat all,0.15,0.36875
-Treat all,0.16,0.36123
-Treat all,0.17,0.35354
-Treat all,0.18,0.34565
-Treat all,0.19,0.33758
-Treat all,0.2,0.3293
-Treat all,0.21,0.32081
-Treat all,0.22,0.3121
-Treat all,0.23,0.30316
-Treat all,0.24,0.294
-Treat all,0.25,0.28458
-Treat all,0.26,0.27491
-Treat all,0.27,0.26498
-Treat all,0.28,0.25477
-Treat all,0.29,0.24428
-Treat all,0.3,0.23348
-Treat all,0.31,0.22237
-Treat all,0.32,0.21094
-Treat all,0.33,0.19916
-Treat all,0.34,0.18703
-Treat all,0.35,0.17452
-Treat all,0.36,0.16162
-Treat all,0.37,0.14831
-Treat all,0.38,0.13458
-Treat all,0.39,0.12039
-Treat all,0.4,0.10573
-Treat all,0.41,0.09057
-Treat all,0.42,0.07489
-Treat all,0.43,0.05866
-Treat all,0.44,0.04185
-Treat all,0.45,0.02443
-Treat all,0.46,0.00636
-Treat all,0.47,-0.01238
-Treat all,0.48,-0.03185
-Treat all,0.49,-0.05209
-Treat all,0.5,-0.07313
+CatBoost,0.02,0.45663
+CatBoost,0.03,0.45128
+CatBoost,0.04,0.44617
+CatBoost,0.05,0.44154
+CatBoost,0.06,0.43599
+CatBoost,0.07,0.43251
+CatBoost,0.08,0.42769
+CatBoost,0.09,0.4239
+CatBoost,0.1,0.42014
+CatBoost,0.11,0.41537
+CatBoost,0.12,0.41116
+CatBoost,0.13,0.40727
+CatBoost,0.14,0.40356
+CatBoost,0.15,0.39914
+CatBoost,0.16,0.39404
+CatBoost,0.17,0.38884
+CatBoost,0.18,0.38446
+CatBoost,0.19,0.37987
+CatBoost,0.2,0.37546
+CatBoost,0.21,0.3723
+CatBoost,0.22,0.36874
+CatBoost,0.23,0.36465
+CatBoost,0.24,0.35981
+CatBoost,0.25,0.35447
+CatBoost,0.26,0.351
+CatBoost,0.27,0.34597
+CatBoost,0.28,0.34199
+CatBoost,0.29,0.33609
+CatBoost,0.3,0.33193
+CatBoost,0.31,0.32682
+CatBoost,0.32,0.32118
+CatBoost,0.33,0.3169
+CatBoost,0.34,0.31228
+CatBoost,0.35,0.30875
+CatBoost,0.36,0.30124
+CatBoost,0.37,0.29927
+CatBoost,0.38,0.29352
+CatBoost,0.39,0.28672
+CatBoost,0.4,0.28554
+CatBoost,0.41,0.28112
+CatBoost,0.42,0.27631
+CatBoost,0.43,0.27295
+CatBoost,0.44,0.26579
+CatBoost,0.45,0.25836
+CatBoost,0.46,0.25305
+CatBoost,0.47,0.24878
+CatBoost,0.48,0.24579
+CatBoost,0.49,0.24248
+CatBoost,0.5,0.23943
+CatBoost,0.51,0.23427
+CatBoost,0.52,0.23219
+CatBoost,0.53,0.22303
+CatBoost,0.54,0.21523
+CatBoost,0.55,0.21022
+CatBoost,0.56,0.20705
+CatBoost,0.57,0.19917
+CatBoost,0.58,0.19564
+CatBoost,0.59,0.19189
+CatBoost,0.6,0.18865
+CatBoost,0.61,0.18622
+CatBoost,0.62,0.1814
+CatBoost,0.63,0.17199
+CatBoost,0.64,0.16488
+CatBoost,0.65,0.16124
+CatBoost,0.66,0.15603
+CatBoost,0.67,0.14791
+CatBoost,0.68,0.14488
+CatBoost,0.69,0.13246
+CatBoost,0.7,0.13006
+CatBoost,0.71,0.12471
+CatBoost,0.72,0.11706
+CatBoost,0.73,0.11106
+CatBoost,0.74,0.10252
+CatBoost,0.75,0.09559
+CatBoost,0.76,0.09337
+CatBoost,0.77,0.08288
+CatBoost,0.78,0.07545
+CatBoost,0.79,0.06517
+CatBoost,0.8,0.0602
+XGBoost,0.02,0.45673
+XGBoost,0.03,0.45176
+XGBoost,0.04,0.44577
+XGBoost,0.05,0.44103
+XGBoost,0.06,0.43625
+XGBoost,0.07,0.43266
+XGBoost,0.08,0.42821
+XGBoost,0.09,0.42441
+XGBoost,0.1,0.41963
+XGBoost,0.11,0.41538
+XGBoost,0.12,0.41085
+XGBoost,0.13,0.40709
+XGBoost,0.14,0.4025
+XGBoost,0.15,0.39828
+XGBoost,0.16,0.39404
+XGBoost,0.17,0.38977
+XGBoost,0.18,0.38502
+XGBoost,0.19,0.38011
+XGBoost,0.2,0.37534
+XGBoost,0.21,0.37142
+XGBoost,0.22,0.36686
+XGBoost,0.23,0.36254
+XGBoost,0.24,0.35896
+XGBoost,0.25,0.35493
+XGBoost,0.26,0.35179
+XGBoost,0.27,0.3466
+XGBoost,0.28,0.34235
+XGBoost,0.29,0.33962
+XGBoost,0.3,0.33567
+XGBoost,0.31,0.33107
+XGBoost,0.32,0.32721
+XGBoost,0.33,0.32053
+XGBoost,0.34,0.31622
+XGBoost,0.35,0.31151
+XGBoost,0.36,0.30759
+XGBoost,0.37,0.30257
+XGBoost,0.38,0.29431
+XGBoost,0.39,0.28955
+XGBoost,0.4,0.28339
+XGBoost,0.41,0.28058
+XGBoost,0.42,0.27569
+XGBoost,0.43,0.26891
+XGBoost,0.44,0.26356
+XGBoost,0.45,0.25877
+XGBoost,0.46,0.25555
+XGBoost,0.47,0.24868
+XGBoost,0.48,0.24735
+XGBoost,0.49,0.24079
+XGBoost,0.5,0.23392
+XGBoost,0.51,0.23096
+XGBoost,0.52,0.22583
+XGBoost,0.53,0.21929
+XGBoost,0.54,0.21645
+XGBoost,0.55,0.20823
+XGBoost,0.56,0.20572
+XGBoost,0.57,0.19842
+XGBoost,0.58,0.19201
+XGBoost,0.59,0.18497
+XGBoost,0.6,0.18084
+XGBoost,0.61,0.17831
+XGBoost,0.62,0.17383
+XGBoost,0.63,0.16724
+XGBoost,0.64,0.15891
+XGBoost,0.65,0.15966
+XGBoost,0.66,0.15241
+XGBoost,0.67,0.14373
+XGBoost,0.68,0.14424
+XGBoost,0.69,0.13701
+XGBoost,0.7,0.13787
+XGBoost,0.71,0.13565
+XGBoost,0.72,0.12809
+XGBoost,0.73,0.11225
+XGBoost,0.74,0.09774
+XGBoost,0.75,0.09191
+XGBoost,0.76,0.0795
+XGBoost,0.77,0.07934
+XGBoost,0.78,0.07311
+XGBoost,0.79,0.06182
+XGBoost,0.8,0.06158
+Gradient Boosting,0.02,0.45611
+Gradient Boosting,0.03,0.45115
+Gradient Boosting,0.04,0.44686
+Gradient Boosting,0.05,0.44118
+Gradient Boosting,0.06,0.43616
+Gradient Boosting,0.07,0.43209
+Gradient Boosting,0.08,0.42717
+Gradient Boosting,0.09,0.42331
+Gradient Boosting,0.1,0.41907
+Gradient Boosting,0.11,0.41629
+Gradient Boosting,0.12,0.41187
+Gradient Boosting,0.13,0.40723
+Gradient Boosting,0.14,0.40416
+Gradient Boosting,0.15,0.39957
+Gradient Boosting,0.16,0.39596
+Gradient Boosting,0.17,0.39091
+Gradient Boosting,0.18,0.38398
+Gradient Boosting,0.19,0.37975
+Gradient Boosting,0.2,0.37615
+Gradient Boosting,0.21,0.37245
+Gradient Boosting,0.22,0.36871
+Gradient Boosting,0.23,0.36303
+Gradient Boosting,0.24,0.35894
+Gradient Boosting,0.25,0.35401
+Gradient Boosting,0.26,0.35042
+Gradient Boosting,0.27,0.34785
+Gradient Boosting,0.28,0.34332
+Gradient Boosting,0.29,0.33917
+Gradient Boosting,0.3,0.33535
+Gradient Boosting,0.31,0.32922
+Gradient Boosting,0.32,0.32537
+Gradient Boosting,0.33,0.3207
+Gradient Boosting,0.34,0.31517
+Gradient Boosting,0.35,0.30801
+Gradient Boosting,0.36,0.30374
+Gradient Boosting,0.37,0.29965
+Gradient Boosting,0.38,0.29507
+Gradient Boosting,0.39,0.28995
+Gradient Boosting,0.4,0.28263
+Gradient Boosting,0.41,0.27748
+Gradient Boosting,0.42,0.2725
+Gradient Boosting,0.43,0.26939
+Gradient Boosting,0.44,0.26533
+Gradient Boosting,0.45,0.25886
+Gradient Boosting,0.46,0.25179
+Gradient Boosting,0.47,0.24719
+Gradient Boosting,0.48,0.24286
+Gradient Boosting,0.49,0.23743
+Gradient Boosting,0.5,0.23208
+Gradient Boosting,0.51,0.22771
+Gradient Boosting,0.52,0.22492
+Gradient Boosting,0.53,0.21837
+Gradient Boosting,0.54,0.21108
+Gradient Boosting,0.55,0.2044
+Gradient Boosting,0.56,0.20463
+Gradient Boosting,0.57,0.19569
+Gradient Boosting,0.58,0.19459
+Gradient Boosting,0.59,0.19002
+Gradient Boosting,0.6,0.18589
+Gradient Boosting,0.61,0.17989
+Gradient Boosting,0.62,0.17292
+Gradient Boosting,0.63,0.16457
+Gradient Boosting,0.64,0.15814
+Gradient Boosting,0.65,0.15572
+Gradient Boosting,0.66,0.145
+Gradient Boosting,0.67,0.14406
+Gradient Boosting,0.68,0.13747
+Gradient Boosting,0.69,0.13234
+Gradient Boosting,0.7,0.12868
+Gradient Boosting,0.71,0.11907
+Gradient Boosting,0.72,0.11633
+Gradient Boosting,0.73,0.11302
+Gradient Boosting,0.74,0.10782
+Gradient Boosting,0.75,0.09651
+Gradient Boosting,0.76,0.08555
+Gradient Boosting,0.77,0.08698
+Gradient Boosting,0.78,0.08155
+Gradient Boosting,0.79,0.06594
+Gradient Boosting,0.8,0.06434
+LightGBM,0.02,0.45607
+LightGBM,0.03,0.45137
+LightGBM,0.04,0.44625
+LightGBM,0.05,0.44173
+LightGBM,0.06,0.43679
+LightGBM,0.07,0.43282
+LightGBM,0.08,0.42815
+LightGBM,0.09,0.42309
+LightGBM,0.1,0.41927
+LightGBM,0.11,0.41516
+LightGBM,0.12,0.41181
+LightGBM,0.13,0.4071
+LightGBM,0.14,0.40261
+LightGBM,0.15,0.39846
+LightGBM,0.16,0.39391
+LightGBM,0.17,0.38946
+LightGBM,0.18,0.38437
+LightGBM,0.19,0.37957
+LightGBM,0.2,0.37511
+LightGBM,0.21,0.36976
+LightGBM,0.22,0.36569
+LightGBM,0.23,0.36066
+LightGBM,0.24,0.35657
+LightGBM,0.25,0.35401
+LightGBM,0.26,0.34939
+LightGBM,0.27,0.34335
+LightGBM,0.28,0.3389
+LightGBM,0.29,0.33469
+LightGBM,0.3,0.33108
+LightGBM,0.31,0.32818
+LightGBM,0.32,0.32012
+LightGBM,0.33,0.31736
+LightGBM,0.34,0.31343
+LightGBM,0.35,0.30727
+LightGBM,0.36,0.30334
+LightGBM,0.37,0.29844
+LightGBM,0.38,0.29593
+LightGBM,0.39,0.2919
+LightGBM,0.4,0.28722
+LightGBM,0.41,0.2809
+LightGBM,0.42,0.27794
+LightGBM,0.43,0.27249
+LightGBM,0.44,0.26736
+LightGBM,0.45,0.26028
+LightGBM,0.46,0.25487
+LightGBM,0.47,0.24867
+LightGBM,0.48,0.24067
+LightGBM,0.49,0.23566
+LightGBM,0.5,0.2307
+LightGBM,0.51,0.2278
+LightGBM,0.52,0.22185
+LightGBM,0.53,0.217
+LightGBM,0.54,0.21288
+LightGBM,0.55,0.20869
+LightGBM,0.56,0.202
+LightGBM,0.57,0.19824
+LightGBM,0.58,0.19168
+LightGBM,0.59,0.1873
+LightGBM,0.6,0.18566
+LightGBM,0.61,0.17717
+LightGBM,0.62,0.17415
+LightGBM,0.63,0.16753
+LightGBM,0.64,0.16095
+LightGBM,0.65,0.15454
+LightGBM,0.66,0.1456
+LightGBM,0.67,0.14418
+LightGBM,0.68,0.14143
+LightGBM,0.69,0.13659
+LightGBM,0.7,0.13343
+LightGBM,0.71,0.12272
+LightGBM,0.72,0.11548
+LightGBM,0.73,0.11501
+LightGBM,0.74,0.11425
+LightGBM,0.75,0.10202
+LightGBM,0.76,0.09053
+LightGBM,0.77,0.08716
+LightGBM,0.78,0.08163
+LightGBM,0.79,0.07482
+LightGBM,0.8,0.06664
+Treat all,0.02,0.45603
+Treat all,0.03,0.45042
+Treat all,0.04,0.4447
+Treat all,0.05,0.43885
+Treat all,0.06,0.43288
+Treat all,0.07,0.42679
+Treat all,0.08,0.42056
+Treat all,0.09,0.41419
+Treat all,0.1,0.40768
+Treat all,0.11,0.40102
+Treat all,0.12,0.39422
+Treat all,0.13,0.38725
+Treat all,0.14,0.38013
+Treat all,0.15,0.37284
+Treat all,0.16,0.36537
+Treat all,0.17,0.35773
+Treat all,0.18,0.34989
+Treat all,0.19,0.34187
+Treat all,0.2,0.33364
+Treat all,0.21,0.3252
+Treat all,0.22,0.31655
+Treat all,0.23,0.30768
+Treat all,0.24,0.29857
+Treat all,0.25,0.28922
+Treat all,0.26,0.27961
+Treat all,0.27,0.26974
+Treat all,0.28,0.2596
+Treat all,0.29,0.24917
+Treat all,0.3,0.23845
+Treat all,0.31,0.22741
+Treat all,0.32,0.21605
+Treat all,0.33,0.20435
+Treat all,0.34,0.19229
+Treat all,0.35,0.17986
+Treat all,0.36,0.16705
+Treat all,0.37,0.15383
+Treat all,0.38,0.14018
+Treat all,0.39,0.12608
+Treat all,0.4,0.11152
+Treat all,0.41,0.09646
+Treat all,0.42,0.08088
+Treat all,0.43,0.06476
+Treat all,0.44,0.04806
+Treat all,0.45,0.03075
+Treat all,0.46,0.0128
+Treat all,0.47,-0.00583
+Treat all,0.48,-0.02517
+Treat all,0.49,-0.04527
+Treat all,0.5,-0.06618
+Treat all,0.51,-0.08794
+Treat all,0.52,-0.1106
+Treat all,0.53,-0.13423
+Treat all,0.54,-0.15889
+Treat all,0.55,-0.18464
+Treat all,0.56,-0.21156
+Treat all,0.57,-0.23974
+Treat all,0.58,-0.26926
+Treat all,0.59,-0.30022
+Treat all,0.6,-0.33272
+Treat all,0.61,-0.36689
+Treat all,0.62,-0.40286
+Treat all,0.63,-0.44078
+Treat all,0.64,-0.4808
+Treat all,0.65,-0.52311
+Treat all,0.66,-0.56791
+Treat all,0.67,-0.61542
+Treat all,0.68,-0.6659
+Treat all,0.69,-0.71964
+Treat all,0.7,-0.77696
+Treat all,0.71,-0.83824
+Treat all,0.72,-0.90389
+Treat all,0.73,-0.9744
+Treat all,0.74,-1.05034
+Treat all,0.75,-1.13235
+Treat all,0.76,-1.2212
+Treat all,0.77,-1.31777
+Treat all,0.78,-1.42313
+Treat all,0.79,-1.53852
+Treat all,0.8,-1.66544

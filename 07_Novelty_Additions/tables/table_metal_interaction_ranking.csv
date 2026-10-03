@@ -1,11 +1,11 @@
-Metal 1,Metal 2,Mean |SHAP interaction|
-Blood lead,Blood manganese,0.01183
-Blood mercury,Blood manganese,0.01025
-Blood lead,Blood cadmium,0.00927
-Blood cadmium,Blood selenium,0.00721
-Blood cadmium,Blood manganese,0.00528
-Blood mercury,Blood selenium,0.00516
-Blood lead,Blood mercury,0.00434
-Blood selenium,Blood manganese,0.00319
-Blood cadmium,Blood mercury,0.0031
-Blood lead,Blood selenium,0.00301
+Metal 1,Metal 2,Test rows with both measured,Mean |SHAP interaction| (descriptive),Regression n,Interaction beta (log x log),LRT p,FDR-adjusted p
+Blood cadmium,Blood selenium,1303,0.01303,5349,0.4248,0.151,0.303
+Blood mercury,Blood selenium,1303,0.01286,5349,0.4576,0.045,0.218
+Blood mercury,Blood manganese,1303,0.01152,5349,0.1728,0.077,0.218
+Blood lead,Blood manganese,1303,0.01089,5349,0.241,0.087,0.218
+Blood lead,Blood cadmium,2176,0.00674,9301,0.038,0.385,0.481
+Blood selenium,Blood manganese,1303,0.00626,5349,-0.7301,0.312,0.446
+Blood lead,Blood selenium,1303,0.00566,5349,-0.8187,0.027,0.218
+Blood cadmium,Blood manganese,1303,0.00521,5349,-0.138,0.241,0.401
+Blood cadmium,Blood mercury,2176,0.00463,9301,0.0005,0.987,0.987
+Blood lead,Blood mercury,2176,0.00431,9301,0.0084,0.826,0.917

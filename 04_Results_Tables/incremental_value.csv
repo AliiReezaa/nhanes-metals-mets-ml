@@ -1,0 +1,6 @@
+model,algorithm,n_predictors,cv_auc,cv_auc_sd,test_auc,test_auc_ci_low,test_auc_ci_high,delta_vs_full,delta_ci_low,delta_ci_high,delong_p
+full,CatBoost,32,0.8438,0.012,0.8532,0.8369,0.8692,0.0,0.0,0.0,1.0
+no_metals,CatBoost,27,0.8423,0.0115,0.8531,0.8372,0.8689,-0.0001,-0.0028,0.0028,0.951
+lead_only,CatBoost,28,0.8428,0.0119,0.8528,0.8371,0.8685,-0.0004,-0.0031,0.0023,0.778
+no_bmi,CatBoost,31,0.7734,0.0104,0.7736,0.7514,0.793,-0.0796,-0.0949,-0.0641,2.61e-26
+age_bmi_lr,Logistic Regression,2,0.8264,0.0119,0.8346,0.8169,0.8525,-0.0186,-0.0263,-0.0113,2.48e-06

@@ -1,2 +1,2 @@
 Metal,Breakpoint (µg/dL),95% CI low,95% CI high,Bootstrap reps,Method
-Blood lead,2.8,0.5,2.8,80/80,"segmented logistic GLM, profile-likelihood breakpoint search, adjusted for age/BMI/sex/PIR"
+Blood lead,2.39,0.74,2.75,80/80,"segmented logistic GLM, profile-likelihood breakpoint search, adjusted for age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"

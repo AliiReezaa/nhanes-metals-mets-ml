@@ -229,7 +229,7 @@ def get_model_registry(random_state=None):
     try:
         from catboost import CatBoostClassifier
         registry["CatBoost"] = {
-            "estimator": lambda: CatBoostClassifier(random_state=random_state, verbose=False),
+            "estimator": lambda: CatBoostClassifier(random_state=random_state, verbose=False, allow_writing_files=False),
             "param_grid": {"model__iterations": [200, 500], "model__learning_rate": [0.01, 0.05, 0.1],
                            "model__depth": [4, 6]},
         }

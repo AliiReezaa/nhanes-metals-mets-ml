@@ -1,4 +1,6 @@
-Metal,N,LRT chi-square,df,P value,Nonlinear (P<0.05)
-Blood lead,10096,4.52,3,0.211,No
-Blood cadmium,10096,0.65,3,0.885,No
-Blood selenium,5715,3.02,3,0.389,No
+Metal,N,LRT chi-square,df,P value,Nonlinear (P<0.05),Adjusted for
+Blood lead,9301,10.19,3,0.017,Yes,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"
+Blood cadmium,9301,12.51,3,0.006,Yes,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"
+Blood mercury,9301,5.43,3,0.143,No,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"
+Blood selenium,5349,2.77,3,0.428,No,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"
+Blood manganese,5349,3.17,3,0.366,No,"age, BMI, sex, income, race/ethnicity, education, smoking, alcohol, cycle"

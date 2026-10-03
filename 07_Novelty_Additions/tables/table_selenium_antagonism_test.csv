@@ -1,3 +1,3 @@
-Pair,Mean |SHAP interaction|,Spearman rho,P value
-Selenium × cadmium,0.00721,-0.3276,6.3e-57
-Selenium × lead,0.00301,0.0131,0.535
+Pair,Test rows with selenium measured,Mean |SHAP interaction| (descriptive),"Spearman rho, SHAP interaction vs. metal (descriptive)",Regression interaction beta,Regression LRT p,FDR-adjusted p
+Selenium × cadmium,1303,0.01303,0.0828,0.4248,0.151,0.303
+Selenium × lead,1303,0.00566,-0.0649,-0.8187,0.027,0.218
