@@ -211,8 +211,8 @@ def main():
 
         def _fmt(v):
             return "(" + ", ".join(str(x) for x in v) + ")" if isinstance(v, list) else str(v)
-        sel = ", ".join(f"{k.replace('model__', '')} = {_fmt(v)}" for k, v in bp.items()) or "—"
-        rows3.append([t["model"], GRIDS.get(t["model"], "—"), sel, f"{t['cv_auc']:.4f}"])
+        sel = ", ".join(f"{k.replace('model__', '')} = {_fmt(v)}" for k, v in bp.items()) or "–"
+        rows3.append([t["model"], GRIDS.get(t["model"], "–"), sel, f"{t['cv_auc']:.4f}"])
     ds.caption(doc, "Table S3.",
                "Hyperparameter search space, selected configuration and cross-validated "
                "discrimination for each algorithm. Every grid holds at most 12 configurations and was "
@@ -333,7 +333,7 @@ def main():
         rows7.append(["Class weighting instead of SMOTENC", r["model"],
                       f"{r['cv_auc_smote']:.4f}",
                       "not applicable" if pd.isna(cw) else f"{cw:.4f}",
-                      "—" if pd.isna(r["delta"]) else f"{r['delta']:+.4f}"])
+                      "–" if pd.isna(r["delta"]) else f"{r['delta']:+.4f}"])
     for _, r in s_met.iterrows():
         rows7.append(["Lead only, other four metals dropped", r["model"],
                       f"{r['cv_auc_all_5_metals']:.4f}", f"{r['cv_auc_lead_only']:.4f}",
@@ -370,7 +370,7 @@ def main():
                       f"{r['test_auc']:.3f} ({ci(r['test_auc_ci_low'], r['test_auc_ci_high'])})",
                       "reference" if r["model"] == "full" else
                       f"{num(r['delta_vs_full'], 4)} ({num(r['delta_ci_low'], 4)} to {num(r['delta_ci_high'], 4)})",
-                      "—" if r["model"] == "full" else
+                      "–" if r["model"] == "full" else
                       ("< 0.001" if r["delong_p"] < 0.001 else f"{r['delong_p']:.3f}")])
     ds.caption(doc, "Table S8.",
                f"Incremental value of the blood metals and simple baselines. The leading algorithm "

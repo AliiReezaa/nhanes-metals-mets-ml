@@ -481,7 +481,7 @@ def main():
     # ---- Table 2: participant flow
     t2 = doc.tables[1]
     steps = [
-        ("0. NHANES 2007–2018 pooled sample", rem[0], "—"),
+        ("0. NHANES 2007–2018 pooled sample", rem[0], "–"),
         ("1. Age ≥ 20 years", rem[1], f"{exc[1]:,} (age < 20)"),
         ("2. Not pregnant", rem[2], f"{exc[2]:,} (pregnant)"),
         ("3. Complete data on all 5 MetS components (waist, blood pressure, HDL, triglycerides, glucose)",

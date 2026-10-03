@@ -227,7 +227,7 @@ def fig2_roc(preds, cmp_df):
             continue
         st = ps.model_style(name, rank)
         fpr, tpr, _ = roc_curve(y, preds[name].values)
-        label = f"{name} — {row.AUC:.3f}"
+        label = f"{name}, {row.AUC:.3f}"
         for a in (ax, axz):
             a.plot(fpr, tpr, label=label, **st)
 
@@ -361,7 +361,7 @@ def fig4_calibration(preds, cmp_df):
         st = ps.model_style(name, rank)
         ax.plot(mean_pred, frac_pos, marker="o", ms=3.4, markeredgecolor="white",
                 markeredgewidth=0.4, **st)
-        ax.plot([], [], **st, label=f"{name} — slope {slope:.2f}")
+        ax.plot([], [], **st, label=f"{name}, slope {slope:.2f}")
     models = plotted
 
     ax.set_xlabel("Mean predicted probability")
@@ -856,7 +856,7 @@ def figM1_pipeline():
     ax.add_patch(FancyBboxPatch((2.0, 3.2), 96.0, 17.8,
                                 boxstyle="round,pad=0.4,rounding_size=0.8",
                                 facecolor="#F8F9F9", edgecolor="#5D6D7E", linewidth=1.0))
-    ax.text(50.0, 18.5, "5. Leakage-safe model development — every step below refitted inside each training fold",
+    ax.text(50.0, 18.5, "5. Leakage-safe model development: every step below refitted inside each training fold",
             ha="center", va="center", fontsize=8.2, fontweight="bold", color="#2C3E50")
 
     inner = [

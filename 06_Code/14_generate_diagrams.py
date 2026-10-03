@@ -194,13 +194,13 @@ def build_figure1(n: dict):
 
     GAP = 0.55
     y = 0.15 + 0.5  # title reserve
-    box1_sub = f"Merged {n['n_modules']} modules ({n['module_list']}), all six 2-year cycles — n = {n['n_pooled']:,}"
+    box1_sub = f"Merged {n['n_modules']} modules ({n['module_list']}), all six 2-year cycles; n = {n['n_pooled']:,}"
     box2_sub = f"n = {n['n_age20']:,}"
     box2b_sub = f"n = {n['n_not_preg']:,}"
     box3_sub = (f"Waist circumference, mean systolic/diastolic BP, HDL-C, triglycerides, fasting glucose\n"
                 f"n = {n['n_complete_mets']:,}")
-    box3b_sub = f"Fasted 8 to 24 h (non-zero NCHS fasting weight) — n = {n['n_fasted']:,}"
-    box4_sub = f"Lead, cadmium, mercury, selenium, manganese — FINAL ANALYTIC COHORT: n = {n['n_final']:,}"
+    box3b_sub = f"Fasted 8 to 24 h (non-zero NCHS fasting weight); n = {n['n_fasted']:,}"
+    box4_sub = f"Lead, cadmium, mercury, selenium, manganese. FINAL ANALYTIC COHORT: n = {n['n_final']:,}"
     outcome_sub = (f"Harmonized criteria (Alberti et al. 2009):\nmeasured threshold OR drug treatment "
                    f"(BPQ050A / BPQ100D / DIQ050 / DIQ070)\n\n"
                    f"MetS+: n = {n['mets_pos_harmonized']:,} ({n['mets_pct_harmonized']:.1f}%)\n"
@@ -208,7 +208,7 @@ def build_figure1(n: dict):
     predictor_sub = (f"{n['n_predictors']} predictors: 5 blood metals + demographic /\nanthropometric / lifestyle covariates\n\n"
                       f"All 5 MetS-defining components AND all 4\nmedication-status variables EXCLUDED (leakage-safe by design)")
     final_sub = (f"n = {n['n_final']:,} participants × {n['n_predictors']} predictors + 1 outcome label\n\n"
-                 f"Worst-missing predictor: {n['worst_missing_var']} ({n['worst_missing_pct']:.1f}% missing) — imputed "
+                 f"Worst-missing predictor: {n['worst_missing_var']} ({n['worst_missing_pct']:.1f}% missing), imputed "
                  f"and flagged with an always-present\nmissing-value indicator, inside each cross-validation fold only, "
                  f"never before the train/test split\n\n"
                  f"Stratified 80/20 split (Sec. 3.1.6): {n['n_train']:,} train / {n['n_test']:,} test")
@@ -234,7 +234,7 @@ def build_figure1(n: dict):
     ax.text(W / 2, 0.15, "Figure 1. Data-Cleaning Pipeline for the Machine-Learning Analysis",
             ha="center", va="top", fontsize=17, fontweight="bold", color="#1F3864")
 
-    box(0.6, y1, W - 1.2, "NHANES 2007–2018 — 6 pooled cycles", box1_sub, blue_e, blue_f, fontsize_sub=10.2)
+    box(0.6, y1, W - 1.2, "NHANES 2007–2018: 6 pooled cycles", box1_sub, blue_e, blue_f, fontsize_sub=10.2)
     arrow(W / 2, y1 + h1, y2)
 
     box(0.6, y2, W - 1.2, "Age ≥ 20 years", box2_sub, blue_e, blue_f)
@@ -270,7 +270,7 @@ def build_figure1(n: dict):
                 arrowprops=dict(arrowstyle="-|>", color="#1F3864", lw=1.6, connectionstyle="arc3,rad=-0.2"))
 
     ax.text(0.6, y6 + h_final + 0.28,
-            "Blue — cohort assembly steps     Green — final analytic cohort     Tan — outcome & predictor construction",
+            "Blue: cohort assembly steps     Green: final analytic cohort     Tan: outcome & predictor construction",
             va="top", fontsize=10, color="#555")
 
     out_path = DIAGRAMS_DIR / "figure1_data_cleaning_pipeline.png"
@@ -349,7 +349,7 @@ text{{font-family:'DejaVu Sans','Helvetica Neue',Arial,sans-serif;}}
 .c-teal{{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1;}}
 .c-teal .th{{fill:#085041;}}
 .c-teal .ts{{fill:#0F6E56;}}
-</style></defs><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>{"".join(body)}<text class="ts" x="40" y="{footer_y1}">Blue — data preparation and cohort definition (steps 1–9).</text><text class="ts" x="40" y="{footer_y2}">Teal — model tuning, evaluation, and interpretation (steps 10–13).</text></svg></body></html>'''
+</style></defs><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>{"".join(body)}<text class="ts" x="40" y="{footer_y1}">Blue: data preparation and cohort definition (steps 1–9).</text><text class="ts" x="40" y="{footer_y2}">Teal: model tuning, evaluation, and interpretation (steps 10–13).</text></svg></body></html>'''
     return svg
 
 
@@ -409,7 +409,7 @@ text{{font-family:'DejaVu Sans','Helvetica Neue',Arial,sans-serif;}}
 .c-teal{{fill:#E1F5EE;stroke:#0F6E56;stroke-width:1;}}
 .c-teal .th{{fill:#085041;}}
 .c-teal .ts{{fill:#0F6E56;}}
-</style></defs><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><text class="th" x="40" y="40">PHASE 1 · MACHINE LEARNING — completed</text><rect class="c-blue" x="40" y="74" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="106">Data &amp; Cleaning</text><text class="ts" x="64" y="128">NHANES 2007–2018 pooled, n={n['n_final']:,} final</text></g><line class="arr" x1="40" y1="156" x2="40" y2="176" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="180" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="212">Feature Engineering</text><text class="ts" x="64" y="234">{n['n_predictors']} predictors, 80/20 split</text></g><line class="arr" x1="40" y1="262" x2="40" y2="282" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="286" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="318">Modeling</text><text class="ts" x="64" y="340">11 algorithms tuned via 10-fold CV</text></g><line class="arr" x1="40" y1="368" x2="40" y2="388" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="392" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="424">Interpretation</text><text class="ts" x="64" y="446">SHAP, permutation, sensitivity checks</text></g><text class="th" x="40" y="508">PHASE 2 · MENDELIAN RANDOMIZATION — planned</text><rect class="c-teal" x="40" y="528" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="560">Exposure Screening</text><text class="ts" x="64" y="582">AI-ranked predictors × GWAS instrument availability</text></g><line class="arr" x1="40" y1="610" x2="40" y2="630" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="634" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="666">Instrument Extraction</text><text class="ts" x="64" y="688">Harmonize SNP–exposure–outcome data</text></g><line class="arr" x1="40" y1="716" x2="40" y2="736" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="740" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="772">Causal Estimation</text><text class="ts" x="64" y="794">IVW plus four robust MR methods</text></g><line class="arr" x1="40" y1="822" x2="40" y2="842" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="846" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="878">Robustness Checks</text><text class="ts" x="64" y="900">Heterogeneity, pleiotropy, directionality tests</text></g><text class="ts" x="40" y="954">Solid boxes — completed, real NHANES data and model results.</text><text class="ts" x="40" y="970">Dashed boxes — planned next phase, pending GWAS data access and IRB/ethics approval.</text></svg></body></html>'''
+</style></defs><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs><text class="th" x="40" y="40">PHASE 1 · MACHINE LEARNING: completed</text><rect class="c-blue" x="40" y="74" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="106">Data &amp; Cleaning</text><text class="ts" x="64" y="128">NHANES 2007–2018 pooled, n={n['n_final']:,} final</text></g><line class="arr" x1="40" y1="156" x2="40" y2="176" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="180" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="212">Feature Engineering</text><text class="ts" x="64" y="234">{n['n_predictors']} predictors, 80/20 split</text></g><line class="arr" x1="40" y1="262" x2="40" y2="282" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="286" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="318">Modeling</text><text class="ts" x="64" y="340">11 algorithms tuned via 10-fold CV</text></g><line class="arr" x1="40" y1="368" x2="40" y2="388" marker-end="url(#arrow)"/><rect class="c-blue" x="40" y="392" width="600" height="78" rx="4"/><g class="c-blue"><text class="th" x="64" y="424">Interpretation</text><text class="ts" x="64" y="446">SHAP, permutation, sensitivity checks</text></g><text class="th" x="40" y="508">PHASE 2 · MENDELIAN RANDOMIZATION: planned</text><rect class="c-teal" x="40" y="528" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="560">Exposure Screening</text><text class="ts" x="64" y="582">AI-ranked predictors × GWAS instrument availability</text></g><line class="arr" x1="40" y1="610" x2="40" y2="630" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="634" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="666">Instrument Extraction</text><text class="ts" x="64" y="688">Harmonize SNP–exposure–outcome data</text></g><line class="arr" x1="40" y1="716" x2="40" y2="736" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="740" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="772">Causal Estimation</text><text class="ts" x="64" y="794">IVW plus four robust MR methods</text></g><line class="arr" x1="40" y1="822" x2="40" y2="842" marker-end="url(#arrow)"/><rect class="c-teal" x="40" y="846" width="600" height="78" rx="4" stroke-dasharray="4 3"/><g class="c-teal"><text class="th" x="64" y="878">Robustness Checks</text><text class="ts" x="64" y="900">Heterogeneity, pleiotropy, directionality tests</text></g><text class="ts" x="40" y="954">Solid boxes: completed, real NHANES data and model results.</text><text class="ts" x="40" y="970">Dashed boxes: planned next phase, pending GWAS data access and IRB/ethics approval.</text></svg></body></html>'''
 
 
 def build_study_workflow_diagram(n: dict):

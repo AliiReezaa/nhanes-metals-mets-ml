@@ -92,7 +92,7 @@ PARA_REPLACE: dict[int, str] = {
         "strength of the lead association is not consistent from one study to the next, "
         "which is why the pooled estimates carry substantial heterogeneity "
         "{{me_hasani|me_xu_four|me_parkoh}}. Some data indicate that lead affects specific "
-        "components of MetS — blood pressure and lipids in particular — more than it "
+        "components of MetS, blood pressure and lipids in particular, more than it "
         "predicts the syndrome as a coherent whole {{pb_prehtn|me_park_pb}}."
     ),
 

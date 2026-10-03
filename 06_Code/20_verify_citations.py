@@ -183,7 +183,7 @@ def check_external(ids):
         else:
             src = rec["source"]
             ident = rec.get("pmid") or rec.get("doi")
-            print(f"  [{NUM[key]:>2}] {key:<15} OK  {src:<9} {ident} — "
+            print(f"  [{NUM[key]:>2}] {key:<15} OK  {src:<9} {ident}: "
                   f"{rec['journal']} {rec['year']};{rec.get('volume') or rec.get('issue')}:{rec['pages']}")
     return ok
 

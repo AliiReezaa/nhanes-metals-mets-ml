@@ -11,7 +11,7 @@ and is cited from here.
 
 Display items retained in the main text:
   Table 1  survey-weighted baseline characteristics
-  Table 2  discrimination, calibration and paired-bootstrap comparison, 11 models
+  Table 2  discrimination, calibration and DeLong comparison, all models
   Figure 2 ROC curves
   Figure 3 SHAP summary for the leading model
   Figure 4 importance concordance (method agreement and cross-model agreement)
@@ -26,6 +26,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -63,16 +64,30 @@ s_diq = pd.read_csv(MET / "sensitivity_diq010.csv")
 s_met = pd.read_csv(MET / "sensitivity_metals_scope.csv")
 s_smo = pd.read_csv(MET / "sensitivity_smote_vs_classweight.csv")
 s_out = pd.read_csv(MET / "sensitivity_outcome_definition.csv")
+inc = pd.read_csv(MET / "incremental_value.csv").set_index("model")
+rcv = pd.read_csv(MET / "repeated_cv.csv").set_index("model")
+dca_df = pd.read_csv(MET / "decision_curve_data.csv")
+temporal = pd.DataFrame(N.get("temporal_validation", []))
 
 f = N["flow"]
 TOP = N["top_model"]
-tied_names = [m for m, v in N["significance"].items() if v["tied"]]
+SHAP_M = N["shap_model"]
+SIG = N["significance"]
+tied_names = [m for m, v in SIG.items() if v["tied"]]
+others_tied = [m for m in tied_names if m != TOP]
 
-shap33 = shap_all[~shap_all["feature_code"].str.startswith("missingindicator")].copy()
-shap33["rank"] = shap33["mean_abs_shap"].rank(ascending=False, method="min").astype(int)
+# 2026-10 audit (P7/P8): every interpretive statement below is derived from the
+# outputs at build time; nothing about direction, shape or ordering is typed in.
+shap_pred = shap_all[~shap_all["feature_code"].str.startswith("missingindicator")].copy()
+shap_pred["rank"] = shap_pred["mean_abs_shap"].rank(ascending=False, method="min").astype(int)
 perm["rank"] = perm["perm_importance_mean"].rank(ascending=False, method="min").astype(int)
 psd = {r.feature_code: (float(r.perm_importance_mean), float(r.perm_importance_std))
        for r in perm.itertuples()}
+METALS = ["LBXBPB", "LBXBCD", "LBXTHG", "LBXBSE", "LBXBMN"]
+MNAME = {"LBXBPB": "lead", "LBXBCD": "cadmium", "LBXTHG": "mercury", "LBXBSE": "selenium",
+         "LBXBMN": "manganese"}
+WORDS = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine",
+         10: "ten", 11: "eleven", 12: "twelve"}
 
 MINUS = "−"
 
@@ -85,8 +100,42 @@ def p_txt(p):
     return "< 0.001" if p < 0.001 else f"{p:.3f}"
 
 
-def ci(lo, hi):
-    return f"{num(lo)}–{num(hi)}"
+def p_eq(p):
+    return "p < 0.001" if p < 0.001 else f"p = {p:.3f}"
+
+
+def ci(lo, hi, dp=3):
+    return f"{num(lo, dp)}–{num(hi, dp)}"
+
+
+def join(items):
+    items = list(items)
+    if len(items) <= 1:
+        return "".join(items)
+    return ", ".join(items[:-1]) + " and " + items[-1]
+
+
+def t1(var):
+    return tab1[tab1["variable"] == var].iloc[0]
+
+
+def shape_of(centers, values):
+    """Plain-language description of a binned SHAP dependence curve."""
+    v = np.asarray(values, float)
+    rng = v.max() - v.min()
+    if rng < 0.03:
+        return "flat"
+    rho = pd.Series(v).corr(pd.Series(np.arange(len(v))), method="spearman")
+    imin, imax = int(v.argmin()), int(v.argmax())
+    if rho >= 0.8:
+        return "rising"
+    if rho <= -0.8:
+        return "falling"
+    if 0 < imin < len(v) - 1 and min(v[0], v[-1]) - v[imin] > 0.4 * rng:
+        return "U-shaped"
+    if 0 < imax < len(v) - 1 and v[imax] - max(v[0], v[-1]) > 0.4 * rng:
+        return "inverted U-shaped"
+    return "rising" if rho > 0.3 else "falling" if rho < -0.3 else "irregular"
 
 
 def main():
@@ -97,110 +146,175 @@ def main():
 
     # ==================================================================
     ds.heading(doc, "1. Study population", 1)
-
+    harm, lab = outdef.iloc[1], outdef.iloc[0]
     ds.para(doc,
             f"Of {f['pooled']:,} participants sampled across the six NHANES cycles, "
-            f"{f['final_cohort']:,} adults met all inclusion criteria (Figure 1), and were divided "
-            f"into {f['train_n']:,} training and {f['test_n']:,} held-out test participants. "
-            f"Metabolic syndrome was present in {int(outdef.loc[1, 'n_positive']):,} participants, a "
-            f"crude prevalence of {outdef.loc[1, 'prevalence_pct']:.2f}%. Of these, "
-            f"{int(outdef.loc[1, 'n_reclassified_negative_to_positive']):,} reached the "
-            f"three-component threshold only because the drug-treatment clause scored a component "
-            f"positive that the measured value alone would not have, and would have been classified "
-            f"as non-cases under a measured-value-only definition "
-            f"({outdef.loc[0, 'prevalence_pct']:.2f}% prevalence).")
+            f"{f['final_cohort']:,} non-pregnant adults in the fasting subsample with complete "
+            f"outcome and metal data formed the analytic cohort (Figure 1), divided into "
+            f"{f['train_n']:,} training and {f['test_n']:,} held-out test participants. Metabolic "
+            f"syndrome was present in {int(harm['n_positive']):,} participants, a crude prevalence "
+            f"of {harm['prevalence_pct']:.2f}%. Of these, "
+            f"{int(harm['n_reclassified_negative_to_positive']):,} reached the three-component "
+            f"threshold only because a drug-treatment clause scored a component positive that the "
+            f"measured value alone would not have; under a measured-value-only definition the "
+            f"prevalence would have been {lab['prevalence_pct']:.2f}%.")
 
+    age, bmi = t1("RIDAGEYR"), t1("BMXBMI")
+    up, down, flat = [], [], []
+    for m in METALS:
+        r = t1(m)
+        ratio = r["mets_mean"] / r["no_mets_mean"]
+        bucket = flat if r["p_value"] >= 0.05 else (up if ratio > 1 else down)
+        bucket.append(f"{MNAME[m]} ({(ratio - 1) * 100:+.0f}%)".replace("-", MINUS))
+    metal_sent = []
+    if up:
+        metal_sent.append(f"{join(up)} {'was' if len(up) == 1 else 'were'} higher in the "
+                          f"metabolic syndrome group")
+    if down:
+        metal_sent.append(f"{join(down)} {'was' if len(down) == 1 else 'were'} lower")
+    flat_txt = (f"; {join(flat)} did not differ at p < 0.05" if flat else "")
     ds.para(doc,
             "Survey-weighted characteristics by metabolic syndrome status are given in Table 1. "
-            "Participants with metabolic syndrome were on average 13.4 years older and had a body "
-            "mass index 5.5 kg/m² higher. Among the blood metals, lead and selenium were higher in "
-            "the metabolic syndrome group and mercury and manganese were lower, while cadmium did "
-            "not differ appreciably; every difference reaching significance was small relative to "
-            "the spread of the measurements.")
+            f"Participants with metabolic syndrome were on average "
+            f"{age['mets_mean'] - age['no_mets_mean']:.1f} years older and had a body mass index "
+            f"{bmi['mets_mean'] - bmi['no_mets_mean']:.1f} kg/m² higher. Comparing geometric means, "
+            + ("; ".join(metal_sent) if metal_sent else "no metal differed at p < 0.05")
+            + flat_txt + ". The percentages are the relative difference in geometric mean; all are "
+            "small relative to the spread of the concentrations within each group, and none is "
+            "adjusted for age, which differs sharply between the groups.")
 
-    rows_t1 = [[r["clinical_name"],
-                f"{r['no_mets_mean']:.2f} ({r['no_mets_se']:.3f})",
-                f"{r['mets_mean']:.2f} ({r['mets_se']:.3f})",
-                p_txt(r["p_value"])] for _, r in tab1.iterrows()]
+    rows_t1 = []
+    for _, r in tab1.iterrows():
+        if r["summary"] == "geometric mean":
+            cell = lambda g: (f"{r[g + '_mean']:.2f} ({r[g + '_ci_low']:.2f}–{r[g + '_ci_high']:.2f})"
+                              if pd.notna(r.get(g + "_ci_low")) else f"{r[g + '_mean']:.2f}")
+            name = r["clinical_name"] + "†"
+        elif r["type"] == "continuous":
+            cell = lambda g: f"{r[g + '_mean']:.2f} ({r[g + '_se']:.2f})"
+            name = r["clinical_name"]
+        else:
+            cell = lambda g: f"{r[g + '_mean']:.1f} ({r[g + '_se']:.1f})"
+            name = r["clinical_name"]
+        rows_t1.append([name, cell("no_mets"), cell("mets"), p_txt(r["p_value"])])
+    se_row = t1("LBXBSE")
     ds.caption(doc, "Table 1.",
                "Survey-weighted characteristics of the analytic cohort by metabolic syndrome status. "
-               "Continuous variables are weighted means (standard error); categorical variables are "
-               "weighted percentages (standard error). Standard errors account for the NHANES "
-               "complex survey design via Taylor-series linearization with domain estimation.",
-               above=True)
+               "Continuous variables are weighted means (standard error); blood metals are weighted "
+               "geometric means (95% confidence interval); categorical variables are weighted "
+               "percentages (standard error). All estimates use the fasting-subsample weight divided "
+               "by six and Taylor-series linearization with the participants' own strata and "
+               "primary sampling units.", above=True)
     ds.add_table(doc, ["Characteristic", "No MetS", "MetS", "p"], rows_t1,
-                 col_widths_in=[2.65, 1.35, 1.35, 0.75], align_right_from=1)
+                 col_widths_in=[2.55, 1.45, 1.45, 0.65], align_right_from=1)
     ds.table_note(doc,
-                  "MetS, metabolic syndrome. Unweighted group sizes: no MetS n = 5,981; MetS "
-                  "n = 5,163. Selenium and manganese were assayed only from the 2011–2012 cycle "
-                  "onward, so both are based on n = 3,382 without and n = 2,935 with metabolic "
-                  "syndrome. Metal concentrations use the cycle-appropriate laboratory weight; all "
-                  "other rows use the examination weight. *p-values for categorical variables are "
-                  "descriptive chi-square tests and are not design-corrected.*")
+                  f"MetS, metabolic syndrome. Unweighted group sizes: no MetS n = "
+                  f"{int(age['no_mets_n']):,}; MetS n = {int(age['mets_n']):,}. †Geometric mean. "
+                  f"Selenium and manganese were assayed only from the 2011–2012 cycle onward, so both "
+                  f"are based on n = {int(se_row['no_mets_n']):,} without and "
+                  f"n = {int(se_row['mets_n']):,} with metabolic syndrome. p-values for continuous "
+                  f"variables are design-based t tests of the domain difference (on the log scale for "
+                  f"the metals; 94 degrees of freedom, 184 primary sampling units minus 90 strata); "
+                  f"for categorical variables they are design-adjusted Wald F tests.")
 
     # ==================================================================
     ds.heading(doc, "2. Model performance", 1)
-
     top_row = cmp_df.iloc[0]
     worst = cmp_df.iloc[-1]
-    tied_p = ", ".join(f"{N['significance'][m]['p']:.3f}" for m in tied_names if m != TOP)
+    lr_auc = cmp_df.loc[cmp_df.Model == "Logistic Regression", "AUC"].iloc[0]
+    rest = [m for m in cmp_df["Model"] if m not in tied_names]
+    rest_pmax = max(SIG[m]["p"] for m in rest) if rest else None
+    if others_tied:
+        tie_txt = (f"{join(others_tied)} {'was' if len(others_tied) == 1 else 'were'} statistically "
+                   f"indistinguishable from it (DeLong "
+                   f"{join(p_eq(SIG[m]['p']) for m in others_tied)}; Figure S2), so "
+                   f"{'these models form' if len(tied_names) > 2 else 'the two form'} a tied leading "
+                   f"group rather than a ranking")
+    else:
+        tie_txt = "every other model differed from it at p < 0.05 by DeLong's test (Figure S2)"
     ds.para(doc,
-            f"All eleven models were evaluated once on the held-out test partition (Table 2, "
-            f"Figure 2). {TOP} achieved the highest area under the receiver operating characteristic "
-            f"curve at {top_row['AUC']:.3f} "
-            f"({ci(top_row['AUC_95CI_low'], top_row['AUC_95CI_high'])}), and "
-            f"{worst['Model']} the lowest at {worst['AUC']:.3f} "
-            f"({ci(worst['AUC_95CI_low'], worst['AUC_95CI_high'])}). The apparent ordering at the "
-            f"top of the table does not survive sampling variability: in the paired bootstrap, "
-            f"LightGBM, XGBoost and Gradient Boosting all had AUROC differences from {TOP} whose 95% "
-            f"confidence intervals included zero (p = {tied_p}; Figure S2), so these four "
-            f"gradient-boosted ensembles form a tied leading group rather than a ranking. Every "
-            f"remaining model "
-            f"differed from {TOP} at p < 0.001. Two caveats apply: the reference was chosen as the "
-            f"test-set maximum, so the differences carry a winner's-curse bias and the p-values are "
-            f"anticonservative, and no adjustment was made for the ten simultaneous comparisons. "
-            f"The margin over the simplest baseline is modest in any case — logistic regression "
-            f"reached {cmp_df.loc[cmp_df.Model == 'Logistic Regression', 'AUC'].iloc[0]:.3f}, only "
-            f"{N['significance']['Logistic Regression']['auc_diff']:.3f} AUROC units below {TOP} "
-            f"({ci(*N['significance']['Logistic Regression']['ci'])}).")
+            f"All {WORDS.get(len(cmp_df), len(cmp_df))} models were evaluated once on the held-out "
+            f"test partition (Table 2, Figure 2). {TOP} achieved the highest area under the receiver "
+            f"operating characteristic curve at {top_row['AUC']:.3f} "
+            f"({ci(top_row['AUC_95CI_low'], top_row['AUC_95CI_high'])}), and {worst['Model']} the "
+            f"lowest at {worst['AUC']:.3f} ({ci(worst['AUC_95CI_low'], worst['AUC_95CI_high'])}). "
+            f"{tie_txt[0].upper() + tie_txt[1:]}."
+            + (f" The remaining models differed from {TOP} at "
+               f"{'p < 0.001' if rest_pmax < 0.001 else f'p ≤ {rest_pmax:.3f}'}." if rest and others_tied else "")
+            + f" Two caveats apply: the reference was chosen as the test-set maximum, so the "
+            f"differences carry a winner's-curse bias, and no adjustment was made for the "
+            f"{WORDS.get(len(cmp_df) - 1, len(cmp_df) - 1)} simultaneous comparisons. The margin over "
+            f"the simplest baseline is modest in any case: logistic regression reached "
+            f"{lr_auc:.3f}, {SIG['Logistic Regression']['auc_diff']:.3f} AUROC units below {TOP} "
+            f"(95% CI {ci(*SIG['Logistic Regression']['ci'])}).")
 
-    d = N["dca"]
+    r_top = rcv.loc[TOP] if TOP in rcv.index else None
+    if r_top is not None:
+        order = rcv.sort_values("mean_auc", ascending=False)
+        ds.para(doc,
+                f"Cross-validation repeated over {int(r_top['repeats'])} different random partitions "
+                f"of the training data ({int(r_top['folds'])} folds each; Table S9) gave {TOP} a mean "
+                f"AUROC of {r_top['mean_auc']:.3f}, with the individual folds spanning "
+                f"{r_top['p2_5_auc']:.3f} to {r_top['p97_5_auc']:.3f} (2.5th to 97.5th percentile). "
+                f"The repeated-CV ordering placed {order.index[0]} first, followed by "
+                f"{join(order.index[1:4])}; the means of the leading models lay within "
+                f"{order['mean_auc'].iloc[0] - order['mean_auc'].iloc[min(3, len(order) - 1)]:.3f} "
+                f"AUROC units of one another, smaller than the fold-to-fold standard deviation of "
+                f"{r_top['sd_auc_folds']:.3f}.")
+
+    lead_models = list(cmp_df["Model"].head(4))
+    sl = cal.loc[lead_models, "calibration_slope"]
+    off = cal[(cal["calibration_slope"] < 0.8) | (cal["calibration_slope"] > 1.2)]
+    off_txt = ""
+    if len(off):
+        parts = []
+        for m, r in off.iterrows():
+            kind = "over-dispersed" if r["calibration_slope"] < 1 else "under-dispersed"
+            parts.append(f"{m} (slope {r['calibration_slope']:.2f}, AUROC "
+                         f"{cmp_df.loc[cmp_df.Model == m, 'AUC'].iloc[0]:.3f}; {kind})")
+        off_txt = (f" Calibration did not track discrimination across the wider field: "
+                   f"{join(parts)} departed from the ideal slope by more than 0.2. A slope below 1 "
+                   f"means predicted probabilities that are too extreme, and above 1 too timid; "
+                   f"either can coexist with acceptable ranking while giving an individual a wrong "
+                   f"absolute risk.")
+    d = N["dca"]["points"]
+    td = dca_df[dca_df.model == TOP].set_index("threshold")["net_benefit"]
+    ta = dca_df[dca_df.model == "Treat all"].set_index("threshold")["net_benefit"]
+    above = [t for t in td.index if td[t] > max(ta.get(t, -1), 0) + 1e-9]
+    pt = "0.20"
+    dca_txt = (f"Decision-curve analysis (Figure S4) showed {TOP} above both reference "
+               f"strategies at every threshold from {min(above):.2f} to {max(above):.2f}"
+               if above else f"Decision-curve analysis (Figure S4) did not show {TOP} above both "
+                             f"reference strategies at any threshold examined")
+    gain = d[pt]["net_interventions_avoided_per_1000"]
+    dca_txt += (f". At a risk threshold of 0.20 its net benefit was {d[pt]['model_nb']:.3f} against "
+                f"{d[pt]['treat_all_nb']:.3f} for treating everyone, "
+                + (f"equivalent to {gain:.0f} fewer unnecessary interventions per 1,000 adults for "
+                   f"the same number of cases found" if gain > 0 else
+                   "so at that threshold the model offers no gain over treating everyone")
+                + ".")
     ds.para(doc,
-            f"Calibration of the four leading models was close to ideal, with slopes from "
-            f"{cal.loc[tied_names, 'calibration_slope'].min():.2f} to "
-            f"{cal.loc[tied_names, 'calibration_slope'].max():.2f} against an ideal of 1.00 "
-            f"(Figure S3). Calibration did not track discrimination across the wider field, which "
-            f"AUROC alone would conceal: Random Forest reached a respectable "
-            f"{cmp_df.loc[cmp_df.Model == 'Random Forest', 'AUC'].iloc[0]:.3f} but a slope of "
-            f"{cal.loc['Random Forest', 'calibration_slope']:.2f}, and the multilayer perceptron "
-            f"({cal.loc['MLP', 'calibration_slope']:.2f}) and Naive Bayes "
-            f"({cal.loc['Naive Bayes', 'calibration_slope']:.2f}) were worse in the opposite "
-            f"direction, producing probabilities far too extreme for the evidence behind them. Any "
-            f"of these could rank participants acceptably while giving an individual a badly wrong "
-            f"absolute risk. Decision-curve analysis (Figure S4) showed the leading models above "
-            f"both reference strategies across the range of thresholds examined; at a threshold of "
-            f"0.20, {TOP} yielded a net benefit of {d['points']['0.20']['model_nb']:.3f} against "
-            f"{d['points']['0.20']['treat_all_nb']:.3f} for treat-all, equivalent to identifying "
-            f"{d['points']['0.20']['net_true_positives_per_1000']:.0f} additional true cases per "
-            f"1,000 adults screened without treating more people unnecessarily. Threshold-level "
-            f"classification metrics are given in Table S4.")
+            f"Calibration slopes of the four highest-AUROC models ranged from {sl.min():.2f} to "
+            f"{sl.max():.2f} against an ideal of 1.00 (Figure S3).{off_txt} {dca_txt} "
+            f"Threshold-level classification metrics, each with a bootstrap 95% confidence "
+            f"interval, are given in Table S4.")
 
     rows_t2 = []
     for _, r in cmp_df.iterrows():
         m = r["Model"]
-        s = N["significance"][m]
+        s = SIG[m]
         delta = ("reference" if m == TOP else
                  f"{num(s['auc_diff'], 4)} ({num(s['ci'][0], 4)} to {num(s['ci'][1], 4)})")
         rows_t2.append([("**" + m + "**") if s["tied"] else m,
                         f"{r['AUC']:.3f} ({ci(r['AUC_95CI_low'], r['AUC_95CI_high'])})",
                         f"{r['AUPRC']:.3f}", f"{r['Brier']:.4f}",
                         f"{cal.loc[m, 'calibration_slope']:.2f}",
-                        delta, "—" if m == TOP else p_txt(s["p"])])
+                        delta, "–" if m == TOP else p_txt(s["p"])])
     ds.caption(doc, "Table 2.",
                f"Discrimination and calibration on the held-out test partition (n = {f['test_n']:,}), "
-               f"ordered by AUROC. Differences are against {TOP} from a paired bootstrap of 1,000 "
-               f"resamples in which the same resampled participants were scored under both models. "
-               f"**Models in bold are statistically indistinguishable from {TOP}.**", above=True)
+               f"ordered by AUROC. Δ AUROC is {TOP} minus the model, with a paired-bootstrap 95% "
+               f"confidence interval (1,000 resamples, the same participants scored under both "
+               f"models); p is from DeLong's test for correlated ROC curves. **Models in bold are "
+               f"statistically indistinguishable from {TOP} (p ≥ 0.05).**", above=True)
     ds.add_table(doc,
                  ["Model", "AUROC (95% CI)", "AUPRC", "Brier", "Cal. slope",
                   f"Δ AUROC vs {TOP} (95% CI)", "p"],
@@ -209,48 +323,58 @@ def main():
     ds.table_note(doc,
                   "AUROC, area under the receiver operating characteristic curve; AUPRC, area under "
                   "the precision–recall curve; Cal. slope, calibration slope (1.00 = perfect). Lower "
-                  "Brier scores indicate better probabilistic accuracy.")
+                  "Brier scores indicate better probabilistic accuracy. Bootstrap 95% confidence "
+                  "intervals for AUPRC and Brier score are in 04_Results_Tables/model_comparison.csv.")
 
     ds.figure(doc, FIGP / "fig2_roc_curves.png", width_in=6.3)
+    n_t = len(tied_names)
     ds.caption(doc, "Figure 2.",
-               "Receiver operating characteristic curves on the held-out test partition. "
-               "**(A)** All eleven models, with AUROC in the legend; the four models "
-               "statistically indistinguishable from the best performer are drawn in color and the "
-               "remainder in grey. **(B)** Detail of the region of clinical interest.")
+               f"Receiver operating characteristic curves on the held-out test partition. "
+               f"**(A)** All {WORDS.get(len(cmp_df), len(cmp_df))} models, with AUROC in the legend; "
+               + (f"the {WORDS.get(n_t, n_t)} models statistically indistinguishable from the best "
+                  f"performer are drawn in color and the remainder in grey. " if n_t > 1 else
+                  "the best performer is drawn in color and the remainder in grey. ")
+               + "**(B)** Detail of the region of clinical interest.")
 
     # ==================================================================
     ds.heading(doc, "3. Predictor importance", 1)
-
-    s1, s2, s3 = shap33.nsmallest(3, "rank").itertuples()
+    s1, s2, s3 = shap_pred.nsmallest(3, "rank").itertuples()
     p1, p2, p3 = perm.nsmallest(3, "rank").itertuples()
+    shap_note = ("" if SHAP_M == TOP else
+                 f" SHAP values are computed for {SHAP_M}, the highest-AUROC tree-based model, "
+                 f"because exact tree SHAP is not available for {TOP}.")
     ds.para(doc,
-            f"Body mass index and age dominated both importance analyses (Figures 3 and 4; full "
-            f"ranking in Table S5). By mean absolute SHAP value, body mass index "
-            f"({s1.mean_abs_shap:.3f}) and age ({s2.mean_abs_shap:.3f}) were followed by "
-            f"{s3.clinical_name.lower()} at {s3.mean_abs_shap:.3f}, a fivefold drop from second to "
-            f"third. The gap was starker by permutation importance, where removing body mass index "
-            f"cost {p1.perm_importance_mean:.3f} AUROC units and age "
-            f"{p2.perm_importance_mean:.3f}, against {p3.perm_importance_mean:.4f} for the "
-            f"third-ranked predictor. Between them these two account for nearly all of the model's "
-            f"discriminatory capacity; everything else adjusts risk at the margin.")
+            f"Two predictors dominated both importance analyses for {SHAP_M} (Figures 3 and 4; full "
+            f"ranking in Table S5).{shap_note} By mean absolute SHAP value, "
+            f"{s1.clinical_name.split(' (')[0].lower()} ({s1.mean_abs_shap:.3f}) and "
+            f"{s2.clinical_name.split(' (')[0].lower()} ({s2.mean_abs_shap:.3f}) were followed by "
+            f"{s3.clinical_name.split(' (')[0].lower()} at {s3.mean_abs_shap:.3f}, a "
+            f"{s2.mean_abs_shap / s3.mean_abs_shap:.1f}-fold drop from second to third. By "
+            f"permutation importance, randomly shuffling "
+            f"{p1.clinical_name.split(' (')[0].lower()} cost {p1.perm_importance_mean:.3f} AUROC "
+            f"units and {p2.clinical_name.split(' (')[0].lower()} {p2.perm_importance_mean:.3f}, "
+            f"against {p3.perm_importance_mean:.4f} for the third-ranked predictor. Everything "
+            f"else adjusts risk at the margin; Table S8 shows what this means for the model as a "
+            f"whole.")
 
+    mi = N["missingness_indicator_shap"]
+    mi_named = [x["name"].replace(" missing (imputed)", "").replace(" (missing)", "").lower()
+                for x in mi if x["mean_abs_shap"] >= 0.01]
     ds.para(doc,
             f"The two methods agreed only moderately below the top of the ranking (Spearman "
             f"ρ = {N['spearman_shap_perm']:.2f} across {N['n_predictors_ranked']} predictors; "
-            f"Figure 4A). Disagreement of this kind is expected rather than anomalous: mean "
-            f"absolute SHAP measures how far a predictor moves individual predictions, whereas "
-            f"permutation importance measures how much ranking performance degrades when that "
-            f"predictor is destroyed, so a predictor substitutable by correlated predictors scores "
-            f"well on the first and poorly on the second. Reporting either alone would have "
-            f"supported a confident but method-dependent account of which exposures matter. Two "
-            f"missingness indicators also carried non-trivial SHAP weight — whether average daily "
-            f"alcohol consumption and whether the income-to-poverty ratio were recorded — which are "
-            f"artifacts of questionnaire structure rather than biological signal and are excluded "
-            f"from the predictor ranking.")
+            f"Figure 4A). Disagreement of this kind is expected: mean absolute SHAP measures how far "
+            f"a predictor moves individual predictions, whereas permutation importance measures how "
+            f"much ranking performance degrades when that predictor is scrambled, so a predictor "
+            f"that correlated predictors can substitute for scores well on the first and poorly on "
+            f"the second."
+            + (f" Missing-value indicators for {join(mi_named)} also carried SHAP weight of at "
+               f"least 0.01; these describe questionnaire structure rather than biology and are "
+               f"kept out of the predictor ranking." if mi_named else ""))
 
     ds.figure(doc, FIGP / "fig6_shap_beeswarm.png", width_in=5.9)
     ds.caption(doc, "Figure 3.",
-               f"SHAP summary plot for the {TOP} model on the held-out test partition, showing the "
+               f"SHAP summary plot for the {SHAP_M} model on the held-out test partition, showing the "
                f"18 highest-ranked features. Each point is one participant; horizontal position is "
                f"that feature's contribution to that participant's predicted log-odds of metabolic "
                f"syndrome, and color encodes the feature's value from low (blue) to high "
@@ -258,156 +382,185 @@ def main():
 
     # ==================================================================
     ds.heading(doc, "4. Blood metals", 1)
-
     mr = N["metal_ranks"]
-    pb, cd, se, hg, mn = (mr["LBXBPB"], mr["LBXBCD"], mr["LBXBSE"], mr["LBXTHG"], mr["LBXBMN"])
+    npr = N["n_predictors_ranked"]
 
     def span(m):
-        v = list(m["per_model_perm_rank"].values())
+        v = list(mr[m]["per_model_perm_rank"].values())
         return f"{min(v)}–{max(v)}"
 
-    gaps = {k: abs(v["shap_rank"] - v["perm_rank"]) for k, v in mr.items()}
-    worst = max(gaps, key=gaps.get)
-    worst_name = mr[worst]["clinical_name"].split(" (")[0].replace("Blood ", "").replace(", total", "")
-
+    by_shap = sorted(METALS, key=lambda m: mr[m]["shap_rank"])
+    by_perm = sorted(METALS, key=lambda m: mr[m]["perm_rank"])
+    gaps = {m: abs(mr[m]["shap_rank"] - mr[m]["perm_rank"]) for m in METALS}
+    widest = max(gaps, key=gaps.get)
+    closest = min(gaps, key=gaps.get)
     ds.para(doc,
-            f"All five metals ranked in the middle or lower portion of the ordering, well below "
-            f"body mass index and age but above several demographic and lifestyle covariates. Their "
-            f"relative standing depended sharply on which importance method was used, and that "
-            f"method-dependence is itself the substantive observation; the precise ordering it "
-            f"produces is not. Cadmium was the highest-ranked metal by SHAP (rank {cd['shap_rank']} "
-            f"of {N['n_predictors_ranked']}) but fell to {cd['perm_rank']} by permutation "
-            f"importance, a gap of {gaps['LBXBCD']} places; the widest gap among the metals belonged "
-            f"to {worst_name} ({mr[worst]['shap_rank']} versus {mr[worst]['perm_rank']}). Lead "
-            f"showed the opposite pattern, ranking {pb['shap_rank']} and {pb['perm_rank']} — close "
-            f"agreement between methods, and the only metal of the five in the permutation-importance "
-            f"top ten.")
+            f"The five metals ranked between {min(min(mr[m]['shap_rank'], mr[m]['perm_rank']) for m in METALS)} "
+            f"and {max(max(mr[m]['shap_rank'], mr[m]['perm_rank']) for m in METALS)} of {npr} "
+            f"predictors, and their order depended on the importance method. By SHAP the "
+            f"highest-ranked metal was {MNAME[by_shap[0]]} (rank {mr[by_shap[0]]['shap_rank']}); by "
+            f"permutation importance it was {MNAME[by_perm[0]]} (rank {mr[by_perm[0]]['perm_rank']}). "
+            f"The widest disagreement belonged to {MNAME[widest]} ({mr[widest]['shap_rank']} by "
+            f"SHAP versus {mr[widest]['perm_rank']} by permutation), and the closest agreement to "
+            f"{MNAME[closest]} ({mr[closest]['shap_rank']} versus {mr[closest]['perm_rank']}).")
 
+    lead4 = list(mr["LBXBPB"]["per_model_perm_rank"].keys())
+    stable = sorted(METALS, key=lambda m: (max(mr[m]["per_model_perm_rank"].values())
+                                           - min(mr[m]["per_model_perm_rank"].values())))
+    signal = [m for m in METALS if m in psd and psd[m][0] > psd[m][1]]
+    nosig = [m for m in METALS if m not in signal]
     ds.para(doc,
-            f"Agreement across independently fitted models tells the same story more decisively "
-            f"(Figure 4B). Lead was the most stable, ranking {span(pb)} across the four leading "
-            f"models and appearing in the top ten of every one. Selenium ranked {span(se)}, cadmium "
-            f"{span(cd)}, manganese {span(mn)} and mercury {span(hg)}, the widest swing of any "
-            f"predictor examined. Averaged across models, neither cadmium nor mercury nor manganese "
-            f"placed among the fifteen highest-ranked predictors. The permutation analysis also "
-            f"carries its own uncertainty, and reading the metal ordering without it would overstate "
-            f"what the data support: across ten permutations only lead "
-            f"({psd['LBXBPB'][0]:.5f} ± {psd['LBXBPB'][1]:.5f}) and selenium "
-            f"({psd['LBXBSE'][0]:.5f} ± {psd['LBXBSE'][1]:.5f}) had mean importances exceeding "
-            f"their own standard deviation, whereas for cadmium, manganese and mercury the mean was "
-            f"smaller than the run-to-run variability. The defensible statement is narrower than a "
-            f"rank list: lead and selenium carry permutation signal distinguishable from noise, and "
-            f"the other three do not.")
+            f"Across the {WORDS.get(len(lead4), len(lead4))} highest-AUROC models, each fitted and "
+            f"permuted independently (Figure 4B), permutation ranks were "
+            + join(f"{MNAME[m]} {span(m)}" for m in stable)
+            + f", from most to least stable. The permutation analysis carries its own "
+            f"uncertainty: across ten shuffles, "
+            + (f"only {join(f'{MNAME[m]} ({psd[m][0]:.5f} ± {psd[m][1]:.5f})' for m in signal)} "
+               f"had a mean importance larger than its own standard deviation, whereas for "
+               f"{join(MNAME[m] for m in nosig)} the mean was smaller than the shuffle-to-shuffle "
+               f"variability." if signal and nosig else
+               "every metal had a mean importance larger than its own standard deviation."
+               if signal else "no metal had a mean importance larger than its own standard "
+                              "deviation.")
+            + " The defensible statement is therefore narrower than a rank list.")
 
     md = N["metals_dependence"]
-    se_c, se_v = md["LBXBSE"]["binned_centers"], md["LBXBSE"]["binned_mean_shap"]
-    se_cross = next((c for c, v in zip(se_c, se_v) if v > 0), None)
-    pb_c, pb_v = md["LBXBPB"]["binned_centers"], md["LBXBPB"]["binned_mean_shap"]
-    cd_v = md["LBXBCD"]["binned_mean_shap"]
-    mn_v = md["LBXBMN"]["binned_mean_shap"]
-    pb_last_pos = max((c for c, v in zip(pb_c, pb_v) if v > 0), default=None)
-
+    descr = []
+    for m in METALS:
+        c, v = md[m]["binned_centers"], md[m]["binned_mean_shap"]
+        sh = shape_of(c, v)
+        if sh == "flat":
+            descr.append(f"{MNAME[m]} was essentially flat (binned means {num(min(v))} to "
+                         f"{num(max(v))})")
+        else:
+            descr.append(f"{MNAME[m]} was {sh}, from {num(v[0])} in the lowest bin to "
+                         f"{num(v[-1])} in the highest (range {num(min(v))} to {num(max(v))})")
+    pb_v = md["LBXBPB"]["binned_mean_shap"]
+    pb_shape = shape_of(md["LBXBPB"]["binned_centers"], pb_v)
     ds.para(doc,
-            f"The shape of each metal's contribution is shown in Figure 5. Selenium was the only one "
-            f"to rise monotonically across essentially its whole range, moving from "
-            f"{num(se_v[0])} in the lowest bin, crossing zero at approximately {se_cross:.0f} µg/L "
-            f"and reaching {num(max(se_v))} in the highest — the largest positive contribution of "
-            f"any metal. Cadmium was U-shaped, contributing positively at both the lowest "
-            f"({num(cd_v[0])}) and highest ({num(cd_v[-1])}) concentrations with a trough of "
-            f"{num(min(cd_v))} between. Lead ran opposite to the conventional expectation, "
-            f"contributing positively only up to about {pb_last_pos:.1f} µg/dL and then declining "
-            f"to {num(min(pb_v))} in the highest bin. Mercury declined similarly, and manganese was "
-            f"flat throughout, every binned mean falling between {num(min(mn_v))} and "
-            f"{num(max(mn_v))}.")
-
-    ds.para(doc,
-            "The inverse gradient for lead deserves emphasis rather than quiet omission, because it "
-            "runs against the hypothesis that motivated the analysis. In a cross-sectional model "
-            "adjusted for body mass index, age and socioeconomic position, higher blood lead was "
-            "associated with a lower predicted probability of metabolic syndrome. This is an "
-            "associational pattern within one fitted model, not an estimate of a causal effect; "
-            "residual confounding by smoking, which raises blood cadmium and lead while being "
-            "associated with lower body mass index, is one plausible explanation among several, and "
-            "adiposity-related dilution of blood metal concentrations is another. Disentangling "
-            "these is what the Mendelian randomization component is designed to do, and the "
-            "direction observed here should be read as a question posed to that analysis rather "
-            "than an answer from this one.")
+            f"The shape of each metal's contribution is shown in Figure 5, as the mean SHAP value "
+            f"within twelve equal-count bins of the exposure: " + "; ".join(descr) + ". These are "
+            f"contributions to the predicted log-odds within one fitted model, adjusted for "
+            f"everything else the model contains, and they are an order of magnitude smaller than "
+            f"those of body mass index and age.")
+    if pb_v[-1] < pb_v[0]:
+        ds.para(doc,
+                "The lower predicted risk at the highest blood lead concentrations deserves "
+                "emphasis rather than quiet omission, because it runs against the hypothesis that "
+                "motivated the analysis. It is an associational pattern within one model, not an "
+                "estimate of a causal effect. Residual confounding by smoking, which raises blood "
+                "lead and cadmium and is associated with lower body mass index, is one plausible "
+                "explanation, and dilution of blood metal concentrations with greater body size "
+                "is another. Separating these is what the Mendelian randomization component is "
+                "designed to do, and the direction observed here is a question posed to that "
+                "analysis rather than an answer from this one.")
 
     ds.figure(doc, FIGP / "fig7_importance_concordance.png", width_in=5.7)
     ds.caption(doc, "Figure 4.",
                f"Agreement between importance methods and across models. **(A)** Rank by mean "
-               f"absolute SHAP value against rank by permutation importance for the {TOP} model; "
+               f"absolute SHAP value against rank by permutation importance for the {SHAP_M} model; "
                f"the five blood metals are highlighted and the diagonal denotes perfect agreement. "
                f"**(B)** Permutation-importance rank of the fifteen highest-ranked predictors in "
-               f"each of the four leading models, fitted independently. A predictor whose row is "
-               f"uniform is important as a property of the data; one whose row varies is important "
-               f"as a property of a particular fitted model. " + gloss("fig7_importance_concordance"))
+               f"each of the four highest-AUROC models, fitted independently. A predictor whose row "
+               f"is uniform is important as a property of the data; one whose row varies is "
+               f"important as a property of a particular fitted model. "
+               + gloss("fig7_importance_concordance"))
 
     ds.figure(doc, FIGP / "fig8_metals_shap_dependence.png", width_in=6.3)
     ds.caption(doc, "Figure 5.",
-               f"SHAP dependence for the five blood metals in the {TOP} model on the held-out test "
-               f"partition. Each grey point is one participant; the orange line joins mean SHAP "
-               f"values within duodeciles of the exposure distribution, and the dashed line at zero "
+               f"SHAP dependence for the five blood metals in the {SHAP_M} model on the held-out "
+               f"test partition. Each grey point is one participant; the orange line joins mean SHAP "
+               f"values within twelve equal-count bins of the exposure, and the dashed line at zero "
                f"marks no contribution to the predicted log-odds. Axes are truncated at the 1st and "
                f"98th percentiles. Selenium and manganese are based on the "
                f"{md['LBXBSE']['n_observed']:,} test participants from cycles in which those "
                f"analytes were assayed. " + gloss("fig8_metals_shap_dependence"))
 
     # ==================================================================
-    ds.heading(doc, "5. Subgroup performance and sensitivity analyses", 1)
+    ds.heading(doc, "5. Incremental value, subgroups and sensitivity analyses", 1)
+    full = inc.loc["full"]
+    nm, lo_, nb, ab = inc.loc["no_metals"], inc.loc["lead_only"], inc.loc["no_bmi"], inc.loc["age_bmi_lr"]
+
+    def dtxt(r):
+        return (f"{num(r['delta_vs_full'], 4)} (95% CI {num(r['delta_ci_low'], 4)} to "
+                f"{num(r['delta_ci_high'], 4)}; {p_eq(r['delong_p'])})")
+    ds.para(doc,
+            f"Table S8 tests directly what the metals add. Refitting {full['algorithm']} with its "
+            f"tuned settings but without the five metals changed test-set AUROC from "
+            f"{full['test_auc']:.3f} to {nm['test_auc']:.3f}, a difference of {dtxt(nm)}; keeping "
+            f"lead as the only metal gave {lo_['test_auc']:.3f}, {dtxt(lo_)}. Removing body mass "
+            f"index instead gave {nb['test_auc']:.3f}, {dtxt(nb)}, and a logistic regression on age "
+            f"and body mass index alone reached {ab['test_auc']:.3f}, {dtxt(ab)}. "
+            + ("On this test set the metals' contribution to discrimination is not distinguishable "
+               "from zero. " if nm["delong_p"] >= 0.05 else
+               "The metals make a statistically detectable but small contribution to "
+               "discrimination. ")
+            + "Their importance ranks describe attribution within a fitted model, not predictive "
+            "value that would be lost without them.")
 
     ov = sg[sg.subgroup == "Overall"].iloc[0]
-    old = sg[sg.subgroup.str.startswith("Age >")].iloc[0]
-    yng = sg[sg.subgroup.str.startswith("Age 20")].iloc[0]
-    mid = sg[sg.subgroup.str.startswith("Age 41")].iloc[0]
-    fem = sg[sg.subgroup == "Female"].iloc[0]
+    sub = sg[sg.subgroup != "Overall"]
+    worst_sg = sub.loc[sub["auc"].idxmin()]
+    best_sg = sub.loc[sub["auc"].idxmax()]
+    below = sub[sub["ci_high"] < ov["ci_low"]]
+    mis = sub[(sub["slope_ci_high"] < 1) | (sub["slope_ci_low"] > 1) |
+              (sub["oe_ci_high"] < 1) | (sub["oe_ci_low"] > 1)]
+    age_sg = sub[sub.subgroup.str.startswith("Age")]
     ds.para(doc,
-            f"Discrimination was stable across sex and race/ethnicity but deteriorated markedly with "
-            f"age (Table S6, Figure S5). Against an overall test-set AUROC of {ov['auc']:.3f} "
-            f"({ci(ov['ci_low'], ov['ci_high'])}), the oldest tertile reached {old['auc']:.3f} "
-            f"({ci(old['ci_low'], old['ci_high'])}), an interval lying entirely below that of the "
-            f"youngest tertile ({yng['auc']:.3f}, {ci(yng['ci_low'], yng['ci_high'])}). Within a "
-            f"single age tertile the range of age is compressed to about two decades, so the "
-            f"model's second most important predictor can no longer separate participants within "
-            f"that stratum, and a prevalence of {old['prevalence_pct']:.1f}% leaves few negatives "
-            f"to rank against. Calibration behaved differently: only the middle tertile departed "
-            f"detectably from ideal on both statistics (slope {mid['calibration_slope']:.2f}, "
-            f"{ci(mid['slope_ci_low'], mid['slope_ci_high'])}; observed-to-expected "
-            f"{mid['observed_expected_ratio']:.3f}, {ci(mid['oe_ci_low'], mid['oe_ci_high'])}), "
-            f"with women showing a smaller over-prediction "
-            f"({fem['observed_expected_ratio']:.3f}, {ci(fem['oe_ci_low'], fem['oe_ci_high'])}); in "
-            f"the oldest tertile predicted risk was accurate in aggregate "
-            f"({old['observed_expected_ratio']:.3f}, {ci(old['oe_ci_low'], old['oe_ci_high'])}). "
-            f"These are descriptive screens over {len(sg) * 2} intervals without multiplicity "
-            f"adjustment. The model is therefore least useful for ranking precisely the group with "
-            f"the highest absolute burden, while still stating that group's average risk correctly.")
+            f"Against an overall test-set AUROC of {ov['auc']:.3f} "
+            f"({ci(ov['ci_low'], ov['ci_high'])}), subgroup AUROC ranged from {worst_sg['auc']:.3f} "
+            f"in {worst_sg['subgroup'].lower().replace('age', 'the age band')} "
+            f"({ci(worst_sg['ci_low'], worst_sg['ci_high'])}) to {best_sg['auc']:.3f} in "
+            f"{best_sg['subgroup'].lower().replace('age', 'the age band')} (Table S6, Figure S5)"
+            + (f"; the interval for {join(b.lower() for b in below['subgroup'])} lay entirely below "
+               f"the overall interval" if len(below) else "")
+            + ". Within an age band the range of age is compressed, so the model's second most "
+            f"important predictor separates participants less well there; prevalence across the "
+            f"age bands ran from {age_sg['prevalence_pct'].min():.1f}% to "
+            f"{age_sg['prevalence_pct'].max():.1f}%. "
+            + (f"Calibration departed detectably from ideal (slope or observed-to-expected ratio "
+               f"interval excluding 1) in {join(mis['subgroup'].str.lower())}. " if len(mis) else
+               "No subgroup's calibration slope or observed-to-expected ratio interval excluded 1. ")
+            + f"These are descriptive screens over {len(sg) * 2} intervals without multiplicity "
+            f"adjustment.")
 
+    if len(temporal):
+        rs = temporal.iloc[0]; tv = temporal.iloc[1]
+        ds.para(doc,
+                f"In temporal validation (Table S10), {tv['Model']} re-tuned and developed on the "
+                f"2007–2014 cycles (n = {int(tv['Train n']):,}) reached an AUROC of "
+                f"{tv['Test AUROC']:.3f} ({ci(tv['AUROC 95% CI low'], tv['AUROC 95% CI high'])}) on "
+                f"the 2015–2018 cycles (n = {int(tv['Test n']):,}), against "
+                f"{rs['Test AUROC']:.3f} for the random split. Its calibration slope was "
+                f"{tv['Calibration slope']:.2f} and its calibration-in-the-large "
+                f"{num(tv['Calibration intercept (in-the-large)'], 3)}, with an observed-to-expected "
+                f"ratio of {tv['O:E ratio']:.3f}.")
+
+    so = s_out.set_index("model")
+    d_lab = (so["cv_auc_labonly_label"] - so["cv_auc_harmonized_label"])
+    d_nol = (so["cv_auc_nolipidmed_label"] - so["cv_auc_harmonized_label"])
+    d_bpf = (so["cv_auc_bpfirst_label"] - so["cv_auc_harmonized_label"])
+
+    def rng(sr, dp=4):
+        return f"{num(sr.min(), dp)} to {num(sr.max(), dp)}".replace("+", "")
     ds.para(doc,
-            f"Results of the four prespecified sensitivity analyses are given in Table S7. Adding "
-            f"physician-diagnosed diabetes raised cross-validated discrimination by "
-            f"{s_diq['delta'].min():.4f} to {s_diq['delta'].max():.4f} AUROC units, as expected for "
-            f"a variable partly downstream of the glucose component. Replacing SMOTENC with class "
-            f"weighting changed discrimination by at most {s_smo['delta'].abs().max():.4f} units, "
-            f"confirming that the imbalance strategy is immaterial at this near-balanced prevalence. "
-            f"Substituting the measured-value-only outcome definition lowered discrimination by "
-            f"{s_out['delta'].min():.4f} to {s_out['delta'].max():.4f} units, the largest effect of "
-            f"the four. The metal-panel analysis produced the most consequential result: restricting "
-            f"the panel to blood lead alone and discarding cadmium, mercury, selenium and manganese "
-            f"changed discrimination by between {s_met['delta'].min():+.4f} and "
-            f"{s_met['delta'].max():+.4f} units — marginally upward in all three models, not "
-            f"downward. Deltas this small sit within run-to-run variability of the "
-            f"cross-validation and carry no confidence intervals, so this is an "
-            f"absence of detectable contribution rather than a demonstration of exactly zero. The "
-            f"four additional metals add nothing measurable to discrimination: the ranking "
-            f"positions they occupy reflect within-model attribution, not predictive value that "
-            f"would be lost by removing them. No arm removed lead itself, so its own incremental "
-            f"contribution was not tested by this design.")
+            f"Sensitivity analyses are given in Table S7 (cross-validated AUROC on the training "
+            f"partition, {join(list(s_diq['model']))} at their tuned settings). Adding "
+            f"physician-diagnosed diabetes changed discrimination by {rng(s_diq['delta'])} AUROC "
+            f"units, as expected for a variable partly downstream of the glucose component. "
+            f"Replacing SMOTENC with class weighting changed it by {rng(s_smo['delta'])}. The "
+            f"measured-value-only outcome changed it by {rng(d_lab)}, dropping the lipid-medication "
+            f"clause by {rng(d_nol)} (prevalence {so['nolipidmed_prevalence_pct'].iloc[0]:.1f}% "
+            f"instead of {so['harmonized_prevalence_pct'].iloc[0]:.1f}%), and using only the first "
+            f"blood-pressure reading by {rng(d_bpf)}. Restricting the metal panel to lead changed "
+            f"it by {rng(s_met['delta'])}. Differences of a few thousandths sit within the "
+            f"fold-to-fold variability shown in Table S9.")
 
     path = OUT / "Manuscript_Results_AI.docx"
     # Convert break-only paragraphs into page_break_before on the following
     # block, so a section that happens to end on a page boundary cannot leave
     # a blank page behind it.
-    n_breaks = ds.normalize_page_breaks(doc)
+    ds.normalize_page_breaks(doc)
     doc.save(path)
     print(f"Saved: {path}")
     print(f"paragraphs={len(doc.paragraphs)} tables={len(doc.tables)}")

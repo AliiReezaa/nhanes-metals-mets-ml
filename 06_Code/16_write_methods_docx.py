@@ -129,7 +129,7 @@ def main():
     ds.para(doc,
             f"Predictors were specified in advance from the metabolic-syndrome and metal-toxicity "
             f"literature, across four domains. The **blood-metal panel** is lead, cadmium, total "
-            f"mercury, selenium and manganese — the analytes measured together in the NHANES "
+            f"mercury, selenium and manganese, the analytes measured together in the NHANES "
             f"whole-blood assay and the panel used in prior NHANES analyses of metals and metabolic "
             f"syndrome {cite('bulka')}. **Demographic and socioeconomic** predictors (age, sex, "
             f"race/ethnicity, education, marital status, household size, income-to-poverty ratio, "
@@ -142,8 +142,8 @@ def main():
             f"source variables.")
 
     ds.para(doc,
-            f"No data-driven selection procedure — stepwise regression or the least absolute "
-            f"shrinkage and selection operator — was used in this phase. Selection algorithms run on "
+            f"No data-driven selection procedure (stepwise regression or the least absolute "
+            f"shrinkage and selection operator) was used in this phase. Selection algorithms run on "
             f"a fixed dataset produce model-selection instability, biased effect estimates and "
             f"confidence intervals whose nominal coverage fails, so the surviving set partly reflects "
             f"a stochastic screening step rather than which variables matter {cite('heinze')}. Since "
@@ -156,8 +156,8 @@ def main():
     r = coll.iloc[0]
     ds.para(doc,
             f"Two candidates were removed prospectively. Hip circumference was excluded on training-"
-            f"partition grounds — correlation {r['pearson_r']:.3f} with body mass index and "
-            f"{r['pct_missing_var_1_train']:.1f}% missing — so it adds imputation burden while "
+            f"partition grounds: correlation {r['pearson_r']:.3f} with body mass index and "
+            f"{r['pct_missing_var_1_train']:.1f}% missing, so it adds imputation burden while "
             f"splitting importance with a near-identical retained variable. Physician-diagnosed "
             f"diabetes was held out as partly downstream of the glucose component and reintroduced "
             f"only in sensitivity analysis. Three items needed harmonization or skip-pattern "
@@ -231,8 +231,8 @@ def main():
     ds.para(doc,
             f"Continuous predictors were median-imputed and standardized; binary, ordinal and "
             f"one-hot columns were mode-imputed and left on their original scale. Standardization is "
-            f"required because the model set includes distance- and kernel-based learners — "
-            f"k-nearest neighbors, the support vector machine and the multilayer perceptron — whose "
+            f"required because the model set includes distance- and kernel-based learners ("
+            f"k-nearest neighbors, the support vector machine and the multilayer perceptron) whose "
             f"objectives are not scale-invariant, so an unscaled predictor measured in hundreds "
             f"(selenium, µg/L) would dominate the distance metric over one measured in units. Tree "
             f"ensembles are invariant to monotone rescaling and are unaffected, so one shared "
@@ -287,7 +287,7 @@ def main():
             f"Calibration was assessed with quantile-binned curves, the Brier score, the calibration "
             f"slope, the calibration-in-the-large intercept and the observed-to-expected ratio, "
             f"because a model can rank well while misstating absolute "
-            f"risk — the failure that matters if a predicted probability reaches a clinician "
+            f"risk, the failure that matters if a predicted probability reaches a clinician "
             f"{cite('vancalster')}. Clinical utility was assessed by decision-curve analysis against "
             f"treat-all and treat-none strategies over threshold probabilities from 2% to 80% "
             f"{cite('vickers')}.")
@@ -300,8 +300,8 @@ def main():
             f"permutations of each column, with the standard deviation retained so rank differences "
             f"can be read against the noise producing them, in the permutation framework of "
             f"{cite('altmann')}. The two measure "
-            f"different things — how far a predictor moves individual predictions, versus how much "
-            f"ranking performance depends on it — so a predictor substitutable by correlated "
+            f"different things, how far a predictor moves individual predictions, versus how much "
+            f"ranking performance depends on it, so a predictor substitutable by correlated "
             f"predictors scores high on the first and low on the second, and both are reported. SHAP "
             f"runs on the {n_cols}-column transformed matrix and permutation importance on the "
             f"{n_pred} original columns, so SHAP importances are ranked among those {n_pred} "

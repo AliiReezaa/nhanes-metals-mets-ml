@@ -219,8 +219,8 @@ def build_mets_status(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def report_outcome_definition_impact(df: pd.DataFrame) -> pd.DataFrame:
-    """Quantifies exactly how much the medication-adjusted fix changes the
-    outcome label, instead of just asserting that it matters."""
+    """Quantifies how much the drug-treatment clause, and each sensitivity
+    variant of the definition, changes the outcome label."""
     n = len(df)
     n_pos_old = int(df["mets_status_labonly"].sum())
     n_pos_new = int(df[cfg.OUTCOME_VAR].sum())
@@ -228,16 +228,23 @@ def report_outcome_definition_impact(df: pd.DataFrame) -> pd.DataFrame:
     n_reclass_to_positive = int(((df["mets_status_labonly"] == 0) & (df[cfg.OUTCOME_VAR] == 1)).sum())
     n_reclass_to_negative = int(((df["mets_status_labonly"] == 1) & (df[cfg.OUTCOME_VAR] == 0)).sum())
 
+    n_nolip = int(df["mets_status_nolipidmed"].sum())
+    n_bpf = int(df["mets_status_bpfirst"].sum())
     rows = [
-        {"definition": "lab_only (original pipeline)", "n": n, "n_positive": n_pos_old,
+        {"definition": "lab_only (measured values only)", "n": n, "n_positive": n_pos_old,
          "prevalence_pct": round(100 * n_pos_old / n, 2)},
-        {"definition": "harmonized (this fix: + drug-treatment clause)", "n": n, "n_positive": n_pos_new,
-         "prevalence_pct": round(100 * n_pos_new / n, 2)},
+        {"definition": "harmonized (measured value or drug treatment; primary)", "n": n,
+         "n_positive": n_pos_new, "prevalence_pct": round(100 * n_pos_new / n, 2)},
+        {"definition": "harmonized without the lipid-medication clause (sensitivity)", "n": n,
+         "n_positive": n_nolip, "prevalence_pct": round(100 * n_nolip / n, 2)},
+        {"definition": "harmonized with the first blood-pressure reading only (sensitivity)", "n": n,
+         "n_positive": n_bpf, "prevalence_pct": round(100 * n_bpf / n, 2)},
     ]
     summary = pd.DataFrame(rows)
-    summary["n_reclassified_negative_to_positive"] = [np.nan, n_reclass_to_positive]
-    summary["n_reclassified_positive_to_negative"] = [np.nan, n_reclass_to_negative]
-    summary["n_on_any_relevant_medication"] = [np.nan, int((df["on_bp_med"] | df["on_lipid_med"] | df["on_glu_med"]).sum())]
+    summary["n_reclassified_negative_to_positive"] = [np.nan, n_reclass_to_positive, np.nan, np.nan]
+    summary["n_reclassified_positive_to_negative"] = [np.nan, n_reclass_to_negative, np.nan, np.nan]
+    summary["n_on_any_relevant_medication"] = [
+        np.nan, int((df["on_bp_med"] | df["on_lipid_med"] | df["on_glu_med"]).sum()), np.nan, np.nan]
 
     out_path = cfg.OUT_METRICS / "outcome_definition_comparison.csv"
     summary.to_csv(out_path, index=False)
